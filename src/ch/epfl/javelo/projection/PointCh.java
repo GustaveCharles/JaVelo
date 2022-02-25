@@ -1,10 +1,7 @@
-package ch.epfl.javelo;
-
-import ch.epfl.javelo.projection.Ch1903;
-import ch.epfl.javelo.projection.SwissBounds;
+package ch.epfl.javelo.projection;
 
 /**
- * @throws IllegalArgumentException if the coordinates e and n are included in the swiss territory
+ * @throws IllegalArgumentException if the coordinates e and n are not included in the swiss territory
  */
 public record PointCh(double e, double n) {
     public PointCh{
