@@ -25,7 +25,7 @@ public final class WebMercator {
 
     public static double y(double lat){
 
-        double Y = (Math.PI - Math2.asinh(Math.tan(lat)));
+        double Y = (Math.PI - Math2.asinh(Math.tan(lat))) / (2*Math.PI);
 
         return Y;
     }
@@ -39,15 +39,14 @@ public final class WebMercator {
 
         double lon = 2*Math.PI*x - Math.PI;
 
-        return Math.round(Math.toDegrees(lon)); // verifier avec un assistant si c est bon de faire math.round
-                                                // et math.todegree
+        return lon;
     }
 
     public static double lat(double y){
 
         double lat = Math.atan(Math.sinh(Math.PI - 2*Math.PI*y));
 
-        return Math.round(Math.toDegrees(lat));
+        return lat;
     }
 
 }

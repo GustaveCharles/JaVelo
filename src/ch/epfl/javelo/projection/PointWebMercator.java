@@ -3,6 +3,7 @@ package ch.epfl.javelo.projection;
 
 import ch.epfl.javelo.projection.PointCh;
 
+
 public record PointWebMercator(double x, double y) {
 
     /**
@@ -17,8 +18,8 @@ public record PointWebMercator(double x, double y) {
     }
 
     public static PointWebMercator of(int zoomLevel, double x, double y){
-       double X = x*Math.pow(2,-(8+zoomLevel));
-       double Y = y*Math.pow(2,-(8+zoomLevel));
+       double X = Math.scalb(x,8+zoomLevel);
+       double Y = Math.scalb(y,8+zoomLevel);
         return new PointWebMercator(X,Y);
     }
 
@@ -30,22 +31,22 @@ public record PointWebMercator(double x, double y) {
     }
 
     public double xAtZoomLevel(int zoomLevel){
-        return Math.round(x*Math.pow(2,8+zoomLevel));
+        return Math.round(Math.scalb(this.x,8+zoomLevel));
     }
 
     public double yAtZoomLevel(int zoomLevel){
-        return Math.round(y*Math.pow(2,8+zoomLevel));
+        return Math.round(Math.scalb(this.y,8+zoomLevel));
     }
 
     public double lon(){
-       return WebMercator.lon(x);
+       return WebMercator.lon(this.x);
     }
 
-    double lat(){
-       return WebMercator.lat(y);
+    public double lat(){
+       return WebMercator.lat(this.y);
     }
 
-    PointCh toPointCh(){
+    public PointCh toPointCh(){
         double e= Ch1903.e(lon(), lat());
         double n = Ch1903.n(lon(),lat());
         if(!SwissBounds.containsEN(e,n)){
