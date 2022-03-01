@@ -25,7 +25,7 @@ public record PointWebMercator(double x, double y) {
     public static PointWebMercator ofPointCh(PointCh pointCh){
        double X = WebMercator.x(pointCh.lon());
         double Y = WebMercator.y(pointCh.lat());
-        
+
         return new PointWebMercator(X,Y);
     }
 

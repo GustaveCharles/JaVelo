@@ -39,14 +39,15 @@ public final class WebMercator {
 
         double lon = 2*Math.PI*x - Math.PI;
 
-        return lon;
+        return Math.round(Math.toDegrees(lon)); // verifier avec un assistant si c est bon de faire math.round
+                                                // et math.todegree
     }
 
     public static double lat(double y){
 
         double lat = Math.atan(Math.sinh(Math.PI - 2*Math.PI*y));
 
-        return lat;
+        return Math.round(Math.toDegrees(lat));
     }
 
 }
