@@ -1,8 +1,11 @@
 package ch.epfl.javelo.projection;
 
-
-import ch.epfl.javelo.projection.PointCh;
-
+/**
+ * represents a point in the Web Mercator system
+ *
+ * @author Gustave Charles -- Saigne (345945)
+ * @author Jean Dupond (339364)
+ */
 
 public record PointWebMercator(double x, double y) {
 
@@ -17,13 +20,26 @@ public record PointWebMercator(double x, double y) {
         }
     }
 
-    public static PointWebMercator of(int zoomLevel, double x, double y){
+    /**
+     *
+     * @param zoomLevel
+     * @param x
+     * @param y
+     * @return
+     */
+    public static PointWebMercator of(int zoomLevel, double x, double y){ //probleme de test ici
        double X = Math.scalb(x,8+zoomLevel);
        double Y = Math.scalb(y,8+zoomLevel);
         return new PointWebMercator(X,Y);
     }
 
-    public static PointWebMercator ofPointCh(PointCh pointCh){
+    /**
+     *
+     * @param pointCh
+     * @return
+     */
+
+    public static PointWebMercator ofPointCh(PointCh pointCh){ //pas arrivé a bien faire le test pour cette methode
        double X = WebMercator.x(pointCh.lon());
         double Y = WebMercator.y(pointCh.lat());
 
@@ -46,6 +62,10 @@ public record PointWebMercator(double x, double y) {
        return WebMercator.lat(this.y);
     }
 
+    /**
+     * from Web Mercator coordinates to SwissBounds coordinates
+     * @return SwissBound coordinates if they are in the Swiss limits, returns null otherwise
+     */
     public PointCh toPointCh(){
         double e= Ch1903.e(lon(), lat());
         double n = Ch1903.n(lon(),lat());

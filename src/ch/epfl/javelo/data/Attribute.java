@@ -86,7 +86,7 @@ public enum Attribute {
     ICN_YES("icn", "yes"),
     NCN_YES("ncn", "yes"),
     RCN_YES("rcn", "yes"),
-    LCN_YES("lcn", "yes");
+    LCN_YES("lcn", "yes"); //1-52
 
     public static final List<Attribute> ALL = List.of(values());
     public static final int COUNT = ALL.size();

@@ -2,15 +2,19 @@ package ch.epfl.javelo.projection;
 
 /**
  * converts WGS 84 coordinates into Swiss coordinates and vice versa
+ *
+ * @author Gustave Charles -- Saigne (345945)
+ * @author Jean Dupond (339364)
  */
+
 public final class Ch1903 {
     private Ch1903(){}
 
-    /**
+    /** convert WGS 84 coordinates to Swiss coordinates
      *
-     * @param lon
-     * @param lat
-     * @return
+     * @param lon longitude of WGS84
+     * @param lat latitude of WGS84
+     * @return returns the E (east) coordinate in Swiss coordinates (meters)
      */
     public static double e(double lon, double lat){
         double lambda1 = Math.pow(10,-4)*(3600*Math.toDegrees(lon)-26782.5),
@@ -22,6 +26,12 @@ public final class Ch1903 {
         return E;
     }
 
+    /** convert WGS 84 coordinates to Swiss coordinates
+     *
+     * @param lon longitude of WGS84
+     * @param lat latitude of WGS84
+     * @return returns the N (north) coordinate in Swiss coordinates (meters)
+     */
     public static double n(double lon, double lat){
         double lambda1 = Math.pow(10,-4)*(3600*Math.toDegrees(lon)-26782.5),
                 phi = Math.pow(10,-4)*(3600*Math.toDegrees(lat)-169028.66);
@@ -33,6 +43,12 @@ public final class Ch1903 {
 
     }
 
+    /**
+     * converts Swiss coordinates to WGS 84 coordinates
+     * @param e east swiss coordinate
+     * @param n north swiss coordinate
+     * @return returns the longitude coordinate in WGS84 coordinates (radians)
+     */
     public static double lon(double e, double n){
         double y = Math.pow(10,-6)*(e-2600000);
         double x = Math.pow(10,-6)*(n-1200000);
@@ -48,6 +64,13 @@ public final class Ch1903 {
         return Math.toRadians(lambda1);
 
     }
+
+    /**
+     * converts Swiss coordinates to WGS 84 coordinates
+     * @param e east swiss coordinate
+     * @param n north swiss coordinate
+     * @return returns the latitude coordinate in WGS84 coordinates (radians)
+     */
 
     public static double lat(double e, double n){
         double y = Math.pow(10,-6)*(e-2600000);
