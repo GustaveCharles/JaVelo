@@ -2,6 +2,8 @@ package ch.epfl.javelo.data;
 
 import ch.epfl.javelo.Preconditions;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringJoiner;
 
 public record AttributeSet(long bits) {
@@ -25,7 +27,10 @@ public record AttributeSet(long bits) {
     public boolean contains(Attribute attribute) {
 
         long mask = 1L << attribute.ordinal();
-        boolean ThisContainsAttribute = (mask & this.bits) == 1;
+        System.out.println(mask);
+        System.out.println(this.bits);
+
+        boolean ThisContainsAttribute = (mask & this.bits) == mask; // ==1 ou ==mask??
 
         return ThisContainsAttribute;
     }
@@ -34,21 +39,29 @@ public record AttributeSet(long bits) {
         //long mask = 1L << that.bits ;
         //long mask1 = 1L << this.bits ;
 
-        if ((that.bits & this.bits) == 1) {
+        if ((that.bits & this.bits) == that.bits) {
             return true;
         }
         return false;
     }
 
-//    public String toString() {
-//
-//        StringJoiner j = new StringJoiner(",", "{", "}");
-//        AttributeSet set = AttributeSet.of(Attribute.ALL);
-//
-//        for (int i = 0; i <= Attribute.ALL.size(); ++i) {
-//            if ((set & Attribute.ALL) == set) {
-//                j.add(set.toString()));
-//            }
-//        }
-//    }
+    public String toString() {
+
+        StringJoiner j = new StringJoiner(",", "{", "}");
+
+
+        for (int i = 1; i <= Attribute.COUNT; i += 1) {
+
+            AttributeSet attributs = AttributeSet.of(Attribute.ALL.get(i));
+
+            long mask = 1L << this.bits ;
+            long mask1 = 1L << attributs.bits;
+
+            if ((mask & mask1) == mask) {
+                j.add(Byte.toString((byte)1));
+            }
+        }
+
+        return toString();
+    }
 }
