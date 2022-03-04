@@ -1,5 +1,7 @@
 package ch.epfl.javelo.projection;
 
+import ch.epfl.javelo.Preconditions;
+
 /**
  * represents a point in the Web Mercator system
  *
@@ -15,9 +17,7 @@ public record PointWebMercator(double x, double y) {
 
     public PointWebMercator{
 
-        if(x<0 || x>1 || y<0 || y>1){
-            throw new IllegalArgumentException();
-        }
+        Preconditions.checkArgument(x>=0 && x<=1 && y>=0 && y<=1);
     }
 
     /**
@@ -28,8 +28,8 @@ public record PointWebMercator(double x, double y) {
      * @return
      */
     public static PointWebMercator of(int zoomLevel, double x, double y){ //probleme de test ici
-       double X = Math.scalb(x,8+zoomLevel);
-       double Y = Math.scalb(y,8+zoomLevel);
+       double X = Math.scalb(x,-8-zoomLevel);
+       double Y = Math.scalb(y,-8-zoomLevel);
         return new PointWebMercator(X,Y);
     }
 

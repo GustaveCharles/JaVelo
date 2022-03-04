@@ -27,10 +27,9 @@ public record AttributeSet(long bits) {
     public boolean contains(Attribute attribute) {
 
         long mask = 1L << attribute.ordinal();
-        System.out.println(mask);
-        System.out.println(this.bits);
 
-        boolean ThisContainsAttribute = (mask & this.bits) == mask; // ==1 ou ==mask??
+
+        boolean ThisContainsAttribute = (mask & this.bits) != 0; // ==1 ou ==mask??
 
         return ThisContainsAttribute;
     }
@@ -39,7 +38,7 @@ public record AttributeSet(long bits) {
         //long mask = 1L << that.bits ;
         //long mask1 = 1L << this.bits ;
 
-        if ((that.bits & this.bits) == that.bits) {
+        if ((that.bits & this.bits) != 0) {
             return true;
         }
         return false;
@@ -49,19 +48,15 @@ public record AttributeSet(long bits) {
 
         StringJoiner j = new StringJoiner(",", "{", "}");
 
+        for (int i = 0; i <Attribute.COUNT; i += 1) {
 
-        for (int i = 1; i <= Attribute.COUNT; i += 1) {
+            Attribute attribute = Attribute.ALL.get(i);
+            if (contains(attribute)){
+                    j.add(attribute.keyValue());
 
-            AttributeSet attributs = AttributeSet.of(Attribute.ALL.get(i));
-
-            long mask = 1L << this.bits ;
-            long mask1 = 1L << attributs.bits;
-
-            if ((mask & mask1) == mask) {
-                j.add(Byte.toString((byte)1));
             }
         }
 
-        return toString();
+        return j.toString();
     }
 }
