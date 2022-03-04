@@ -29,14 +29,12 @@ public record AttributeSet(long bits) {
         long mask = 1L << attribute.ordinal();
 
 
-        boolean ThisContainsAttribute = (mask & this.bits) != 0; // ==1 ou ==mask??
+        boolean ThisContainsAttribute = (mask & this.bits) != 0;
 
         return ThisContainsAttribute;
     }
 
     public boolean intersects(AttributeSet that) {
-        //long mask = 1L << that.bits ;
-        //long mask1 = 1L << this.bits ;
 
         if ((that.bits & this.bits) != 0) {
             return true;
