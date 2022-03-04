@@ -37,22 +37,20 @@ public final class Functions {
         }
 
         return (x) -> {
-            double interval = xMax/samples.length;
+            double interval = xMax/(samples.length-1);
             double sampled = 0;
             if (x<0){
                 return samples[0];
             } else if (x>=xMax){
                 return samples[samples.length-1];
             }
-            for (int i=0; i<xMax; interval++){
-                if (i<=x && i+interval>=x){
-                    double y1 = samples[i+1];
-                    double y0 = samples[i];
-                    double xCoordinate = (x - i)/interval;
-                    sampled = Math2.interpolate(y0,y1,xCoordinate);
-                }
-            }
-            return sampled;
+
+            int i1 = (int) (x/interval);
+            double y0 = samples[i1];
+            double y1 = samples[i1 + 1];
+            double b = (x % interval) / interval;
+
+            return Math2.interpolate(y0,y1,b);
         };
     }
 

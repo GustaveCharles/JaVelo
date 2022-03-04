@@ -2,6 +2,14 @@ package ch.epfl.javelo;
 
 import static java.lang.Math.fma;
 
+/**
+ * Math functions
+ *
+ * @author Baudoin Coispeau (339364)
+ * @author Gustave Charles-Saigne (345945)
+ */
+
+
 public final class Math2 {
 
     private Math2 () {}
@@ -10,6 +18,7 @@ public final class Math2 {
      *
      * @param x
      * @param y
+     * @throws IllegalArgumentException if the x is negative, y equals 0 or y is negative
      * @return the ceil of the division of x by y
      */
     public static int ceilDiv(int x, int y){
@@ -20,6 +29,13 @@ public final class Math2 {
         }
     }
 
+    /**
+     *
+     * @param y0
+     * @param y1
+     * @param x
+     * @return the result of the function y = (y1-y0)x + y0
+     */
     public static double interpolate(double y0, double y1, double x){
         return fma(y1-y0,x,y0);
     }
@@ -29,6 +45,7 @@ public final class Math2 {
      * @param min minimum value in the range
      * @param v value evaluated
      * @param max minimum value in the range
+     * @throws IllegalArgumentException if the minimum is greater than the maximum
      * @return a value between min and max
      */
     public static int clamp(int min, int v, int max){
@@ -50,6 +67,7 @@ public final class Math2 {
      * @param min minimum value in the range
      * @param v value evaluated
      * @param max minimum value in the range
+     * @throws IllegalArgumentException if the minimum is greater than the maximum
      * @return a value between min and max
      */
     public static double clamp(double min, double v, double max){
