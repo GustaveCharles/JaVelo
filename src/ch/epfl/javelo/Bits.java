@@ -19,7 +19,7 @@ public final class Bits {
      * @param start the position of the beginning of the sequence
      * @param length the length of the sequence we want to extract
      * @throws IllegalArgumentException if the range is invalid, meaning that either : the range, the start or the length
-     * is negative, or the range is greater than 31.
+     * is negative, or the range is greater than 32.
      * @return the extracted signed bit
      */
     public static int extractSigned(int value, int start, int length) {
@@ -41,7 +41,7 @@ public final class Bits {
      * @param value the number in binary representation
      * @param start the position of the beginning of the sequence
      * @param length the length of the sequence we want to extract
-     * @throws IllegalArgumentException same as before and if the length is 32
+     * @throws IllegalArgumentException same as before and if the length is greater than 32
      * @return the extracted unsigned bit
      */
     public static int extractUnsigned(int value, int start, int length) {
