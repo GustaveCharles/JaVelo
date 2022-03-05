@@ -37,7 +37,7 @@ public record PointCh(double e, double n) {
 
     /**
      * Returns the longitude of the point, in the WGS84 system, in radians
-     * @return ongitude of the point, in the WGS84 system, in radians
+     * @return longitude of the point, in the WGS84 system, in radians
      */
     public double lon(){return Ch1903.lon(e,n);}
 

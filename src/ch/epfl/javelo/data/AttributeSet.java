@@ -9,7 +9,7 @@ import java.util.StringJoiner;
 public record AttributeSet(long bits) {
 
     public AttributeSet {
-        long bits1 = bits >>> 52;
+        long bits1 = bits >>> Attribute.COUNT;
         Preconditions.checkArgument(bits1 == 0);
     }
 

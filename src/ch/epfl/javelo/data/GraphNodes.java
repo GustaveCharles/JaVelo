@@ -29,14 +29,14 @@ public record GraphNodes (IntBuffer buffer) {
 
    public int outDegree(int nodeId){
 
-        int nombre3 =  buffer.get(OFFSET_OUT_EDGES + 3*nodeId);
-       return Bits.extractUnsigned(nombre3,27,4);
+        int number3 =  buffer.get(OFFSET_OUT_EDGES + 3*nodeId);
+       return Bits.extractUnsigned(number3,27,4);
     }
 
     public int edgeId(int nodeId, int edgeIndex){
 
-        int nombre3 =  buffer.get(OFFSET_OUT_EDGES + 3*nodeId);
-        int index1 = Bits.extractUnsigned(nombre3,0,27);
+        int number3 =  buffer.get(OFFSET_OUT_EDGES + 3*nodeId);
+        int index1 = Bits.extractUnsigned(number3,0,28);
 
         return index1 + edgeIndex;
     }
