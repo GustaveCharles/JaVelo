@@ -25,7 +25,7 @@ public final class Bits {
     public static int extractSigned(int value, int start, int length) {
         int range = start + length;
 
-        if (range >= 0 & range <= 32 & start>=0 & length>=0) {
+        if (range >= 0 && range <= 32 && start>=0 && start <= 31 && length>=0 && length <= 32) {
             int shift1 = value << (32 - (range));
             int shift2 = shift1 >> (32 - length);
             return shift2;
@@ -47,7 +47,7 @@ public final class Bits {
     public static int extractUnsigned(int value, int start, int length) {
         int range = start + length;
 
-        if (range >= 0 & range <= 32 & start>=0 & length>=0) {
+        if (range >= 0 && range <= 32 && start>=0 && start <= 31 && length>=0 && length < 32) {
             int shift1 = value << (32 - (start + length));
             int shift2 = shift1 >>> (32 - length);
             return shift2;
