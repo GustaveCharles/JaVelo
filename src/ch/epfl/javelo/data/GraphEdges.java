@@ -1,6 +1,7 @@
 package ch.epfl.javelo.data;
 
 import ch.epfl.javelo.Bits;
+import ch.epfl.javelo.Math2;
 import ch.epfl.javelo.Q28_4;
 
 import java.nio.ByteBuffer;
@@ -49,7 +50,7 @@ public record GraphEdges (ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuf
 
     public boolean hasProfile(int edgeId){
 
-        int ProfilType = Bits.extractUnsigned(profileIds.get(edgeId*32), 29,2);
+        int ProfilType = Bits.extractUnsigned(profileIds.get(edgeId), 29,2);
 
         if(ProfilType == 0) return false;
 
@@ -57,52 +58,79 @@ public record GraphEdges (ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuf
     }
 
     private int profileType(int edgeId){
-        return Bits.extractUnsigned(profileIds.get(edgeId*32), 29,2);
+        int type =  Bits.extractUnsigned(profileIds.get(edgeId), 30, 2);
+        return type;
     }
 
     public float[] profileSamples(int edgeId){
 
         if(!hasProfile(edgeId)) return new float[0];
 
-        int firstSampleIndex = Bits.extractSigned(profileIds.get(edgeId*32),0,30);
-        double edgeLength = length(edgeId);
-        int nbSamplesOnEdge = (int) ( 1 + Math.ceil(edgeLength));
-        float[] profileSamples = new float[nbSamplesOnEdge];
+        int firstSampleIndex = Bits.extractSigned(profileIds.get(edgeId),0,30);
 
-        float firstSampleValue = Short.toUnsignedInt(elevations.get(firstSampleIndex));
+        double edgeLength = length(edgeId);
+        int nbSamplesOnEdge = (int) ( 1 + Math.ceil(edgeLength/2)); //utiliser ceildiv
+        float[] profileSamples = new float[nbSamplesOnEdge];
+        Math2.ceilDiv((int) edgeLength,Q28_4.ofInt(2)); //definir 2 comme constante final static
+
+        int sum=1;
+        float firstSampleValue = Q28_4.asFloat(Short.toUnsignedInt(elevations.get(firstSampleIndex)));
+        float NewSampleValue = firstSampleValue;
         profileSamples[0] = firstSampleValue;
 
+
         if(profileType(edgeId) == 2){
-            for(int i = 1; i<=Math.round(nbSamplesOnEdge/2); ++i){
-                float otherSampleValues = Bits.extractSigned(elevations.get(firstSampleIndex +i), 0,8);
-                profileSamples[i] = firstSampleValue + otherSampleValues;
+            for(int i = 1; i<=Math.ceil(nbSamplesOnEdge/2); ++i){
+                short otherSampleValues = elevations.get(firstSampleIndex +i);
+                for(int j=1; j>=0;--j) {
+                    float difference = Q28_4.asFloat(Bits.extractSigned(otherSampleValues,j*8,8));
+                    if(difference!=0) {
+                        NewSampleValue+=difference;
+                        profileSamples[sum] = NewSampleValue;
+                        ++sum;
+                    }
+                }
             }
+
+
         }else if(profileType(edgeId) == 3){
-            for(int i = 1; i<=Math.round(nbSamplesOnEdge/4); ++i){
-                float otherSampleValues = Bits.extractSigned(elevations.get(firstSampleIndex +i), 0,4);
-                profileSamples[i] = firstSampleValue + otherSampleValues;
+            for(int i = 1; i<=Math.ceil(nbSamplesOnEdge/4)+1; ++i){//pas sur du +1
+                short otherSampleValues = elevations.get(firstSampleIndex +i);
+                for(int j=3; j>=0;--j){
+                    float difference = Q28_4.asFloat(Bits.extractSigned(otherSampleValues,j*4,4));
+                    if(difference!=0){
+                         NewSampleValue+= difference;
+                        profileSamples[sum] = NewSampleValue;
+                        ++sum;
+                    }
+                }
             }
         }
 
         if(isInverted(edgeId)){
-            inverter(profileSamples);
-            return profileSamples;
+           return inverter(profileSamples);
+
         }else
             return profileSamples;
     }
 
     private float[] inverter(float[] invert){
-        float[] inverted = new float[invert.length];
-        for(int i=0; i<invert.length; ++i){
-            for(int j= invert.length-1; j>0; --j){
-                inverted[i]=invert[j];
+
+        int j=invert.length;
+        float[] inverted = new float[j];
+
+            for(int i =0; i<=j;++i){
+                inverted[i]=invert[j-1];
+                j-=1;
             }
-        }
+
+
+
         return inverted;
     }
 
     public int attributesIndex(int edgeId){
-        return 1;
+        return edgesBuffer.getShort(OFFSET_ATTRIBUTES + edgeId*EDGE_INTS);
     }
 
 }
