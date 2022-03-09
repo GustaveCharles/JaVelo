@@ -16,6 +16,7 @@ public record GraphEdges (ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuf
     private static final int OFFSET_ELEVATION= OFFSET_LENGTH + 2;
     private static final int OFFSET_ATTRIBUTES = OFFSET_ELEVATION + 2;
     private static final int EDGE_INTS = OFFSET_ATTRIBUTES + 2;
+    private static final int DIVISE = 2;
 
 
     public boolean isInverted(int edgeId){
@@ -28,7 +29,6 @@ public record GraphEdges (ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuf
     }
 
     public int targetNodeId(int edgeId){
-
         if(isInverted(edgeId)){
             int targetNode = edgesBuffer.getInt(OFFSET_INVERT + edgeId*EDGE_INTS);
             return  ~targetNode;
@@ -66,19 +66,18 @@ public record GraphEdges (ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuf
 
         if(!hasProfile(edgeId)) return new float[0];
 
+
         int firstSampleIndex = Bits.extractSigned(profileIds.get(edgeId),0,30);
+        int edgeLength = edgesBuffer.getShort(OFFSET_LENGTH + edgeId);
 
-        double edgeLength = length(edgeId);
-        int nbSamplesOnEdge = (int) ( 1 + Math.ceil(edgeLength/2)); //utiliser ceildiv
+        int nbSamplesOnEdge = ( 1 + Math2.ceilDiv( edgeLength,Q28_4.ofInt(DIVISE)));
         float[] profileSamples = new float[nbSamplesOnEdge];
-        Math2.ceilDiv((int) edgeLength,Q28_4.ofInt(2)); //definir 2 comme constante final static
 
-        int sum=1;
         float firstSampleValue = Q28_4.asFloat(Short.toUnsignedInt(elevations.get(firstSampleIndex)));
         float NewSampleValue = firstSampleValue;
         profileSamples[0] = firstSampleValue;
 
-        int delta =0, forIndex = 0,lengthOfExtraction =0;
+        int delta =0, forIndex = 0,lengthOfExtraction =0,sum=1;
 
         if(profileType(edgeId) == 1){
             for(int i = 1; i<=Math.ceil(nbSamplesOnEdge); ++i) {
@@ -90,7 +89,6 @@ public record GraphEdges (ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuf
             }
                 if (isInverted(edgeId)) {
                     return inverter(profileSamples);
-
                 } else
                     return profileSamples;
 
@@ -107,10 +105,8 @@ public record GraphEdges (ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuf
 
             for(int i = 1; i<=Math.ceil(nbSamplesOnEdge/delta); ++i){
                 short otherSampleValues = elevations.get(firstSampleIndex +i);
-                System.out.println("other: " + otherSampleValues);
                 for(int j=forIndex; j>=0;--j) {
                     float difference = Q28_4.asFloat(Bits.extractSigned(otherSampleValues, j * lengthOfExtraction, lengthOfExtraction));
-                    System.out.println("difference: " + difference);
                     if (sum<nbSamplesOnEdge) {
                         NewSampleValue += difference;
                         profileSamples[sum] = NewSampleValue;
