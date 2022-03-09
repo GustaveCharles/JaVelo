@@ -56,8 +56,8 @@ public record PointWebMercator(double x, double y) {
      * @return returns the x coordinate at the given zoom level
      */
     public double xAtZoomLevel(int zoomLevel){
-        return Math.round(Math.scalb(this.x,8+zoomLevel));
-    }
+        return Math.scalb(this.x,8+zoomLevel);
+    } //j'ai enlevé le math. round
 
     /**
      * computes the algorithm to zoom a coordinate at a certain zoom level
@@ -65,7 +65,7 @@ public record PointWebMercator(double x, double y) {
      * @return returns the y coordinate at the given zoom level
      */
     public double yAtZoomLevel(int zoomLevel){
-        return Math.round(Math.scalb(this.y,8+zoomLevel));
+        return Math.scalb(this.y,8+zoomLevel); //j'ai enlevé le Math.round
     }
 
     /**
