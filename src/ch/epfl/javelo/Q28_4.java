@@ -27,7 +27,7 @@ public final class Q28_4 {
      * @return a decimal number
      */
     public static double asDouble(int q28_4){
-        return scalb(q28_4, -4);
+        return scalb((double) q28_4, -4);
     }
 
     /**
