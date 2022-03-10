@@ -29,8 +29,8 @@ public record GraphSectors(ByteBuffer buffer) {
 
         List<Sector> sectors = new ArrayList<>();
 
-        for (int y = minY; y <= maxY; y++){
-            for (int x = minX; x <= maxX; x++){
+        for (int y = minY; y < maxY; y++){
+            for (int x = minX; x < maxX; x++){
                 int sectorIndex = NUMBER_OF_SECTORS_PER_AXIS * y + x;
                 int firstNodeId = buffer.getInt(sectorIndex * SECTORS_INTS + OFFSET_NODE);
                 int numberOfNodes = Short.toUnsignedInt(buffer.getShort(sectorIndex*SECTORS_INTS+OFFSET_LENGTH));
