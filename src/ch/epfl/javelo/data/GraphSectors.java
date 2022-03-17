@@ -23,14 +23,14 @@ public record GraphSectors(ByteBuffer buffer) {
         double rightTopY = clamp(MIN_N, center.n() + distance, MAX_N);
 
         int minX = (int) ((leftBottomX - MIN_E)/sectorWidth);
-        int maxX = (int) Math.ceil(((rightTopX - MIN_E)/sectorWidth));
+        int maxX = (int) Math.ceil(((rightTopX - MIN_E)/sectorWidth) - 1);
         int minY = (int) ((leftBottomY - MIN_N)/sectorHeight);
-        int maxY = (int) Math.ceil(((rightTopY - MIN_N)/sectorHeight));
+        int maxY = (int) Math.ceil(((rightTopY - MIN_N)/sectorHeight) - 1);
 
         List<Sector> sectors = new ArrayList<>();
 
-        for (int y = minY; y < maxY; y++){
-            for (int x = minX; x < maxX; x++){
+        for (int y = minY; y <= maxY; y++){
+            for (int x = minX; x <= maxX; x++){
                 int sectorIndex = NUMBER_OF_SECTORS_PER_AXIS * y + x;
                 int firstNodeId = buffer.getInt(sectorIndex * SECTORS_INTS + OFFSET_NODE);
                 int numberOfNodes = Short.toUnsignedInt(buffer.getShort(sectorIndex*SECTORS_INTS+OFFSET_LENGTH));
@@ -43,5 +43,3 @@ public record GraphSectors(ByteBuffer buffer) {
 
     public record Sector(int startNodeId, int endNodeId){}
 }
-
-

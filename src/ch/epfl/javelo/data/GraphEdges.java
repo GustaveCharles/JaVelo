@@ -21,7 +21,7 @@ public record GraphEdges (ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuf
 
     public boolean isInverted(int edgeId){
 
-        int inv = edgesBuffer.getInt(edgeId);
+        int inv = edgesBuffer.getInt(OFFSET_INVERT + edgeId*EDGE_INTS);
 
         if(inv <0) return true;
 
@@ -39,13 +39,13 @@ public record GraphEdges (ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuf
 
     public double length(int edgeId){
 
-        return Q28_4.asDouble(edgesBuffer.getShort(OFFSET_LENGTH + edgeId));
+        return Q28_4.asDouble(Short.toUnsignedInt(edgesBuffer.getShort(OFFSET_LENGTH + edgeId*EDGE_INTS)));
     }
 
 
     public double elevationGain(int edgeId){
 
-        return Q28_4.asDouble(edgesBuffer.getShort(OFFSET_ELEVATION + edgeId*EDGE_INTS));
+        return Q28_4.asDouble(Short.toUnsignedInt(edgesBuffer.getShort(OFFSET_ELEVATION + edgeId*EDGE_INTS)));
     }
 
     public boolean hasProfile(int edgeId){
@@ -66,7 +66,7 @@ public record GraphEdges (ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuf
 
         if(!hasProfile(edgeId)) return new float[0];
 
-
+        int profileType = profileType(edgeId);
         int firstSampleIndex = Bits.extractSigned(profileIds.get(edgeId),0,30);
         int edgeLength = edgesBuffer.getShort(OFFSET_LENGTH + edgeId);
 
@@ -79,7 +79,7 @@ public record GraphEdges (ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuf
 
         int delta =0, forIndex = 0,lengthOfExtraction =0,sum=1;
 
-        if(profileType(edgeId) == 1){
+        if( profileType == 1){
             for(int i = 1; i<=Math.ceil(nbSamplesOnEdge); ++i) {
                 float newValue = Q28_4.asFloat(Bits.extractUnsigned(elevations.get(firstSampleIndex + i), 0, 16));
                 if (sum < nbSamplesOnEdge) {
@@ -87,22 +87,21 @@ public record GraphEdges (ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuf
                     ++sum;
                 }
             }
-                if (isInverted(edgeId)) {
-                    return inverter(profileSamples);
-                } else
-                    return profileSamples;
 
-            }else if(profileType(edgeId) == 2){
+            }else if(profileType == 2){
             delta = 2;
             forIndex = 1;
             lengthOfExtraction = 8;
 
-        }else if(profileType(edgeId) == 3){
+        }else if(profileType == 3){
             delta = 3;
             forIndex = 3;
             lengthOfExtraction = 4;
+
+
         }
 
+        if(profileType == 2 || profileType ==3){
             for(int i = 1; i<=Math.ceil(nbSamplesOnEdge/delta); ++i){
                 short otherSampleValues = elevations.get(firstSampleIndex +i);
                 for(int j=forIndex; j>=0;--j) {
@@ -114,31 +113,31 @@ public record GraphEdges (ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuf
                     }
                 }
             }
+        }
 
 
-        if(isInverted(edgeId)){
-           return inverter(profileSamples);
-
-        }else
-            return profileSamples;
+        return inverter(profileSamples,edgeId);
     }
 
-    private float[] inverter(float[] invert){
+    private float[] inverter(float[] invert,int edgeID){
 
-        int j=invert.length;
-        float[] inverted = new float[j];
+        if(isInverted(edgeID)){
+            int j=invert.length;
+            float[] inverted = new float[j];
 
             for(int i =0; i< invert.length;++i){
                 inverted[i]=invert[j-1];
                 j-=1;
             }
+            return inverted;
+        }else{
+            return invert;
+        }
 
-
-        return inverted;
     }
 
     public int attributesIndex(int edgeId){
-        return edgesBuffer.getShort(OFFSET_ATTRIBUTES + edgeId*EDGE_INTS);
+        return Short.toUnsignedInt(edgesBuffer.getShort(OFFSET_ATTRIBUTES + edgeId*EDGE_INTS));
     }
 
 }
