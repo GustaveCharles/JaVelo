@@ -34,7 +34,7 @@ public record GraphSectors(ByteBuffer buffer) {
                 int sectorIndex = NUMBER_OF_SECTORS_PER_AXIS * y + x;
                 int firstNodeId = buffer.getInt(sectorIndex * SECTORS_INTS + OFFSET_NODE);
                 int numberOfNodes = Short.toUnsignedInt(buffer.getShort(sectorIndex*SECTORS_INTS+OFFSET_LENGTH));
-                int endNodeId = sectorIndex+numberOfNodes;
+                int endNodeId = firstNodeId+numberOfNodes;
                 sectors.add(new Sector(firstNodeId, endNodeId));
             }
         }
@@ -42,4 +42,5 @@ public record GraphSectors(ByteBuffer buffer) {
     }
 
     public record Sector(int startNodeId, int endNodeId){}
+
 }

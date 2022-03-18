@@ -10,7 +10,7 @@ public final class ElevationProfile {
     private float[] samples;
     private DoubleSummaryStatistics s = new DoubleSummaryStatistics();
 
-    ElevationProfile(double length, float[] elevationSamples){
+   public ElevationProfile(double length, float[] elevationSamples){
         this.length = length;
         this.samples = new float[elevationSamples.length];
 
@@ -28,15 +28,15 @@ public final class ElevationProfile {
         return length;
     }
 
-    double minElevation(){
+    public double minElevation(){
         return s.getMin();
     }
 
-    double maxElevation(){
+    public double maxElevation(){
         return s.getMax();
     }
 
-    double totalAscent(){
+    public double totalAscent(){
         float totalAscent = 0;
         for (int i = 0; i< samples.length - 1; i++){
             float difference = samples[i+1] - samples[i];
@@ -47,7 +47,7 @@ public final class ElevationProfile {
         return totalAscent;
     }
 
-    double totalDescent(){
+    public double totalDescent(){
         float totalDescent = 0;
         for (int i = 0; i< samples.length - 1; i++){
             float difference = samples[i+1] - samples[i];
@@ -58,7 +58,7 @@ public final class ElevationProfile {
         return Math.abs(totalDescent);
     }
 
-    double elevationAt(double position){
+    public double elevationAt(double position){
         if (position <= 0){
             return samples[0];
         }

@@ -25,12 +25,12 @@ public final class Graph { //classe final pour immuabilité
     private final GraphEdges edges;
     private final List<AttributeSet> attributeSets;
 
-    Graph(GraphNodes nodes, GraphSectors sectors, GraphEdges edges, List<AttributeSet> attributeSets){
+   public Graph(GraphNodes nodes, GraphSectors sectors, GraphEdges edges, List<AttributeSet> attributeSets){
 
         this.sectors = sectors;
         this.nodes = nodes;
         this.edges = edges;
-        List<AttributeSet> attributeSets1 = new ArrayList<>(attributeSets); //bonne copie de liste?
+        List<AttributeSet> attributeSets1 = List.copyOf(attributeSets);
         this.attributeSets = attributeSets1;
     }
 
@@ -86,7 +86,7 @@ public final class Graph { //classe final pour immuabilité
                     .map(FileChannel.MapMode.READ_ONLY, 0, channel.size()).asLongBuffer();
         }
 
-        List<AttributeSet> list1 = new ArrayList();
+        List<AttributeSet> list1 = new ArrayList<>();
         for(int i= 0; i< buffer.capacity(); ++i){
             list1.add(new AttributeSet(buffer.get(i)));
         }
@@ -138,7 +138,7 @@ public final class Graph { //classe final pour immuabilité
     }
 
     public AttributeSet edgeAttributes(int edgeId){
-        return attributeSets.get(edgeId);
+        return new AttributeSet(edges.attributesIndex(edgeId));
     }
 
     public double edgeLength(int edgeId){
