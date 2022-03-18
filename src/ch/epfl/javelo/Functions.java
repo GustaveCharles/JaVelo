@@ -38,7 +38,6 @@ public final class Functions {
 
         return (x) -> {
             double interval = xMax/(samples.length-1);
-            double sampled = 0;
             if (x<=0){
                 return samples[0];
             } else if (x>=xMax){

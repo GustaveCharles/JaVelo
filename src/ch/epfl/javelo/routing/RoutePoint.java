@@ -10,8 +10,8 @@ public record RoutePoint (PointCh point, double position, double distanceToRefer
     public static final RoutePoint NONE = new RoutePoint(null,NaN,POSITIVE_INFINITY);
 
     public RoutePoint withPositionShiftedBy(double positionDifference){
-        PointCh newPoint = new PointCh(this.point.e() + positionDifference, this.point.n() + positionDifference);
-        return new RoutePoint(newPoint,this.position,this.distanceToReference);
+        //PointCh newPoint = new PointCh(this.point.e() + positionDifference, this.point.n() + positionDifference);
+        return new RoutePoint(point,position+positionDifference,distanceToReference);
     }
 
     public RoutePoint min(RoutePoint that){
