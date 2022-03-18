@@ -4,7 +4,7 @@ package ch.epfl.javelo.projection;
  * converts WGS 84 coordinates into Swiss coordinates and vice versa
  *
  * @author Gustave Charles -- Saigne (345945)
- * @author Jean Dupond (339364)
+ * @author Baudoin Coispeau (339364)
  */
 
 public final class Ch1903 {
@@ -20,14 +20,12 @@ public final class Ch1903 {
         double lambda1 = Math.pow(10,-4)*(3600*Math.toDegrees(lon)-26782.5),
                 phi = Math.pow(10,-4)*(3600*Math.toDegrees(lat)-169028.66);
 
-        double E=  2600072.37 + 211455.93*lambda1 - 10938.51*lambda1*phi - 0.36*lambda1*Math.pow(phi,2)
+       return 2600072.37 + 211455.93*lambda1 - 10938.51*lambda1*phi - 0.36*lambda1*Math.pow(phi,2)
                 - 44.54*(Math.pow(lambda1,3));
-
-        return E;
     }
 
-    /** convert WGS 84 coordinates to Swiss coordinates
-     *
+    /**
+     * Converts WGS 84 coordinates to Swiss coordinates
      * @param lon longitude of WGS84
      * @param lat latitude of WGS84
      * @return returns the N (north) coordinate in Swiss coordinates (meters)
@@ -36,15 +34,12 @@ public final class Ch1903 {
         double lambda1 = Math.pow(10,-4)*(3600*Math.toDegrees(lon)-26782.5),
                 phi = Math.pow(10,-4)*(3600*Math.toDegrees(lat)-169028.66);
 
-        double N = 1200147.07 + 308807.95 * phi + 3745.25 *Math.pow(lambda1,2)
+        return 1200147.07 + 308807.95 * phi + 3745.25 *Math.pow(lambda1,2)
                 + 76.63 * Math.pow(phi,2) - 194.56 * Math.pow(lambda1,2) * phi + 119.79 * Math.pow(phi,3);
-
-        return N;
-
     }
 
     /**
-     * converts Swiss coordinates to WGS 84 coordinates
+     * Converts Swiss coordinates to WGS 84 coordinates
      * @param e east swiss coordinate
      * @param n north swiss coordinate
      * @return returns the longitude coordinate in WGS84 coordinates (radians)
@@ -66,7 +61,7 @@ public final class Ch1903 {
     }
 
     /**
-     * converts Swiss coordinates to WGS 84 coordinates
+     * Converts Swiss coordinates to WGS 84 coordinates
      * @param e east swiss coordinate
      * @param n north swiss coordinate
      * @return returns the latitude coordinate in WGS84 coordinates (radians)
@@ -83,7 +78,7 @@ public final class Ch1903 {
                 - 0.0447 * Math.pow(y,2) * x
                 - 0.0140 * Math.pow(x,3);
 
-        double phi1= phi0*100/36;
+        double phi1 = phi0*100/36;
 
         return Math.toRadians(phi1);
     }

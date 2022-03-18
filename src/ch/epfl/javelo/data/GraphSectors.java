@@ -6,8 +6,19 @@ import java.util.*;
 import static ch.epfl.javelo.Math2.clamp;
 import static ch.epfl.javelo.projection.SwissBounds.*;
 
+/**
+ * represents the array containing the 16384 sectors of JaVelo
+ *
+ * @author Gustave Charles -- Saigne (345945)
+ * @author Baudoin Coispeau (339364)
+ */
+
+
 public record GraphSectors(ByteBuffer buffer) {
 
+    /**
+     * Constants related to sectors of the graph
+     */
     private static final int OFFSET_NODE = 0;
     private static final int OFFSET_LENGTH = OFFSET_NODE + Integer.BYTES;
     private static final int SECTORS_INTS = OFFSET_LENGTH + Short.BYTES;
@@ -15,6 +26,14 @@ public record GraphSectors(ByteBuffer buffer) {
     private final static double sectorHeight = HEIGHT/NUMBER_OF_SECTORS_PER_AXIS;
     private final static double sectorWidth = WIDTH/NUMBER_OF_SECTORS_PER_AXIS;
 
+    /**
+     * Returns the list of all sectors having an
+     * intersection with the square centered at the given point and with a
+     * side equal to twice the given distance.
+     * @param center the given point
+     * @param distance the distance between the point and the edge of the square
+     * @return a list of sectors contained in the given area
+     */
     public List<Sector> sectorsInArea(PointCh center, double distance){
 
         double leftBottomX = clamp(MIN_E, center.e() - distance, MAX_E);
@@ -41,6 +60,9 @@ public record GraphSectors(ByteBuffer buffer) {
         return sectors;
     }
 
+    /**
+     * Sectors are represented by two node indexes in the Sector record.
+     */
     public record Sector(int startNodeId, int endNodeId){}
 
 }

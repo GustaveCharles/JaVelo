@@ -6,7 +6,7 @@ import ch.epfl.javelo.Preconditions;
  * represents a point in the Web Mercator system
  *
  * @author Gustave Charles -- Saigne (345945)
- * @author Jean Dupond (339364)
+ * @author Baudoin Coispeau (339364)
  */
 
 public record PointWebMercator(double x, double y) {

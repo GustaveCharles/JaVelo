@@ -51,7 +51,6 @@ public record AttributeSet(long bits) {
             Attribute attribute = Attribute.ALL.get(i);
             if (contains(attribute)){
                     j.add(attribute.keyValue());
-
             }
         }
 

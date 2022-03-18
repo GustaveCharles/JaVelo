@@ -6,7 +6,7 @@ import ch.epfl.javelo.Math2;
  * converts between WGS 84 coordinates and Web Mercator coordinates and vice versa
  *
  * @author Gustave Charles -- Saigne (345945)
- * @author Jean Dupond (339364)
+ * @author Baudoin Coispeau (339364)
  */
 
 public final class WebMercator {

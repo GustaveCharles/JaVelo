@@ -4,7 +4,7 @@ package ch.epfl.javelo.projection;
  * contains the necessary constant to delimit the Swiss territory
  *
  * @author Gustave Charles -- Saigne (345945)
- * @author Jean Dupond (339364)
+ * @author Baudoin Coispeau (339364)
  */
 
 public final class SwissBounds {
@@ -26,6 +26,5 @@ public final class SwissBounds {
             return true;
         }
         else return false;
-
     }
 }

@@ -4,6 +4,9 @@ import ch.epfl.javelo.projection.PointCh;
 
 import java.util.List;
 
+/**
+ * Represents a route
+ */
 public interface Route {
     int indexOfSegmentAt(double position);
     double length();
