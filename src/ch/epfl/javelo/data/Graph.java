@@ -2,6 +2,7 @@ package ch.epfl.javelo.data;
 
 import ch.epfl.javelo.Functions;
 import ch.epfl.javelo.projection.PointCh;
+import ch.epfl.javelo.data.GraphSectors.Sector;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -17,7 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.DoubleUnaryOperator;
 
-public class Graph {
+public final class Graph { //classe final pour immuabilité
 
     private final GraphNodes nodes;
     private final GraphSectors sectors;
@@ -29,7 +30,8 @@ public class Graph {
         this.sectors = sectors;
         this.nodes = nodes;
         this.edges = edges;
-        this.attributeSets = attributeSets;
+        List<AttributeSet> attributeSets1 = new ArrayList<>(attributeSets); //bonne copie de liste?
+        this.attributeSets = attributeSets1;
     }
 
     public static Graph loadFrom(Path basePath) throws IOException {
@@ -47,8 +49,7 @@ public class Graph {
         ByteBuffer byteBufferSectors;
         try (FileChannel channel = FileChannel.open(sectorsPath)){
             byteBufferSectors = channel
-                    .map(FileChannel.MapMode.READ_ONLY, 0, channel.size())
-                    .asReadOnlyBuffer();
+                    .map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
         }
         GraphSectors sectors = new GraphSectors(byteBufferSectors);
 
@@ -79,13 +80,18 @@ public class Graph {
         GraphEdges edges = new GraphEdges(byteBufferEdges,nodesBufferEdges,shortBuffer);
 
         Path attributePath = basePath.resolve("attributes.bin");
-        List list;
-        try (FileChannel channel = FileChannel.open(nodesPath)){
-            list = Arrays.asList(channel
-                    .map(FileChannel.MapMode.READ_ONLY, 0, channel.size()).array());
+        LongBuffer buffer;
+        try (FileChannel channel = FileChannel.open(attributePath)){
+            buffer = channel
+                    .map(FileChannel.MapMode.READ_ONLY, 0, channel.size()).asLongBuffer();
         }
 
-        return new Graph(nodes,sectors,edges,list);
+        List<AttributeSet> list1 = new ArrayList();
+        for(int i= 0; i< buffer.capacity(); ++i){
+            list1.add(new AttributeSet(buffer.get(i)));
+        }
+
+        return new Graph(nodes,sectors,edges,list1);
     }
 
     public int nodeCount(){
@@ -104,32 +110,26 @@ public class Graph {
         return nodes.edgeId(nodeId,edgeIndex);
     }
 
-    int nodeClosestTo(PointCh point, double searchDistance){
-        List<GraphSectors.Sector> sectorsInRange= new ArrayList<>();
-        sectorsInRange.addAll(sectors.sectorsInArea(point,searchDistance));
+    public int nodeClosestTo(PointCh point, double searchDistance){
+        double distance1 = searchDistance * searchDistance;
 
-        int node = sectorsInRange.get(0).startNodeId();
-        double distance1 = point.squaredDistanceTo(nodePoint(node));
-        int nodeClosestTo = node;
+        int nodeClosestTo = -1;
+        List<Sector> sectorsInRange= sectors.sectorsInArea(point,searchDistance);
 
-        for(int i=0; i<sectorsInRange.size(); ++i){
-
-            int node1 = sectorsInRange.get(i).startNodeId();
-
-            for(int j=node1+1; j<sectorsInRange.get(i).endNodeId(); ++j){
-                int nodeCompare = j;
+        for(Sector sector: sectorsInRange){
+            for(int nodeCompare=sector.startNodeId(); nodeCompare<sector.endNodeId(); ++nodeCompare){
                 double distance2 = point.squaredDistanceTo(nodePoint(nodeCompare));
 
                 if(distance2<distance1){
+                    distance1 = distance2;
                     nodeClosestTo = nodeCompare;
                 }
             }
-            return nodeClosestTo;
         }
-        return -1;
+        return nodeClosestTo;
     }
 
-    int edgeTargetNodeId(int edgeId){
+    public int edgeTargetNodeId(int edgeId){
        return edges.targetNodeId(edgeId);
     }
 
