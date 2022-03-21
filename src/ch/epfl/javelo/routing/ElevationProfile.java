@@ -66,21 +66,21 @@ public final class ElevationProfile {
      * Returns the total elevation gain of the profile, in meters
      */
     public double totalAscent(){
-        float totalAscent = 0;
+        double totalAscent = 0;
         for (int i = 0; i< samples.length - 1; i++){
             float difference = samples[i+1] - samples[i];
             if (difference >= 0){
                 totalAscent += difference;
             }
         }
-        return totalAscent;
+        return Math.abs(totalAscent);
     }
 
     /**
      * Returns the total negative elevation of the profile, in meters
      */
     public double totalDescent(){
-        float totalDescent = 0;
+        double totalDescent = 0;
         for (int i = 0; i< samples.length - 1; i++){
             float difference = samples[i+1] - samples[i];
             if (difference <= 0){

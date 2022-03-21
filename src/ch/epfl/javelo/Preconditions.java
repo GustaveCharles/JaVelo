@@ -4,7 +4,7 @@ package ch.epfl.javelo;
  * Preconditions of any method
  *
  * @author Gustave Charles -- Saigne (345945)
- * @author Jean Dupond (339364)
+ * @author Baudoin Coispeau (339364)
  */
 public final class Preconditions {
 
