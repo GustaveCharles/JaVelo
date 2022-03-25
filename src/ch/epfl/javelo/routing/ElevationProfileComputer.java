@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.function.DoubleUnaryOperator;
 
 public final class ElevationProfileComputer {
-    private ElevationProfileComputer() {}
+    private ElevationProfileComputer() {
+    }
 
     public static ElevationProfile elevationProfile(Route route, double maxStepLength) {
 
@@ -30,6 +31,7 @@ public final class ElevationProfileComputer {
         }
 
         if (numberOfNanValue == numberOfSamples) {
+            System.out.println("coucou");
             return new ElevationProfile(route.length(), new float[numberOfSamples]);
         }
 
@@ -49,28 +51,33 @@ public final class ElevationProfileComputer {
 
 
         List<Integer> indexes = new ArrayList<>();
-        for (int i = indexFirstCorrectValue; i <= indexLastCorrectValue; i++) {
 
+        if (!Float.isNaN(samplesArray[0]) && Float.isNaN(samplesArray[1])) {
+            indexes.add(0);
+        }
+
+        for (int i = 1; i < samplesArray.length - 1; i++) {
             //Creation d'un tableau contenant les index des extrémités des trous intermédiaires
-            if (!Float.isNaN(samplesArray[i]) && ((Float.isNaN(samplesArray[i - 1]) || Float.isNaN(samplesArray[i + 1])))) {
+            if (!Float.isNaN(samplesArray[i]) && (Float.isNaN(samplesArray[i - 1]) || Float.isNaN(samplesArray[i + 1]))) {
                 indexes.add(i);
-            }
-            if (!Float.isNaN(samplesArray[i]) && (Float.isNaN(samplesArray[i - 1]) && Float.isNaN(samplesArray[i + 1]))) {
+            } else if (!Float.isNaN(samplesArray[i]) && Float.isNaN(samplesArray[i - 1]) && Float.isNaN(samplesArray[i + 1])) {
+                indexes.add(i);
                 indexes.add(i);
             }
         }
+        if (!Float.isNaN(samplesArray[samplesArray.length - 1]) && Float.isNaN(samplesArray[samplesArray.length - 2])) {
+            indexes.add(samplesArray.length - 1);
+        }
 
-        for (int i = 0; i<indexes.size() / 2; i++) {
-            int length = indexes.get(2*i+1) - indexes.get(2*i);
-            DoubleUnaryOperator function = Functions.sampled(new float[] {samplesArray[indexes.get(2*i)],
-                    samplesArray[indexes.get(2*i+1)]}, length);
+        for (int i = 0; i < indexes.size() / 2; i++) {
+            int length = indexes.get(2 * i + 1) - indexes.get(2 * i);
+            DoubleUnaryOperator function = Functions.sampled(new float[]{samplesArray[indexes.get(2 * i)],
+                    samplesArray[indexes.get(2 * i + 1)]}, length);
 
-            for (int j=1; j<length; j++){
-                samplesArray[indexes.get(2*i)+j] = (float) function.applyAsDouble(j);
+            for (int j = 1; j < length; j++) {
+                samplesArray[indexes.get(2 * i) + j] = (float) function.applyAsDouble(j);
             }
         }
         return new ElevationProfile(route.length(), samplesArray);
     }
-
-
 }
