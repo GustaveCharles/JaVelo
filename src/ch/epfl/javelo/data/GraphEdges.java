@@ -9,6 +9,10 @@ import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 import java.util.ArrayList;
 
+import static ch.epfl.javelo.Bits.extractSigned;
+import static ch.epfl.javelo.Bits.extractUnsigned;
+import static ch.epfl.javelo.Q28_4.asFloat;
+
 public record GraphEdges (ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuffer elevations){
 
     private static final int OFFSET_INVERT = 0;
@@ -50,7 +54,7 @@ public record GraphEdges (ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuf
 
     public boolean hasProfile(int edgeId){
 
-        int ProfilType = Bits.extractUnsigned(profileIds.get(edgeId), 30,2);
+        int ProfilType = extractUnsigned(profileIds.get(edgeId), 30,2);
 
         if(ProfilType == 0) return false;
 
@@ -58,7 +62,7 @@ public record GraphEdges (ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuf
     }
 
     private int profileType(int edgeId){
-        int type =  Bits.extractUnsigned(profileIds.get(edgeId), 30, 2);
+        int type =  extractUnsigned(profileIds.get(edgeId), 30, 2);
         return type;
     }
 
@@ -68,7 +72,7 @@ public record GraphEdges (ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuf
 
         int profileType = profileType(edgeId);
         int firstSampleIndex = Bits.extractSigned(profileIds.get(edgeId),0,30);
-        int edgeLength = edgesBuffer.getShort(OFFSET_LENGTH + edgeId);
+        int edgeLength = Short.toUnsignedInt(edgesBuffer.getShort(OFFSET_LENGTH + edgeId*EDGE_INTS));
 
         int nbSamplesOnEdge = ( 1 + Math2.ceilDiv( edgeLength,Q28_4.ofInt(DIVISE)));
         float[] profileSamples = new float[nbSamplesOnEdge];
@@ -97,8 +101,6 @@ public record GraphEdges (ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuf
             delta = 3;
             forIndex = 3;
             lengthOfExtraction = 4;
-
-
         }
 
         if(profileType == 2 || profileType ==3){
@@ -114,7 +116,6 @@ public record GraphEdges (ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuf
                 }
             }
         }
-
 
         return inverter(profileSamples,edgeId);
     }
@@ -135,6 +136,7 @@ public record GraphEdges (ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuf
         }
 
     }
+
 
     public int attributesIndex(int edgeId){
         return Short.toUnsignedInt(edgesBuffer.getShort(OFFSET_ATTRIBUTES + edgeId*EDGE_INTS));

@@ -30,8 +30,7 @@ public final class Graph { //classe final pour immuabilité
         this.sectors = sectors;
         this.nodes = nodes;
         this.edges = edges;
-        List<AttributeSet> attributeSets1 = List.copyOf(attributeSets);
-        this.attributeSets = attributeSets1;
+        this.attributeSets = List.copyOf(attributeSets);
     }
 
     public static Graph loadFrom(Path basePath) throws IOException {
@@ -138,7 +137,7 @@ public final class Graph { //classe final pour immuabilité
     }
 
     public AttributeSet edgeAttributes(int edgeId){
-        return new AttributeSet(edges.attributesIndex(edgeId));
+        return attributeSets.get(edges.attributesIndex(edgeId));
     }
 
     public double edgeLength(int edgeId){
@@ -150,7 +149,7 @@ public final class Graph { //classe final pour immuabilité
     }
 
     public DoubleUnaryOperator edgeProfile(int edgeId){
-       return edges.hasProfile(edgeId) ? Functions.sampled(edges.profileSamples(edgeId),edges.profileSamples(edgeId).length):
+        return edges.hasProfile(edgeId) ? Functions.sampled(edges.profileSamples(edgeId),edges.length(edgeId)):
                Functions.constant(Double.NaN);
     }
 
