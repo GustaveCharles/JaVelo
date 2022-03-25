@@ -15,8 +15,7 @@ import java.util.function.DoubleUnaryOperator;
  */
 
 public final class ElevationProfileComputer {
-    private ElevationProfileComputer() {
-    }
+    private ElevationProfileComputer() {}
 
     /**
      * returns the longitudinal profile of the route, ensuring that the spacing between
@@ -27,9 +26,7 @@ public final class ElevationProfileComputer {
      * @return the longitudinal profile of the route
      */
     public static ElevationProfile elevationProfile(Route route, double maxStepLength) {
-
         Preconditions.checkArgument(maxStepLength > 0);
-
         int numberOfSamples = (int) Math.ceil(route.length() / maxStepLength) + 1;
         double spaceBetweenSamples = route.length() / (numberOfSamples - 1);
         float[] samplesArray = new float[numberOfSamples];
@@ -46,20 +43,13 @@ public final class ElevationProfileComputer {
             return new ElevationProfile(route.length(), new float[numberOfSamples]);
         }
 
-        //Bouchage des trous en tête du tableau
-        int indexFirstCorrectValue = 0;
-        while (indexFirstCorrectValue < samplesArray.length && Float.isNaN(samplesArray[indexFirstCorrectValue])) {
-            indexFirstCorrectValue++;
-        }
+        //Closing the holes at the top of the array
+        int indexFirstCorrectValue = firstValidValue(samplesArray);
         Arrays.fill(samplesArray, 0, indexFirstCorrectValue, samplesArray[indexFirstCorrectValue]);
 
-        //Bouchage des trous en queue du tableau
-        int indexLastCorrectValue = samplesArray.length - 1;
-        while (indexLastCorrectValue >= 0 && Float.isNaN(samplesArray[indexLastCorrectValue])) {
-            indexLastCorrectValue--;
-        }
+        //Closing the holes at the tail of the array
+        int indexLastCorrectValue = lastValidValue(samplesArray);
         Arrays.fill(samplesArray, indexLastCorrectValue, samplesArray.length, samplesArray[indexLastCorrectValue]);
-
 
         List<Integer> indexes = new ArrayList<>();
 
@@ -72,7 +62,7 @@ public final class ElevationProfileComputer {
         }
 
         for (int i = 1; i < samplesArray.length - 1; i++) {
-            //Creation d'un tableau contenant les index des extrémités des trous intermédiaires
+            //Creation of an array containing the indexes of the ends of the intermediate holes
             if (!Float.isNaN(samplesArray[i]) && Float.isNaN(samplesArray[i - 1]) && Float.isNaN(samplesArray[i + 1])) {
                 indexes.add(i);
                 indexes.add(i);
@@ -92,5 +82,21 @@ public final class ElevationProfileComputer {
             }
         }
         return new ElevationProfile(route.length(), samplesArray);
+    }
+
+    private static int firstValidValue(float[] sample){
+        int indexFirstCorrectValue = 0;
+        while (indexFirstCorrectValue < sample.length && Float.isNaN(sample[indexFirstCorrectValue])) {
+            indexFirstCorrectValue++;
+        }
+        return indexFirstCorrectValue;
+    }
+
+    private static int lastValidValue(float[] sample){
+        int indexLastCorrectValue = sample.length - 1;
+        while (indexLastCorrectValue >= 0 && Float.isNaN(sample[indexLastCorrectValue])) {
+            indexLastCorrectValue--;
+        }
+        return indexLastCorrectValue;
     }
 }
