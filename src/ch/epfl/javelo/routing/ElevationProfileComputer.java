@@ -27,9 +27,11 @@ public final class ElevationProfileComputer {
      */
     public static ElevationProfile elevationProfile(Route route, double maxStepLength) {
         Preconditions.checkArgument(maxStepLength > 0);
-        int numberOfSamples = (int) Math.ceil(route.length() / maxStepLength) + 1;
-        double spaceBetweenSamples = route.length() / (numberOfSamples - 1);
+        double length = route.length();
+        int numberOfSamples = (int) Math.ceil(length / maxStepLength) + 1;
+        double spaceBetweenSamples = length / (numberOfSamples - 1);
         float[] samplesArray = new float[numberOfSamples];
+
 
         int numberOfNanValue = 0;
         for (int i = 0; i < numberOfSamples; i++) {
@@ -40,8 +42,9 @@ public final class ElevationProfileComputer {
         }
 
         if (numberOfNanValue == numberOfSamples) {
-            return new ElevationProfile(route.length(), new float[numberOfSamples]);
+            return new ElevationProfile(length, new float[numberOfSamples]);
         }
+
 
         //Closing the holes at the top of the array
         int indexFirstCorrectValue = firstValidValue(samplesArray);
@@ -56,11 +59,6 @@ public final class ElevationProfileComputer {
         if (!Float.isNaN(samplesArray[0]) && Float.isNaN(samplesArray[1])){
             indexes.add(0);
         }
-
-        if (!Float.isNaN(samplesArray[samplesArray.length-1]) && Float.isNaN(samplesArray[samplesArray.length-2])){
-            indexes.add(samplesArray.length-1);
-        }
-
         for (int i = 1; i < samplesArray.length - 1; i++) {
             //Creation of an array containing the indexes of the ends of the intermediate holes
             if (!Float.isNaN(samplesArray[i]) && Float.isNaN(samplesArray[i - 1]) && Float.isNaN(samplesArray[i + 1])) {
@@ -71,17 +69,21 @@ public final class ElevationProfileComputer {
                 indexes.add(i);
             }
         }
+        if (!Float.isNaN(samplesArray[samplesArray.length-1]) && Float.isNaN(samplesArray[samplesArray.length-2])){
+            indexes.add(samplesArray.length-1);
+        }
 
         for (int i = 0; i < indexes.size() / 2; i++) {
-            int length = indexes.get(2 * i + 1) - indexes.get(2 * i);
-            DoubleUnaryOperator function = Functions.sampled(new float[]{samplesArray[indexes.get(2 * i)],
-                    samplesArray[indexes.get(2 * i + 1)]}, length);
+            int amount = indexes.get(2 * i + 1) - indexes.get(2 * i);
+            DoubleUnaryOperator methodFunction = Functions.sampled(new float[] {samplesArray[indexes.get(2 * i)],
+                    samplesArray[indexes.get(2 * i + 1)]}, amount);
 
-            for (int j = 1; j < length; j++) {
-                samplesArray[indexes.get(2 * i) + j] = (float) function.applyAsDouble(j);
+            for (int j = 1; j < amount; j++) {
+                samplesArray[indexes.get(2 * i) + j] = (float) methodFunction.applyAsDouble(j);
             }
         }
-        return new ElevationProfile(route.length(), samplesArray);
+
+        return new ElevationProfile(length, samplesArray);
     }
 
     private static int firstValidValue(float[] sample){

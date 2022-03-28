@@ -99,10 +99,9 @@ public final class ElevationProfile {
         if (position <= 0){
             return samples[0];
         }
-        else if (position >= length){
+        if (position >= length) {
             return samples[samples.length - 1];
-        } else {
-            return Functions.sampled(samples, length).applyAsDouble(position);
         }
+        return Functions.sampled(samples, length).applyAsDouble(position);
     }
 }
