@@ -54,27 +54,26 @@ public final class SingleRoute implements Route{
 
     @Override
     public PointCh pointAt(double position) {
-        double clampedPosition = checkPosition(position);
-        int dichValue = binarySearch(routePositions,clampedPosition);
-        double edgePosition = calculatePosition(dichValue,routePositions,clampedPosition);
+        double clampedPosition = Math2.clamp(0,position,length());
+        int dichValue = binarySearch(clampedPosition);
+        double edgePosition = calculatePosition(dichValue,clampedPosition);
 
         return edges.get(dichValue).pointAt(edgePosition);
     }
 
     @Override
     public double elevationAt(double position) {
-        double clampedPosition = checkPosition(position);
-        int dichValue = binarySearch(routePositions,clampedPosition);
-        double edgePosition = calculatePosition(dichValue,routePositions,clampedPosition);
+        double clampedPosition =Math2.clamp(0,position,length());
+        int dichValue = binarySearch(clampedPosition);
+        double edgePosition = calculatePosition(dichValue,clampedPosition);
 
         return edges.get(dichValue).elevationAt(edgePosition);
     }
 
     @Override
-    public int nodeClosestTo(double position) { //marche pas
-        double clampedPosition = checkPosition(position);
-        int dichValue = binarySearch(routePositions,clampedPosition);
-        double edgePosition = calculatePosition(dichValue,routePositions,clampedPosition);
+    public int nodeClosestTo(double position) {
+        double clampedPosition = Math2.clamp(0,position,length());
+        int dichValue = binarySearch(clampedPosition);
 
         double position1 = clampedPosition- routePositions[dichValue],position2 = routePositions[dichValue+1]-clampedPosition;
 
@@ -85,20 +84,16 @@ public final class SingleRoute implements Route{
 
     @Override
     public RoutePoint pointClosestTo(PointCh point) {
-        RoutePoint firstComparison =  RoutePoint.NONE;
+        RoutePoint pointCompare =  RoutePoint.NONE;
 
         for(int i=0; i<edges.size();++i){
            double longestPositionOnEdge = Math2.clamp(0,edges.get(i).positionClosestTo(point),edges.get(i).length());
-           double distanceFromPointToEdge = longestPositionOnEdge + routePositions[edges.indexOf(edges.get(i))]; //edges.get(i).positionClosestTo(point)-longestPositionOnEdge
-            firstComparison = firstComparison.min(edges.get(i).pointAt(longestPositionOnEdge),distanceFromPointToEdge,point.distanceTo(edges.get(i).pointAt(longestPositionOnEdge)));
+           double distanceFromPointToEdge = longestPositionOnEdge + routePositions[edges.indexOf(edges.get(i))];
+            pointCompare = pointCompare.min(edges.get(i).pointAt(longestPositionOnEdge),distanceFromPointToEdge,point.distanceTo(edges.get(i).pointAt(longestPositionOnEdge)));
         }
-        return firstComparison;
+        return pointCompare;
     }
 
-
-    private double checkPosition(double position){
-        return Math2.clamp(0,position,length());
-    }
 
     private double[] positionArray(){
         double length =0;
@@ -112,13 +107,13 @@ public final class SingleRoute implements Route{
         return routePositions;
     }
 
-    private int binarySearch(double[] routePositions, double position){
+    private int binarySearch( double position){
         int dichValue = Arrays.binarySearch(routePositions,position);
         return dichValue<0 ? Math2.clamp(0,-dichValue-2,edges.size()-1):
             Math2.clamp(0,dichValue,edges.size()-1);
     }
 
-    private double calculatePosition(int dichValue,double[] routePositions, double position){
+    private double calculatePosition(int dichValue, double position){
         return dichValue<0 ? (position - routePositions[-dichValue-2]):
                 position - routePositions[dichValue];
     }

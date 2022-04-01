@@ -14,7 +14,7 @@ import static java.lang.Float.POSITIVE_INFINITY;
 
 public record RoutePoint (PointCh point, double position, double distanceToReference){
 
-    public static final RoutePoint NONE = new RoutePoint(null,NaN,POSITIVE_INFINITY);
+    public static final RoutePoint NONE = new RoutePoint(null,NaN,POSITIVE_INFINITY); //faut utiliser none
 
     /**
      * Returns a point identical to the receiver (this) but whose position is offset by the given

@@ -24,12 +24,13 @@ public class MultiRoute implements Route {
         int index=0;
 
        for(Route segment:segments){
-           length += segment.length();
+           length = segment.length();
            if(length<clampedPosition){
-               index=segment.indexOfSegmentAt(segment.length())+1;
+               index += segment.indexOfSegmentAt(segment.length())+1;
                clampedPosition -= length;
            }else{
-               index = segment.indexOfSegmentAt(clampedPosition)+1;
+               index += segment.indexOfSegmentAt(clampedPosition);
+               break;
            }
        }
        return index;
@@ -40,9 +41,6 @@ public class MultiRoute implements Route {
         double length=0;
 
         for (Route segment: segments){
-            //for(Edge edge: segment.edges()){
-              //  length +=edge.length();
-           // }
             length += segment.length();
         }
         return length;
@@ -62,24 +60,23 @@ public class MultiRoute implements Route {
 
     @Override
     public List<PointCh> points() {
-        HashSet<PointCh> pointChList = new HashSet<>();
+        List<PointCh> pointChList = new ArrayList<>();
 
         for(Route segment: segments){
-            pointChList.addAll(segment.points());
-
-        }
-        for(PointCh point : pointChList){
-            if(pointChList.contains(point)){
-                pointChList.remove(point);
+            for(PointCh pointCh: segment.points()){
+                if(!pointChList.contains(pointCh)){
+                    pointChList.add(pointCh);
+                }
             }
         }
-        return new ArrayList<>(pointChList);
+
+        return pointChList;
     }
 
     @Override
     public PointCh pointAt(double position) {
         double clampedPosition = Math2.clamp(0,position,length());
-        PointCh pointAt = new PointCh(0,0);
+        PointCh pointAt = segments.get(0).pointAt(position);
 
         for(Route segment : segments){
             double length = segment.length();
@@ -88,7 +85,7 @@ public class MultiRoute implements Route {
                 clampedPosition -= length;
             }else{
                 pointAt = segment.pointAt(clampedPosition);
-
+                break;
             }
         }
         return pointAt;
@@ -106,6 +103,7 @@ public class MultiRoute implements Route {
                 clampedPosition -= length;
             }else{
                 elevationAt = segment.elevationAt(clampedPosition);
+                break;
             }
         }
         return elevationAt;
@@ -123,6 +121,7 @@ public class MultiRoute implements Route {
                 clampedPosition -= length;
             }else{
                 nodeClosestTo = segment.nodeClosestTo(clampedPosition);
+                break;
             }
         }
         return nodeClosestTo;
@@ -134,8 +133,8 @@ public class MultiRoute implements Route {
         double pastLength=0;
 
         for(Route segment: segments){
-            pastLength += segment.length();
             pointCompare = pointCompare.min(segment.pointClosestTo(point).withPositionShiftedBy(pastLength));
+            pastLength += segment.length();
         }
         return pointCompare;
     }
