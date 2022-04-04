@@ -7,11 +7,17 @@ import ch.epfl.javelo.Q28_4;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
-import java.util.ArrayList;
-
-import static ch.epfl.javelo.Bits.extractSigned;
 import static ch.epfl.javelo.Bits.extractUnsigned;
-import static ch.epfl.javelo.Q28_4.asFloat;
+
+/**
+ * represents the array of all edges of the JaVelo graph
+ * and gives all its characteristics
+ *
+ * @author Baudoin Coispeau (339364)
+ * @author Gustave Charles-Saigne (345945)
+ */
+//TODO un switch pour profileSamples
+    //TODO check le if dans is inverted et dans hasprofile
 
 public record GraphEdges (ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuffer elevations){
 
@@ -23,49 +29,90 @@ public record GraphEdges (ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuf
     private static final int DIVISE = 2;
 
 
+//    private enum ProfileTypeEnum{
+//        PROFILE_TYPE_1,
+//        PROFILE_TYPE_2,
+//        PROFILE_TYPE_3,
+//        PROFILE_TYPE_4;
+//    }
+
+    /**
+     *checks in which way the edge is going
+     * @param edgeId the given edge
+     * @return returns true iff the edge with the given identity goes
+     * in the opposite direction to the OSM channel it comes from
+     */
     public boolean isInverted(int edgeId){
 
         int inv = edgesBuffer.getInt(OFFSET_INVERT + edgeId*EDGE_INTS);
 
-        if(inv <0) return true;
-
-        return false;
+        return inv < 0;
+//        if(inv <0) return true;
+//
+//        return false;
     }
 
+    /**
+     * extracts from the edges buffer the identity of the destination node
+     * @param edgeId the given edge
+     * @return returns the identity of the destination node of the given identity edge
+     */
     public int targetNodeId(int edgeId){
-        if(isInverted(edgeId)){
-            int targetNode = edgesBuffer.getInt(OFFSET_INVERT + edgeId*EDGE_INTS);
-            return  ~targetNode;
-        }else{
-            return edgesBuffer.getInt(OFFSET_INVERT + edgeId*EDGE_INTS);
-        }
+        int targetNode = edgesBuffer.getInt(OFFSET_INVERT + edgeId*EDGE_INTS);
+
+        return (isInverted(edgeId)) ? ~targetNode:
+                edgesBuffer.getInt(OFFSET_INVERT + edgeId*EDGE_INTS);
     }
 
+    /**
+     * extracts a short representation of two byte buffers and then converts it to decimal (double)
+     * @param edgeId the given edge
+     * @return returns the length, in meters, of the given identity edge
+     */
     public double length(int edgeId){
 
         return Q28_4.asDouble(Short.toUnsignedInt(edgesBuffer.getShort(OFFSET_LENGTH + edgeId*EDGE_INTS)));
     }
 
-
+    /**
+     * extracts a short representation of two byte buffers and then converts it to decimal (double)
+     * @param edgeId the given edge
+     * @return returns the positive elevation, in meters, of the edge with the given identity
+     */
     public double elevationGain(int edgeId){
 
         return Q28_4.asDouble(Short.toUnsignedInt(edgesBuffer.getShort(OFFSET_ELEVATION + edgeId*EDGE_INTS)));
     }
 
+    /**
+     *checks if the edge has a profile
+     * @param edgeId the given edge
+     * @return returns true iff the given identity edge has a profile
+     */
     public boolean hasProfile(int edgeId){
 
         int ProfilType = extractUnsigned(profileIds.get(edgeId), 30,2);
 
-        if(ProfilType == 0) return false;
-
-        return true;
+        return ProfilType != 0;
+//        if(ProfilType == 0) return false;
+//
+//        return true;
     }
 
+    /**
+     *
+     */
     private int profileType(int edgeId){
         int type =  extractUnsigned(profileIds.get(edgeId), 30, 2);
         return type;
     }
 
+    /**
+     *
+     * @param edgeId the given edge
+     * @return returns the array of samples of the profile
+     * of the edge with the given identity, which is empty if the edge does not have a profile
+     */
     public float[] profileSamples(int edgeId){
 
         if(!hasProfile(edgeId)) return new float[0];
@@ -83,6 +130,11 @@ public record GraphEdges (ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuf
 
         int delta =0, forIndex = 0,lengthOfExtraction =0,sum=1;
 
+//        switch (profileType1){
+//
+//            case profileType1.PROFILE_TYPE_1:
+//
+//        }
         if( profileType == 1){
             for(int i = 1; i<=Math.ceil(nbSamplesOnEdge); ++i) {
                 float newValue = Q28_4.asFloat(Bits.extractUnsigned(elevations.get(firstSampleIndex + i), 0, 16));
@@ -138,6 +190,11 @@ public record GraphEdges (ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuf
     }
 
 
+    /**
+     * extracts from the buffer a short composed of two bytes and then covnerts it to int
+     * @param edgeId the given edge
+     * @return returns the identity of the attribute set attached to the given identity edge
+     */
     public int attributesIndex(int edgeId){
         return Short.toUnsignedInt(edgesBuffer.getShort(OFFSET_ATTRIBUTES + edgeId*EDGE_INTS));
     }
