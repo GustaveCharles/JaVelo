@@ -18,7 +18,7 @@ public enum Attribute {
     HIGHWAY_STEPS("highway", "steps"),
     HIGHWAY_PRIMARY("highway", "primary"),
     HIGHWAY_CYCLEWAY("highway", "cycleway"),
-    HIGHWAY_MOTORWAY("highway","motorway"),
+    HIGHWAY_MOTORWAY("highway", "motorway"),
     HIGHWAY_PEDESTRIAN("highway", "pedestrian"),
     HIGHWAY_TRUNK("highway", "trunk"),
     HIGHWAY_LIVING_STREET("highway", "living_street"),
