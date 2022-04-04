@@ -14,7 +14,7 @@ public final class Preconditions {
 
     private Preconditions() {}
 
-    /** throws an exception if its argument is false and does nothing otherwise
+    /** @throws IllegalArgumentException if its argument is false and does nothing otherwise
      *
      * @param shouldBeTrue the boolean value
      */
