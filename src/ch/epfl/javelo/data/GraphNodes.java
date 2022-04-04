@@ -20,8 +20,10 @@ public record GraphNodes(IntBuffer buffer) {
     private static final int NODE_INTS = OFFSET_OUT_EDGES + 1;
 
 
-    /** we know that each NODE_INTS there is a new node so we divide de total number of nodes
-     *  by NODE_INTS
+    /**
+     * we know that each NODE_INTS there is a new node so we divide de total number of nodes
+     * by NODE_INTS
+     *
      * @return returns the total number of nodes
      */
     public int count() {
@@ -29,7 +31,9 @@ public record GraphNodes(IntBuffer buffer) {
         return buffer.capacity() / NODE_INTS;
     }
 
-    /** we extract the int value off the buffer and then we convert it to decimal
+    /**
+     * we extract the int value off the buffer and then we convert it to decimal
+     *
      * @param nodeId the node which we want to know its E coordinate
      * @return returns the E coordinate of the given identity node
      */
@@ -38,7 +42,9 @@ public record GraphNodes(IntBuffer buffer) {
         return Q28_4.asDouble(buffer.get(OFFSET_E + NODE_INTS * nodeId));
     }
 
-    /** we extract the int value off the buffer and then we convert it to decimal
+    /**
+     * we extract the int value off the buffer and then we convert it to decimal
+     *
      * @param nodeId the node which we want to know its N coordinate
      * @return returns the N coordinate of the given identity node
      */
@@ -48,8 +54,9 @@ public record GraphNodes(IntBuffer buffer) {
     }
 
     /**
-     *we extract the int representation off the buffer
+     * we extract the int representation off the buffer
      * and then we select which bits we want the using an unsigned extraction
+     *
      * @param nodeId the given identity node
      * @return returns the number of edges outgoing from the given identity node
      */
@@ -60,9 +67,10 @@ public record GraphNodes(IntBuffer buffer) {
     }
 
     /**
-     *we extract the int representation off the buffer
+     * we extract the int representation off the buffer
      * and then we select which bits we want the using an unsigned extraction.
      * As we already know the index of the first edge, we add it to the index of the extracted edge
+     *
      * @param nodeId
      * @param edgeIndex
      * @return returns the identity of the edgeIndex-th edge outgoing from the identity node nodeId
