@@ -10,7 +10,9 @@ import java.util.DoubleSummaryStatistics;
  * @author Gustave Charles -- Saigne (345945)
  * @author Baudoin Coispeau (339364)
  */
-
+//TODO essayer de changer la composition pour pouvoir utiliser checkarguments dans ElevationProfile
+    //TODO utiliser l operateur ternaire ?: pour elevationAt
+    //TODO regarder si la classe est bien immuable (copie profonde du tableau samples?)
 public final class ElevationProfile {
 
     private double length;
@@ -49,21 +51,21 @@ public final class ElevationProfile {
     }
 
     /**
-     * Returns the minimum altitude of the profile, in meters,
+     * @return Returns the minimum altitude of the profile, in meters,
      */
     public double minElevation(){
         return s.getMin();
     }
 
     /**
-     * Returns the maximum altitude of the profile, in meters
+     * @return Returns the maximum altitude of the profile, in meters
      */
     public double maxElevation(){
         return s.getMax();
     }
 
     /**
-     * Returns the total elevation gain of the profile, in meters
+     * @return Returns the total elevation gain of the profile, in meters
      */
     public double totalAscent(){
         double totalAscent = 0;
@@ -77,7 +79,7 @@ public final class ElevationProfile {
     }
 
     /**
-     * Returns the total negative elevation of the profile, in meters
+     * @return Returns the total negative elevation of the profile, in meters
      */
     public double totalDescent(){
         double totalDescent = 0;

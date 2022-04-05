@@ -13,7 +13,7 @@ import java.util.function.DoubleUnaryOperator;
  * @author Gustave Charles -- Saigne (345945)
  * @author Baudoin Coispeau (339364)
  */
-
+//TODO expliquer vite fait les méthodes privées
 public final class ElevationProfileComputer {
     private ElevationProfileComputer() {}
 

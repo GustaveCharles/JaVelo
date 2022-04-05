@@ -71,8 +71,8 @@ public record GraphNodes(IntBuffer buffer) {
      * and then we select which bits we want the using an unsigned extraction.
      * As we already know the index of the first edge, we add it to the index of the extracted edge
      *
-     * @param nodeId
-     * @param edgeIndex
+     * @param nodeId the given node
+     * @param edgeIndex the Index of the first node of the edge
      * @return returns the identity of the edgeIndex-th edge outgoing from the identity node nodeId
      */
     public int edgeId(int nodeId, int edgeIndex) {

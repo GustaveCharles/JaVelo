@@ -3,22 +3,33 @@ package ch.epfl.javelo.routing;
 import ch.epfl.javelo.Math2;
 import ch.epfl.javelo.Preconditions;
 import ch.epfl.javelo.projection.PointCh;
-import jdk.management.jfr.RecordingInfo;
-
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
-public class MultiRoute implements Route {
+/**
+ * represents a multiple route, composed of a sequence
+ * of contiguous routes called segments
+ *
+ * @author Gustave Charles -- Saigne (345945)
+ * @author Baudoin Coispeau (339364)
+ */
+
+public final class MultiRoute implements Route {
 
     private final List<Route> segments;
 
-    MultiRoute(List<Route> segments){
+    /**
+     * @throws IllegalArgumentException if the size of the segments is equal to 0
+     */
+    public MultiRoute(List<Route> segments){
         Preconditions.checkArgument(segments.size()!=0);
         this.segments=List.copyOf(segments);
     }
 
     @Override
+    /**
+     * {@inheritDoc}
+     */
     public int indexOfSegmentAt(double position) {
         double clampedPosition = Math2.clamp(0,position,length()), length = 0;
         int index=0;
@@ -37,6 +48,9 @@ public class MultiRoute implements Route {
     }
 
     @Override
+    /**
+     * {@inheritDoc}
+     */
     public double length() {
         double length=0;
 
@@ -47,6 +61,9 @@ public class MultiRoute implements Route {
     }
 
     @Override
+    /**
+     * {@inheritDoc}
+     */
     public List<Edge> edges() {
         List<Edge> edges = new ArrayList<>();
 
@@ -55,25 +72,30 @@ public class MultiRoute implements Route {
                 edges.add(edge);
             }
         }
-        return edges;
+        return List.copyOf(edges);
     }
 
     @Override
+    /**
+     * {@inheritDoc}
+     */
     public List<PointCh> points() {
         List<PointCh> pointChList = new ArrayList<>();
 
         for(Route segment: segments){
-            for(PointCh pointCh: segment.points()){
-                if(!pointChList.contains(pointCh)){
-                    pointChList.add(pointCh);
-                }
-            }
+            pointChList.addAll(segment.points());
+            pointChList.remove(pointChList.size()-1);
         }
 
-        return pointChList;
+        List<PointCh> intermediateList = segments.get(segments.size()-1).points();
+        pointChList.add(intermediateList.get(intermediateList.size()-1));
+        return List.copyOf(pointChList);
     }
 
     @Override
+    /**
+     * {@inheritDoc}
+     */
     public PointCh pointAt(double position) {
         double clampedPosition = Math2.clamp(0,position,length());
         PointCh pointAt = segments.get(0).pointAt(position);
@@ -92,9 +114,11 @@ public class MultiRoute implements Route {
     }
 
     @Override
+    /**
+     * {@inheritDoc}
+     */
     public double elevationAt(double position) {
-        double clampedPosition = Math2.clamp(0,position,length());
-        double elevationAt = 0;
+        double clampedPosition = Math2.clamp(0,position,length()), elevationAt = 0;
 
         for(Route segment : segments){
             double length = segment.length();
@@ -110,6 +134,9 @@ public class MultiRoute implements Route {
     }
 
     @Override
+    /**
+     * {@inheritDoc}
+     */
     public int nodeClosestTo(double position) {
         double clampedPosition = Math2.clamp(0,position,length());
         int nodeClosestTo = 0;
@@ -128,6 +155,9 @@ public class MultiRoute implements Route {
     }
 
     @Override
+    /**
+     * {@inheritDoc}
+     */
     public RoutePoint pointClosestTo(PointCh point) {
         RoutePoint pointCompare =  RoutePoint.NONE;
         double pastLength=0;

@@ -17,8 +17,6 @@ import static ch.epfl.javelo.Bits.extractUnsigned;
  * @author Baudoin Coispeau (339364)
  * @author Gustave Charles-Saigne (345945)
  */
-//TODO un switch pour profileSamples
-//TODO check le if dans is inverted et dans hasprofile
 
 public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuffer elevations) {
 
@@ -30,12 +28,37 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
     private static final int DIVISE = 2;
 
 
-//    private enum ProfileTypeEnum{
-//        PROFILE_TYPE_1,
-//        PROFILE_TYPE_2,
-//        PROFILE_TYPE_3,
-//        PROFILE_TYPE_4;
-//    }
+    private enum ProfileTypeEnum {
+        PROFILE_TYPE_INEXISTANT(0),
+        PROFILE_TYPE_1(1),
+        PROFILE_TYPE_2(2),
+        PROFILE_TYPE_3(3);
+
+        int nombre;
+
+        ProfileTypeEnum(int nombre) {
+            this.nombre = nombre;
+        }
+    }
+
+    /**
+     * the default should never happen
+     */
+    private ProfileTypeEnum switch2(int nombre) {
+        switch (nombre) {
+            case 0:
+                return ProfileTypeEnum.PROFILE_TYPE_INEXISTANT;
+            case 1:
+                return ProfileTypeEnum.PROFILE_TYPE_1;
+            case 2:
+                return ProfileTypeEnum.PROFILE_TYPE_2;
+            case 3:
+                return ProfileTypeEnum.PROFILE_TYPE_3;
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
 
     /**
      * checks in which way the edge is going
@@ -49,9 +72,6 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
         int inv = edgesBuffer.getInt(OFFSET_INVERT + edgeId * EDGE_INTS);
 
         return inv < 0;
-//        if(inv <0) return true;
-//
-//        return false;
     }
 
     /**
@@ -100,17 +120,6 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
         int ProfilType = extractUnsigned(profileIds.get(edgeId), 30, 2);
 
         return ProfilType != 0;
-//        if(ProfilType == 0) return false;
-//
-//        return true;
-    }
-
-    /**
-     *
-     */
-    private int profileType(int edgeId) {
-        int type = extractUnsigned(profileIds.get(edgeId), 30, 2);
-        return type;
     }
 
     /**
@@ -120,9 +129,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
      */
     public float[] profileSamples(int edgeId) {
 
-        if (!hasProfile(edgeId)) return new float[0];
-
-        int profileType = profileType(edgeId);
+        int profileType = extractUnsigned(profileIds.get(edgeId), 30, 2);
         int firstSampleIndex = Bits.extractSigned(profileIds.get(edgeId), 0, 30);
         int edgeLength = Short.toUnsignedInt(edgesBuffer.getShort(OFFSET_LENGTH + edgeId * EDGE_INTS));
 
@@ -130,51 +137,35 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
         float[] profileSamples = new float[nbSamplesOnEdge];
 
         float firstSampleValue = Q28_4.asFloat(Short.toUnsignedInt(elevations.get(firstSampleIndex)));
-        float NewSampleValue = firstSampleValue;
+        float newSampleValue = firstSampleValue;
         profileSamples[0] = firstSampleValue;
 
-        int delta = 0, forIndex = 0, lengthOfExtraction = 0, sum = 1;
+        switch (switch2(profileType)) {
 
-//        switch (profileType1){
-//
-//            case profileType1.PROFILE_TYPE_1:
-//
-//        }
-        if (profileType == 1) {
-            for (int i = 1; i <= Math.ceil(nbSamplesOnEdge); ++i) {
-                float newValue = Q28_4.asFloat(Bits.extractUnsigned(elevations.get(firstSampleIndex + i), 0, 16));
-                if (sum < nbSamplesOnEdge) {
-                    profileSamples[sum] = newValue;
-                    ++sum;
-                }
-            }
+            case PROFILE_TYPE_INEXISTANT:
+                return new float[0];
 
-        } else if (profileType == 2) {
-            delta = 2;
-            forIndex = 1;
-            lengthOfExtraction = 8;
-
-        } else if (profileType == 3) {
-            delta = 3;
-            forIndex = 3;
-            lengthOfExtraction = 4;
-        }
-
-        if (profileType == 2 || profileType == 3) {
-            for (int i = 1; i <= Math.ceil(nbSamplesOnEdge / delta); ++i) {
-                short otherSampleValues = elevations.get(firstSampleIndex + i);
-                for (int j = forIndex; j >= 0; --j) {
-                    float difference = Q28_4.asFloat(Bits.extractSigned(otherSampleValues, j * lengthOfExtraction, lengthOfExtraction));
+            case PROFILE_TYPE_1:
+                int sum = 1;
+                for (int i = 1; i <= Math.ceil(nbSamplesOnEdge); ++i) {
+                    float newValue = Q28_4.asFloat(Bits.extractUnsigned(elevations.get(firstSampleIndex + i), 0, 16));
                     if (sum < nbSamplesOnEdge) {
-                        NewSampleValue += difference;
-                        profileSamples[sum] = NewSampleValue;
+                        profileSamples[sum] = newValue;
                         ++sum;
                     }
                 }
-            }
-        }
+                return inverter(profileSamples, edgeId);
 
-        return inverter(profileSamples, edgeId);
+            case PROFILE_TYPE_2:
+                type2and3(nbSamplesOnEdge, 2, firstSampleIndex, 1, 8, profileSamples, newSampleValue);
+                return inverter(profileSamples, edgeId);
+
+            case PROFILE_TYPE_3:
+                type2and3(nbSamplesOnEdge, 3, firstSampleIndex, 3, 4, profileSamples, newSampleValue);
+                return inverter(profileSamples, edgeId);
+
+        }
+        return new float[0];
     }
 
     private float[] inverter(float[] invert, int edgeID) {
@@ -194,6 +185,21 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
 
     }
 
+    private float[] type2and3(int nbSamplesOnEdge, int delta, int firstSampleIndex, int forIndex, int lengthOfExtraction, float[] profileSamples, float NewSampleValue) {
+        int sum = 1;
+        for (int i = 1; i <= Math.ceil(nbSamplesOnEdge / delta); ++i) {
+            short otherSampleValues = elevations.get(firstSampleIndex + i);
+            for (int j = forIndex; j >= 0; --j) {
+                float difference = Q28_4.asFloat(Bits.extractSigned(otherSampleValues, j * lengthOfExtraction, lengthOfExtraction));
+                if (sum < nbSamplesOnEdge) {
+                    NewSampleValue += difference;
+                    profileSamples[sum] = NewSampleValue;
+                    ++sum;
+                }
+            }
+        }
+        return profileSamples;
+    }
 
     /**
      * extracts from the buffer a short composed of two bytes and then covnerts it to int

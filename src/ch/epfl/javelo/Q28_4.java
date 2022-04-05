@@ -3,7 +3,7 @@ package ch.epfl.javelo;
 import static java.lang.Math.scalb;
 
 /**
- * Convert numbers between Q28.4 representation and other representations
+ * Convert numbers between Q28.4 representation and other representations (Int, Double, Float)
  *
  * @author Baudoin Coispeau (339364)
  * @author Gustave Charles-Saigne (345945)

@@ -111,7 +111,7 @@ public final class Math2 {
      * @param uX x-coordinate of vector U
      * @param uY y-coordinate of vector U
      * @return the squared norm of a vector U
-     */
+     */ //l'utiliser lorsqu 'on demande le point le plus proche d'un certain segment
     public static double squaredNorm(double uX, double uY) {
         return Math.pow(uX, 2) + Math.pow(uY, 2);
     }
