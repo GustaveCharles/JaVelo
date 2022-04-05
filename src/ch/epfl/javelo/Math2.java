@@ -3,98 +3,97 @@ package ch.epfl.javelo;
 import static java.lang.Math.fma;
 
 /**
- * Math functions
+ * offers static methods for performing certain mathematical calculations
  *
  * @author Baudoin Coispeau (339364)
  * @author Gustave Charles-Saigne (345945)
  */
-
-
+//TODO regarder si le triple if/else on peut le condenser en un ?: (opérateur ternaire)
 public final class Math2 {
 
-    private Math2 () {}
-
-    /**
-     *
-     * @param x
-     * @param y
-     * @throws IllegalArgumentException if the x is negative, y equals 0 or y is negative
-     * @return the ceil of the division of x by y
-     */
-    public static int ceilDiv(int x, int y){
-        if (x<0 || y == 0 || y<0){
-            throw new IllegalArgumentException(); //
-        } else {
-            return (x+y-1)/y;
-        }
+    private Math2() {
     }
 
     /**
+     * performs the ceil of the division of x by y
      *
-     * @param y0
-     * @param y1
-     * @param x
-     * @return the result of the function y = (y1-y0)x + y0
+     * @param x an int
+     * @param y an int
+     * @return the ceil of the division of x by y
+     * @throws IllegalArgumentException if the x is negative, y equals 0 or y is negative
      */
-    public static double interpolate(double y0, double y1, double x){
-        return fma(y1-y0,x,y0);
+    public static int ceilDiv(int x, int y) {
+        Preconditions.checkArgument(!(x < 0 || y == 0 || y < 0));
+        return (x + y - 1) / y;
+    }
+
+    /**
+     * uses the Math library fma method to perform an interpolation
+     *
+     * @param y0 coordinate
+     * @param y1 coordinate
+     * @param x  coordinate
+     * @return returns the y coordinate of the point on the line
+     * passing through (0,y0) and (1,y1) and the given x coordinate
+     */
+    public static double interpolate(double y0, double y1, double x) {
+        return fma(y1 - y0, x, y0);
     }
 
     /**
      * Limit a certain value (an integer) in a range between a maximum and a minimum
+     *
      * @param min minimum value in the range
-     * @param v value evaluated
+     * @param v   value evaluated
      * @param max minimum value in the range
-     * @throws IllegalArgumentException if the minimum is greater than the maximum
      * @return a value between min and max
-     */
-    public static int clamp(int min, int v, int max){
-        if (min>max){
-            throw new IllegalArgumentException();
-        }
-        if (v<min){
-            return min;
-        }
-        else if (v>max){
-            return max;
-        }
-        else{
-            return v;
-        }
-    }
-    /**
-     * Limit a certain value (a double) in a range between a maximum and a minimum
-     * @param min minimum value in the range
-     * @param v value evaluated
-     * @param max minimum value in the range
      * @throws IllegalArgumentException if the minimum is greater than the maximum
-     * @return a value between min and max
      */
-    public static double clamp(double min, double v, double max){
-        if (min>max){
-            throw new IllegalArgumentException();
-        }
-        if (v<min){
+    public static int clamp(int min, int v, int max) {
+        Preconditions.checkArgument(min <= max);
+
+        if (v < min) {
             return min;
-        }
-        else if (v>max){
+        } else if (v > max) {
             return max;
-        }
-        else{
+        } else {
             return v;
         }
     }
 
     /**
+     * Limit a certain value (a double) in a range between a maximum and a minimum
+     *
+     * @param min minimum value in the range
+     * @param v   value evaluated
+     * @param max minimum value in the range
+     * @return a value between min and max
+     * @throws IllegalArgumentException if the minimum is greater than the maximum
+     */
+    public static double clamp(double min, double v, double max) {
+        Preconditions.checkArgument(min <= max);
+
+        if (v < min) {
+            return min;
+        } else if (v > max) {
+            return max;
+        } else {
+            return v;
+        }
+    }
+
+    /**
+     * computes the inverse hyperbolic sine of x
      *
      * @param x
      * @return the inverse hyperbolic sine of x
      */
-    public static double asinh(double x){
-        return Math.log(x+Math.sqrt(Math.pow(x,2) + 1));
+    public static double asinh(double x) {
+        return Math.log(x + Math.sqrt(Math.pow(x, 2) + 1));
     }
 
     /**
+     * computes the dot product of U and V
      *
      * @param uX x-coordinate of vector U
      * @param uY y-coordinate of vector U
@@ -102,32 +101,33 @@ public final class Math2 {
      * @param vY y-coordinate of vector V
      * @return the dot product of U and V
      */
-    public static double dotProduct(double uX, double uY, double vX, double vY){
-        return fma(uX, vX, uY*vY);
+    public static double dotProduct(double uX, double uY, double vX, double vY) {
+        return fma(uX, vX, uY * vY);
     }
 
     /**
+     * computes the squared norm of a vector U
      *
      * @param uX x-coordinate of vector U
      * @param uY y-coordinate of vector U
      * @return the squared norm of a vector U
      */
-    public static double squaredNorm(double uX, double uY){
-        return Math.pow(uX,2) + Math.pow(uY, 2);
+    public static double squaredNorm(double uX, double uY) {
+        return Math.pow(uX, 2) + Math.pow(uY, 2);
     }
 
     /**
+     * computes the norm of a vector U
      *
      * @param uX x-coordinate of vector U
      * @param uY y-coordinate of vector U
      * @return the norm of a vector U
      */
-    public static double norm(double uX, double uY){
-        return Math.sqrt(Math.pow(uX,2) + Math.pow(uY, 2));
+    public static double norm(double uX, double uY) {
+        return Math.sqrt(Math.pow(uX, 2) + Math.pow(uY, 2));
     }
 
     /**
-     *
      * @param aX x-coordinate of vector A
      * @param aY y-coordinate of vector A
      * @param bX x-coordinate of vector B
@@ -138,13 +138,13 @@ public final class Math2 {
      * to point P (of coordinates pX and pY) on the vector going from point A to point B
      * (of components bY and bY)
      */
-    public static double projectionLength(double aX, double aY, double bX, double bY, double pX, double pY){
+    public static double projectionLength(double aX, double aY, double bX, double bY, double pX, double pY) {
 
-        double uX = pX-aX;
-        double uY = pY-aY;
-        double vX = bX-aX;
-        double vY = bY-aY;
+        double uX = pX - aX;
+        double uY = pY - aY;
+        double vX = bX - aX;
+        double vY = bY - aY;
 
-        return dotProduct(uX, uY, vX, vY)/norm(vX, vY);
+        return dotProduct(uX, uY, vX, vY) / norm(vX, vY);
     }
 }
