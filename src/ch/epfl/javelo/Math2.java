@@ -9,6 +9,8 @@ import static java.lang.Math.fma;
  * @author Gustave Charles-Saigne (345945)
  */
 //TODO regarder si le triple if/else on peut le condenser en un ?: (opérateur ternaire)
+// TODO voir quand utiliser squaredNorm : l'utiliser lorsqu 'on demande le point le plus proche
+//  d'un certain segment
 public final class Math2 {
 
     private Math2() {
@@ -111,7 +113,7 @@ public final class Math2 {
      * @param uX x-coordinate of vector U
      * @param uY y-coordinate of vector U
      * @return the squared norm of a vector U
-     */ //l'utiliser lorsqu 'on demande le point le plus proche d'un certain segment
+     */
     public static double squaredNorm(double uX, double uY) {
         return Math.pow(uX, 2) + Math.pow(uY, 2);
     }

@@ -123,6 +123,8 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
     }
 
     /**
+     * extracts from the intbuffer the profile type and then treats each case with a switch
+     *
      * @param edgeId the given edge
      * @return returns the array of samples of the profile
      * of the edge with the given identity, which is empty if the edge does not have a profile
@@ -185,7 +187,8 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
 
     }
 
-    private float[] type2and3(int nbSamplesOnEdge, int delta, int firstSampleIndex, int forIndex, int lengthOfExtraction, float[] profileSamples, float NewSampleValue) {
+    private float[] type2and3(int nbSamplesOnEdge, int delta, int firstSampleIndex, int forIndex,
+                              int lengthOfExtraction, float[] profileSamples, float NewSampleValue) {
         int sum = 1;
         for (int i = 1; i <= Math.ceil(nbSamplesOnEdge / delta); ++i) {
             short otherSampleValues = elevations.get(firstSampleIndex + i);
