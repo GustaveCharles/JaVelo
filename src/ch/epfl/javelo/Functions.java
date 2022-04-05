@@ -11,6 +11,9 @@ import java.util.function.DoubleUnaryOperator;
 //TODO demander si utiliser le triple ternary operator ou pas
 public final class Functions {
 
+    /**
+     * Private constructor of Functions in order to keep the class not instantiable
+     */
     private Functions() {
     }
 
@@ -18,7 +21,7 @@ public final class Functions {
      * Returns a constant function, for whose value is always y
      *
      * @param y a function
-     * @return the y-function
+     * @return the constant y-function
      */
     public static DoubleUnaryOperator constant(double y) {
         return (x) -> y;
@@ -28,31 +31,27 @@ public final class Functions {
      * Returns a function obtained by linear interpolation between samples,
      * regularly spaced and covering the range from 0 to xMax;
      *
-     * @param samples
-     * @param xMax
-     * @return a function obtain by linear interpolation between samples
+     * @param samples list of altitude
+     * @param xMax maximum value of x-coordinate
+     * @return a linear interpolation
      * @throws IllegalArgumentException if the samples array contains less than two elements,
      *                                  or if xMax is less than or equal to 0.
      */
     public static DoubleUnaryOperator sampled(float[] samples, double xMax) {
-
         Preconditions.checkArgument(!(samples.length < 2 || xMax <= 0));
-
         return (x) -> {
-            double interval = xMax / (samples.length - 1);
             if (x <= 0) {
                 return samples[0];
             } else if (x >= xMax) {
                 return samples[samples.length - 1];
             }
+            double interval = xMax / (samples.length - 1);
+            int position = (int) (x / interval);
+            double y0 = samples[position];
+            double y1 = samples[position + 1];
+            double xProportional = (x % interval) / interval;
 
-            int i1 = (int) (x / interval);
-            double y0 = samples[i1];
-            double y1 = samples[i1 + 1];
-            double b = (x % interval) / interval;
-
-            return Math2.interpolate(y0, y1, b);
+            return Math2.interpolate(y0, y1, xProportional);
         };
     }
-
 }
