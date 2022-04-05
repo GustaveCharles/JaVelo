@@ -28,6 +28,9 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
     private static final int DIVISE = 2;
 
 
+    /**
+     * enum representing each profile type
+     */
     private enum ProfileTypeEnum {
         PROFILE_TYPE_INEXISTANT(0),
         PROFILE_TYPE_1(1),
@@ -44,7 +47,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
     /**
      * the default should never happen
      */
-    private ProfileTypeEnum switch2(int nombre) {
+    private ProfileTypeEnum switchTypes(int nombre) {
         switch (nombre) {
             case 0:
                 return ProfileTypeEnum.PROFILE_TYPE_INEXISTANT;
@@ -142,7 +145,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
         float newSampleValue = firstSampleValue;
         profileSamples[0] = firstSampleValue;
 
-        switch (switch2(profileType)) {
+        switch (switchTypes(profileType)) {
 
             case PROFILE_TYPE_INEXISTANT:
                 return new float[0];
@@ -150,7 +153,8 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
             case PROFILE_TYPE_1:
                 int sum = 1;
                 for (int i = 1; i <= Math.ceil(nbSamplesOnEdge); ++i) {
-                    float newValue = Q28_4.asFloat(Bits.extractUnsigned(elevations.get(firstSampleIndex + i), 0, 16));
+                    float newValue = Q28_4.asFloat(Bits.extractUnsigned(elevations.get(firstSampleIndex + i),
+                            0, 16));
                     if (sum < nbSamplesOnEdge) {
                         profileSamples[sum] = newValue;
                         ++sum;
@@ -159,11 +163,15 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
                 return inverter(profileSamples, edgeId);
 
             case PROFILE_TYPE_2:
-                type2and3(nbSamplesOnEdge, 2, firstSampleIndex, 1, 8, profileSamples, newSampleValue);
+                type2and3(nbSamplesOnEdge, 2, firstSampleIndex, 1, 8,
+                        profileSamples, newSampleValue);
+
                 return inverter(profileSamples, edgeId);
 
             case PROFILE_TYPE_3:
-                type2and3(nbSamplesOnEdge, 3, firstSampleIndex, 3, 4, profileSamples, newSampleValue);
+                type2and3(nbSamplesOnEdge, 3, firstSampleIndex, 3, 4,
+                        profileSamples, newSampleValue);
+
                 return inverter(profileSamples, edgeId);
 
         }
@@ -205,7 +213,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
     }
 
     /**
-     * extracts from the buffer a short composed of two bytes and then covnerts it to int
+     * extracts from the buffer a short composed of two bytes and then converts it to int
      *
      * @param edgeId the given edge
      * @return returns the identity of the attribute set attached to the given identity edge

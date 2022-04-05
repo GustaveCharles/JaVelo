@@ -32,14 +32,8 @@ public final class SwissBounds {
      * @return returns true if it is indeed within the limits and false otherwise
      */
     public static boolean containsEN(double e, double n) {
-        //return (e <= MAX_E && e >= MIN_E && n <= MAX_N && n >= MIN_N) ? true :
-          //      false;
+        return (e <= MAX_E && e >= MIN_E && n <= MAX_N && n >= MIN_N);
 
-        if((e <= MAX_E && e >= MIN_E && n <= MAX_N && n >= MIN_N) ){
-            return true;
-        }else{
-            return false;
-        }
     }
 }
 
