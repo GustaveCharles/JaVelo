@@ -9,7 +9,7 @@ import java.util.StringJoiner;
  * @author Baudoin Coispeau (339364)
  * @author Gustave Charles-Saigne (345945)
  */
-//TODO demander comment appeler les ...
+
 public record AttributeSet(long bits) {
 
     /**
@@ -28,7 +28,7 @@ public record AttributeSet(long bits) {
      * computes a loop and adds a 1 in the index position of the attribute when the attribute is present
      * in the list
      *
-     * @param attributes a list of attributes
+     * @param attributes an ellipse of attributes
      * @return returns a set containing only the attributes given as argument
      */
     public static AttributeSet of(Attribute... attributes) {
@@ -37,9 +37,8 @@ public record AttributeSet(long bits) {
         for (Attribute a : attributes) {
             set += 1L << a.ordinal();
         }
-        AttributeSet set1 = new AttributeSet(set);
 
-        return set1;
+        return new AttributeSet(set);
     }
 
     /**
@@ -53,9 +52,7 @@ public record AttributeSet(long bits) {
         long mask = 1L << attribute.ordinal();
 
 
-        boolean ThisContainsAttribute = (mask & this.bits) != 0;
-
-        return ThisContainsAttribute;
+        return (mask & this.bits) != 0;
     }
 
     /**
@@ -67,10 +64,7 @@ public record AttributeSet(long bits) {
      */
     public boolean intersects(AttributeSet that) {
 
-        if ((that.bits & this.bits) != 0) {
-            return true;
-        }
-        return false;
+        return (that.bits & this.bits) != 0;
     }
 
     /**

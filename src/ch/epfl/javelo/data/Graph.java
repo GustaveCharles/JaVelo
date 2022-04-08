@@ -194,7 +194,7 @@ public final class Graph {
     /**
      * checks if the edge is inverted or not
      *
-     * @param edgeId
+     * @param edgeId the given edge
      * @return returns true iff the given identity edge goes
      * in the opposite direction of the OSM channel it comes from
      */
@@ -205,7 +205,7 @@ public final class Graph {
     /**
      * calls the method from GraphEdges to give the set of OSM attributes
      *
-     * @param edgeId
+     * @param edgeId the given edge
      * @return returns the set of OSM attributes attached to the given identity edge
      */
     public AttributeSet edgeAttributes(int edgeId) {

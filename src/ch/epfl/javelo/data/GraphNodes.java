@@ -27,7 +27,7 @@ public record GraphNodes(IntBuffer buffer) {
 
 
     /**
-     * we know that each NODE_INTS there is a new node so we divide de total number of nodes
+     * at each NODE_INTS there is a new node, so we divide de total number of nodes
      * by NODE_INTS
      *
      * @return returns the total number of nodes

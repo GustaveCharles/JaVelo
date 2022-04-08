@@ -66,7 +66,8 @@ public record PointWebMercator(double x, double y) {
      * @return returns the y coordinate at the given zoom level
      */
     public double yAtZoomLevel(int zoomLevel) {
-        return Math.scalb(this.y, 8 + zoomLevel); }
+        return Math.scalb(this.y, 8 + zoomLevel);
+    }
 
     /**
      * @return returns the longitude of the point in the WGS84 system in radians

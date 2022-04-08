@@ -11,9 +11,6 @@ import ch.epfl.javelo.Math2;
 
 public final class WebMercator {
 
-    /**
-     * private constructor, non instantiable
-     */
     private WebMercator() {
     }
 
@@ -24,7 +21,6 @@ public final class WebMercator {
      * @return returns the x value of the Web Mercator coordinate in a value between 0 and 1 ([0,1])
      */
     public static double x(double lon) {
-
 
         double X = (lon + Math.PI) / (2 * Math.PI);
 

@@ -26,9 +26,9 @@ public final class RouteComputer {
     }
 
     /**
-     * Uses the A* algorithm to compute the minimum total cost route from identity node startNodeId to identity node endNodeId in the graph
-     * passed to the constructor, or null if no route exists. If multiple minimum total cost routes exist,
-     * bestRouteBetween returns any of them.
+     * Uses the A* algorithm to compute the minimum total cost route from identity node startNodeId
+     * to identity node endNodeId in the graph passed to the constructor, or null if no route exists.
+     * If multiple minimum total cost routes exist, bestRouteBetween returns any of them.
      *
      * @param startNodeId identity of the starting node
      * @param endNodeId   identity of the last node

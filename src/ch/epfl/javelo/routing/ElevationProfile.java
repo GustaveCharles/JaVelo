@@ -25,12 +25,12 @@ public final class ElevationProfile {
      * @throws IllegalArgumentException if the length is negative or zero, or if the array of samples
      *                                  contains less than 2 elements
      */
-    public ElevationProfile(double length, float[] elevationSamples){
+    public ElevationProfile(double length, float[] elevationSamples) {
         this.length = length;
         this.samples = new float[elevationSamples.length];
         Preconditions.checkArgument(!(length <= 0 || elevationSamples.length < 2));
         System.arraycopy(elevationSamples, 0, samples, 0, elevationSamples.length);
-        for (float sample : samples){
+        for (float sample : samples) {
             s.accept(sample);
         }
     }
@@ -62,30 +62,34 @@ public final class ElevationProfile {
         return s.getMax();
     }
 
-    /** Computes the total elevation gain of a given profile in meters.
+    /**
+     * Computes the total elevation gain of a given profile in meters.
      * The total positive slope is equal to the sum of all the positive differences between a sample and its predecessor.
+     *
      * @return the total elevation gain of the profile
      */
-    public double totalAscent(){
+    public double totalAscent() {
         double totalAscent = 0;
-        for (int i = 0; i<samples.length - 1; i++){
-            float difference = samples[i+1] - samples[i];
-            if (difference >= 0){
+        for (int i = 0; i < samples.length - 1; i++) {
+            float difference = samples[i + 1] - samples[i];
+            if (difference >= 0) {
                 totalAscent += difference;
             }
         }
         return Math.abs(totalAscent);
     }
 
-    /** Computes the total negative elevation of a given profile in meters.
+    /**
+     * Computes the total negative elevation of a given profile in meters.
      * The total negative elevation is equal to the sum of all the negative differences between a sample and its predecessor.
+     *
      * @return the total elevation gain of the profile (positive or zero)
      */
-    public double totalDescent(){
+    public double totalDescent() {
         double totalDescent = 0;
-        for (int i = 0; i<samples.length - 1; i++){
-            float difference = samples[i+1] - samples[i];
-            if (difference <= 0){
+        for (int i = 0; i < samples.length - 1; i++) {
+            float difference = samples[i + 1] - samples[i];
+            if (difference <= 0) {
                 totalDescent += difference;
             }
         }
@@ -94,11 +98,12 @@ public final class ElevationProfile {
 
     /**
      * Computes the altitude of the profile at the given position in meters
+     *
      * @param position an x-axis position on the edge
      * @return the altitude at the given position
      */
-    public double elevationAt(double position){
-        if (position <= 0){
+    public double elevationAt(double position) {
+        if (position <= 0) {
             return samples[0];
         }
         if (position >= length) {

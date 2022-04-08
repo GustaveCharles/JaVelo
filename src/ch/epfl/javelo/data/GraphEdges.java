@@ -197,8 +197,8 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
 
     }
 
-    private float[] type2and3(int nbSamplesOnEdge, int delta, int firstSampleIndex, int forIndex,
-                              int lengthOfExtraction, float[] profileSamples, float NewSampleValue) {
+    private void type2and3(int nbSamplesOnEdge, int delta, int firstSampleIndex, int forIndex,
+                           int lengthOfExtraction, float[] profileSamples, float NewSampleValue) {
         int sum = 1;
         for (int i = 1; i <= Math.ceil(nbSamplesOnEdge / delta); ++i) {
             short otherSampleValues = elevations.get(firstSampleIndex + i);
@@ -212,7 +212,6 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
                 }
             }
         }
-        return profileSamples;
     }
 
     /**

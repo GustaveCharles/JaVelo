@@ -24,6 +24,7 @@ public final class SingleRoute implements Route {
 
     /**
      * @throws IllegalArgumentException if the size of the edge is equal to 0
+     * creates the simple route composed of the given edges
      */
     public SingleRoute(List<Edge> edges) {
         Preconditions.checkArgument(edges.size() != 0);
