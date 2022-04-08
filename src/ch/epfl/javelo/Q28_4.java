@@ -27,8 +27,8 @@ public final class Q28_4 {
     /**
      * Gives the decimal value corresponding to a number in the Q28.4 representation
      *
-     * @param q28_4 a number in the 28.4 representation
-     * @return a decimal number
+     * @param q28_4 a double
+     * @return a decimal number in the 28.4 representation
      */
     public static double asDouble(int q28_4) {
         return scalb((double) q28_4, -4);
@@ -37,11 +37,10 @@ public final class Q28_4 {
     /**
      * Gives the floating-point number corresponding to a number in the Q28.4 representation
      *
-     * @param q28_4 a number in the 28.4 representation
-     * @return a floating-point number
+     * @param q28_4 a float
+     * @return a floating-point number in the 28.4 representation
      */
     public static float asFloat(int q28_4) {
         return scalb(q28_4, -4);
     }
-
 }

@@ -16,8 +16,8 @@ public final class Math2 {
     /**
      * performs the ceil of the division of x by y
      *
-     * @param x an integer
-     * @param y an integer
+     * @param x a dividend
+     * @param y a divisor
      * @return the ceil of the division of x by y
      * @throws IllegalArgumentException if the x is negative, y equals 0 or y is negative
      */

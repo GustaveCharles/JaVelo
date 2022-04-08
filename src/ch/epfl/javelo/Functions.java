@@ -3,7 +3,7 @@ package ch.epfl.javelo;
 import java.util.function.DoubleUnaryOperator;
 
 /**
- * Create objects representing mathematical functions of reals on reals
+ * Creates objects representing mathematical functions of reals on reals
  *
  * @author Baudoin Coispeau (339364)
  * @author Gustave Charles-Saigne (345945)
