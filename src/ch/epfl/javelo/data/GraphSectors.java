@@ -9,15 +9,13 @@ import static ch.epfl.javelo.Math2.clamp;
 import static ch.epfl.javelo.projection.SwissBounds.*;
 
 /**
- * represents the array containing the 16384 sectors of JaVelo
+ * Represents the array containing the 16384 sectors of JaVelo
  *
  * @author Gustave Charles -- Saigne (345945)
  * @author Baudoin Coispeau (339364)
  */
 
-
 public record GraphSectors(ByteBuffer buffer) {
-
 
     private static final int OFFSET_NODE = 0;
     private static final int OFFSET_LENGTH = OFFSET_NODE + Integer.BYTES;
@@ -27,8 +25,7 @@ public record GraphSectors(ByteBuffer buffer) {
     private final static double sectorWidth = WIDTH / NUMBER_OF_SECTORS_PER_AXIS;
 
     /**
-     * computes the list of all sectors having an
-     * intersection with the square centered at the given point and with a
+     * computes the list of all sectors having an intersection with the square centered at the given point and with a
      * side equal to twice the given distance.
      *
      * @param center   the given point
@@ -66,5 +63,4 @@ public record GraphSectors(ByteBuffer buffer) {
      */
     public record Sector(int startNodeId, int endNodeId) {
     }
-
 }

@@ -8,12 +8,9 @@ import java.util.function.DoubleUnaryOperator;
  * @author Baudoin Coispeau (339364)
  * @author Gustave Charles-Saigne (345945)
  */
-//TODO demander si utiliser le triple ternary operator ou pas
+
 public final class Functions {
 
-    /**
-     * Private constructor of Functions in order to keep the class not instantiable
-     */
     private Functions() {
     }
 
@@ -31,8 +28,8 @@ public final class Functions {
      * Returns a function obtained by linear interpolation between samples,
      * regularly spaced and covering the range from 0 to xMax;
      *
-     * @param samples list of altitude
-     * @param xMax maximum value of x-coordinate
+     * @param samples altitude list
+     * @param xMax    maximum value of x-coordinate
      * @return a linear interpolation
      * @throws IllegalArgumentException if the samples array contains less than two elements,
      *                                  or if xMax is less than or equal to 0.
@@ -42,7 +39,8 @@ public final class Functions {
         return (x) -> {
             if (x <= 0) {
                 return samples[0];
-            } else if (x >= xMax) {
+            }
+            if (x >= xMax) {
                 return samples[samples.length - 1];
             }
             double interval = xMax / (samples.length - 1);
@@ -50,7 +48,6 @@ public final class Functions {
             double y0 = samples[position];
             double y1 = samples[position + 1];
             double xProportional = (x % interval) / interval;
-
             return Math2.interpolate(y0, y1, xProportional);
         };
     }

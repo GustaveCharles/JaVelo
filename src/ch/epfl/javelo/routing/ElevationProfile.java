@@ -1,28 +1,24 @@
 package ch.epfl.javelo.routing;
 
 import ch.epfl.javelo.Functions;
+import ch.epfl.javelo.Preconditions;
 
 import java.util.DoubleSummaryStatistics;
 
 /**
- * represents the longitudinal profile of a single or multiple route.
+ * Represents the longitudinal profile of a single or multiple route.
  *
  * @author Gustave Charles -- Saigne (345945)
  * @author Baudoin Coispeau (339364)
  */
-//TODO essayer de changer la composition pour pouvoir utiliser checkarguments dans ElevationProfile
-    //TODO utiliser l operateur ternaire ?: pour elevationAt
-    //TODO regarder si la classe est bien immuable (copie profonde du tableau samples?)
 public final class ElevationProfile {
 
-    private double length;
-    private float[] samples;
-    private DoubleSummaryStatistics s = new DoubleSummaryStatistics();
+    private final double length;
+    private final float[] samples;
+    private final DoubleSummaryStatistics s = new DoubleSummaryStatistics();
 
     /**
-     * Constructs the profile of a route of length "length"
-     * and whose elevation samples are contained in elevationSamples. Moreover, create a copy of the attribute in
-     * order to respect immutability
+     * Build the profile of a route and whose elevation samples are contained in the array elevationSamples.
      * @param length length (in meters)
      * @param elevationSamples sample of elevations uniformly distributed along the route
      * @throws IllegalArgumentException if the length is negative or zero, or if the array of samples
@@ -31,45 +27,44 @@ public final class ElevationProfile {
     public ElevationProfile(double length, float[] elevationSamples){
         this.length = length;
         this.samples = new float[elevationSamples.length];
-
-        if (length <= 0 || elevationSamples.length < 2){
-            throw new IllegalArgumentException();
-        } else {
-            System.arraycopy(elevationSamples, 0, samples, 0, elevationSamples.length);
-            for (float sample : samples){
-                s.accept(sample);
-            }
+        Preconditions.checkArgument(!(length <= 0 || elevationSamples.length < 2));
+        System.arraycopy(elevationSamples, 0, samples, 0, elevationSamples.length);
+        for (float sample : samples){
+            s.accept(sample);
         }
     }
 
     /**
-     * Getter for the length
-     * @return the length (in meters)
+     * Getter for the length of the profile
+     * @return a length (in meters)
      */
     public double length(){
         return length;
     }
 
     /**
-     * @return Returns the minimum altitude of the profile, in meters,
+     * Use the DoubleSummaryStatistics getMin method to compute the minimal altitude of a given profile in meters
+     * @return the minimum altitude of the profile
      */
     public double minElevation(){
         return s.getMin();
     }
 
     /**
-     * @return Returns the maximum altitude of the profile, in meters
+     * Use the DoubleSummaryStatistics getMax method to compute the maximal altitude of a given profile in meters
+     * @return the maximum altitude of the profile
      */
     public double maxElevation(){
         return s.getMax();
     }
 
-    /**
-     * @return Returns the total elevation gain of the profile, in meters
+    /** Compute the total elevation gain of a given profile in meters.
+     * The total positive slope is equal to the sum of all the positive differences between a sample and its predecessor.
+     * @return the total elevation gain of the profile
      */
     public double totalAscent(){
         double totalAscent = 0;
-        for (int i = 0; i< samples.length - 1; i++){
+        for (int i = 0; i<samples.length - 1; i++){
             float difference = samples[i+1] - samples[i];
             if (difference >= 0){
                 totalAscent += difference;
@@ -78,12 +73,13 @@ public final class ElevationProfile {
         return Math.abs(totalAscent);
     }
 
-    /**
-     * @return Returns the total negative elevation of the profile, in meters
+    /** Compute the total negative elevation of a given profile in meters.
+     * The total negative elevation is equal to the sum of all the negative differences between a sample and its predecessor.
+     * @return the total elevation gain of the profile (positive or zero)
      */
     public double totalDescent(){
         double totalDescent = 0;
-        for (int i = 0; i< samples.length - 1; i++){
+        for (int i = 0; i<samples.length - 1; i++){
             float difference = samples[i+1] - samples[i];
             if (difference <= 0){
                 totalDescent += difference;
@@ -93,9 +89,9 @@ public final class ElevationProfile {
     }
 
     /**
-     * Compute the altitude of the profile at the given position
-     * @param position position on the edge
-     * @return the altitude of the profile at the given position
+     * Compute the altitude of the profile at the given position in meters
+     * @param position an x-axis position on the edge
+     * @return the altitude at the given position
      */
     public double elevationAt(double position){
         if (position <= 0){

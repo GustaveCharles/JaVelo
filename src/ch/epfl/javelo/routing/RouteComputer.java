@@ -5,15 +5,34 @@ import ch.epfl.javelo.data.Graph;
 
 import java.util.*;
 
+/**
+ * Represents a route planner
+ */
 public final class RouteComputer {
     private final Graph graph;
     private final CostFunction costFunction;
 
-    public RouteComputer(Graph graph, CostFunction costFunction){
+    /**
+     * Constructs a route planner for the given graph and cost function.
+     *
+     * @param graph        a graph
+     * @param costFunction a function that returns a multiplicative factor for the length of a route based on different parameters
+     */
+    public RouteComputer(Graph graph, CostFunction costFunction) {
         this.graph = graph;
         this.costFunction = costFunction;
     }
 
+    /**
+     * Compute the minimum total cost route from identity node startNodeId to identity node endNodeId in the graph
+     * passed to the constructor, or null if no route exists. If multiple minimum total cost routes exist,
+     * bestRouteBetween returns any of them.
+     *
+     * @param startNodeId identity of the starting node
+     * @param endNodeId   identity of the last node
+     * @return the best cycling route between 2 nodes
+     * @throws IllegalArgumentException if the start and end node are the same
+     */
     public Route bestRouteBetween(int startNodeId, int endNodeId) {
         Preconditions.checkArgument(startNodeId != endNodeId);
         int nbOfNode = graph.nodeCount();
@@ -27,7 +46,9 @@ public final class RouteComputer {
         while (exploringNode.size() != 0) {
             int N = getIndexOfMinValue(exploringNode, distance);
             exploringNode.remove(N);
-            if (N == endNodeId) {return routeCreator(startNodeId, endNodeId, predecessor);}
+            if (N == endNodeId) {
+                return routeCreator(startNodeId, endNodeId, predecessor);
+            }
             int numberOfOutgoingEdges = graph.nodeOutDegree(N);
             for (int edgeIndex = 0; edgeIndex < numberOfOutgoingEdges; edgeIndex++) {
                 int outgoingEdgeId = graph.nodeOutEdgeId(N, edgeIndex);
@@ -43,6 +64,13 @@ public final class RouteComputer {
         return null;
     }
 
+    /**
+     * Find the node in exploring with the minimal distance from the starting node
+     *
+     * @param exploringNode list of node
+     * @param distance      array who represents the distance of all nodes from the starting node
+     * @return the index of the node with the minimal distance
+     */
     private int getIndexOfMinValue(Set<Integer> exploringNode, double[] distance) {
         double minValue = Double.POSITIVE_INFINITY;
         int N = 0;
@@ -55,7 +83,15 @@ public final class RouteComputer {
         return N;
     }
 
-    private int getEdgeId(int nodeBefore, int nodeAfter){
+    /**
+     * Compute the edge identity of a node which points to the next node (nodeAfter) by searching through the
+     * outgoing edges of this node
+     *
+     * @param nodeBefore the first node
+     * @param nodeAfter  the second node
+     * @return an edge identity
+     */
+    private int getEdgeId(int nodeBefore, int nodeAfter) {
         int nbOfEdges = graph.nodeOutDegree(nodeBefore);
         for (int edgeIndex = 0; edgeIndex < nbOfEdges; edgeIndex++) {
             int outgoingEdgeId = graph.nodeOutEdgeId(nodeBefore, edgeIndex);
@@ -67,10 +103,18 @@ public final class RouteComputer {
         return 0;
     }
 
-    private SingleRoute routeCreator(int startNodeId, int endNodeId, int[] predecessor){
+    /**
+     * Create a new SingleRoute composed of the edges connecting the best route
+     *
+     * @param startNodeId identity of the starting node
+     * @param endNodeId   identity of the last node
+     * @param predecessor an array of predecessor of each node in the route
+     * @return an instance of SingleRoute
+     */
+    private SingleRoute routeCreator(int startNodeId, int endNodeId, int[] predecessor) {
         List<Edge> edges = new ArrayList<>();
         int currentNode = endNodeId;
-        while (currentNode != startNodeId){
+        while (currentNode != startNodeId) {
             edges.add(Edge.of(graph, getEdgeId(predecessor[currentNode], currentNode), predecessor[currentNode], currentNode));
             currentNode = predecessor[currentNode];
         }

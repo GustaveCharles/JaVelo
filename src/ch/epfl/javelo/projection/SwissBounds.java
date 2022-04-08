@@ -1,12 +1,11 @@
 package ch.epfl.javelo.projection;
 
 /**
- * contains the necessary constant to delimit the Swiss territory
+ * Contains the necessary constant to delimit the Swiss territory
  *
  * @author Gustave Charles -- Saigne (345945)
  * @author Baudoin Coispeau (339364)
  */
-//TODO regarder pq la méthode s'affiche en jaune avec un assistant
 public final class SwissBounds {
 
     private SwissBounds() {
@@ -14,7 +13,7 @@ public final class SwissBounds {
 
     /**
      * The bounds of the Swiss territory represented by a rectangle with a maximum
-     * or a minimum on the north,south, east and west sides of the rectangle
+     * or a minimum on the north, south, east and west sides of the rectangle
      */
     public static final double MIN_E = 2485000, MAX_E = 2834000, MIN_N = 1075000,
             MAX_N = 1296000;
@@ -33,7 +32,6 @@ public final class SwissBounds {
      */
     public static boolean containsEN(double e, double n) {
         return (e <= MAX_E && e >= MIN_E && n <= MAX_N && n >= MIN_N);
-
     }
 }
 

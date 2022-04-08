@@ -3,7 +3,7 @@ package ch.epfl.javelo;
 import static java.lang.Math.fma;
 
 /**
- * offers static methods for performing certain mathematical calculations
+ * Offers static methods for performing certain mathematical calculations
  *
  * @author Baudoin Coispeau (339364)
  * @author Gustave Charles-Saigne (345945)
@@ -19,8 +19,8 @@ public final class Math2 {
     /**
      * performs the ceil of the division of x by y
      *
-     * @param x an int
-     * @param y an int
+     * @param x an integer
+     * @param y an integer
      * @return the ceil of the division of x by y
      * @throws IllegalArgumentException if the x is negative, y equals 0 or y is negative
      */
@@ -32,9 +32,9 @@ public final class Math2 {
     /**
      * uses the Math library fma method to perform an interpolation
      *
-     * @param y0 coordinate
-     * @param y1 coordinate
-     * @param x  coordinate
+     * @param y0 coordinate of the first point of line
+     * @param y1 coordinate of the second point of the line
+     * @param x  given x-coordinate
      * @return returns the y coordinate of the point on the line
      * passing through (0,y0) and (1,y1) and the given x coordinate
      */
@@ -53,7 +53,6 @@ public final class Math2 {
      */
     public static int clamp(int min, int v, int max) {
         Preconditions.checkArgument(min <= max);
-
         if (v < min) {
             return min;
         } else if (v > max) {
@@ -74,7 +73,6 @@ public final class Math2 {
      */
     public static double clamp(double min, double v, double max) {
         Preconditions.checkArgument(min <= max);
-
         if (v < min) {
             return min;
         } else if (v > max) {
@@ -87,7 +85,7 @@ public final class Math2 {
     /**
      * computes the inverse hyperbolic sine of x
      *
-     * @param x
+     * @param x the given variable
      * @return the inverse hyperbolic sine of x
      */
     public static double asinh(double x) {
@@ -95,13 +93,13 @@ public final class Math2 {
     }
 
     /**
-     * computes the dot product of U and V
+     * computes the dot product of a vector U and a vector V
      *
      * @param uX x-coordinate of vector U
      * @param uY y-coordinate of vector U
      * @param vX x-coordinate of vector V
      * @param vY y-coordinate of vector V
-     * @return the dot product of U and V
+     * @return a dot product between two vectors
      */
     public static double dotProduct(double uX, double uY, double vX, double vY) {
         return fma(uX, vX, uY * vY);
@@ -112,7 +110,7 @@ public final class Math2 {
      *
      * @param uX x-coordinate of vector U
      * @param uY y-coordinate of vector U
-     * @return the squared norm of a vector U
+     * @return the squared norm of a given vector
      */
     public static double squaredNorm(double uX, double uY) {
         return Math.pow(uX, 2) + Math.pow(uY, 2);
@@ -123,7 +121,7 @@ public final class Math2 {
      *
      * @param uX x-coordinate of vector U
      * @param uY y-coordinate of vector U
-     * @return the norm of a vector U
+     * @return the norm of a given vector
      */
     public static double norm(double uX, double uY) {
         return Math.sqrt(Math.pow(uX, 2) + Math.pow(uY, 2));
@@ -141,12 +139,10 @@ public final class Math2 {
      * (of components bY and bY)
      */
     public static double projectionLength(double aX, double aY, double bX, double bY, double pX, double pY) {
-
         double uX = pX - aX;
         double uY = pY - aY;
         double vX = bX - aX;
         double vY = bY - aY;
-
         return dotProduct(uX, uY, vX, vY) / norm(vX, vY);
     }
 }

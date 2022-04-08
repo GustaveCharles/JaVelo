@@ -8,18 +8,17 @@ package ch.epfl.javelo;
  */
 public final class Preconditions {
 
-    /** private constructor to make the class non-instantiable
-     *
-     */
+    private Preconditions() {
+    }
 
-    private Preconditions() {}
-
-    /** @throws IllegalArgumentException if its argument is false and does nothing otherwise
+    /**
+     * Check one or multiple conditions of a method before performing it
      *
      * @param shouldBeTrue the boolean value
+     * @throws IllegalArgumentException if its argument is false and does nothing otherwise
      */
-    public static void checkArgument(boolean shouldBeTrue){
-        if(!shouldBeTrue){
+    public static void checkArgument(boolean shouldBeTrue) {
+        if (!shouldBeTrue) {
             throw new IllegalArgumentException();
         }
     }
