@@ -127,7 +127,7 @@ public final class SingleRoute implements Route {
             double pointPositionOnEdge = Math2.clamp(0, edge.positionClosestTo(point), edge.length());
             double pointPositionOnRoute = pointPositionOnEdge + routePositions[edges.indexOf(edge)];
             pointCompare = pointCompare.min(edge.pointAt(pointPositionOnEdge),
-                    pointPositionOnRoute, point.distanceTo(edge.pointAt(pointPositionOnRoute)));
+                    pointPositionOnRoute, point.distanceTo(edge.pointAt(pointPositionOnEdge)));
         }
         return pointCompare;
     }
@@ -175,4 +175,3 @@ public final class SingleRoute implements Route {
                 position - routePositions[dichValue];
     }
 }
-

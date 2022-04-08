@@ -49,6 +49,7 @@ public final class RouteComputer {
         float[] distance = new float[nbOfNode];
         int[] predecessor = new int[nbOfNode];
         PriorityQueue<WeightedNode> exploringNode = new PriorityQueue<>();
+        List<Edge> edges = new ArrayList<>();
         Arrays.fill(distance, Float.POSITIVE_INFINITY);
         distance[startNodeId] = 0;
 
@@ -60,7 +61,13 @@ public final class RouteComputer {
                 continue;
             }
             if (nodeId == endNodeId) {
-                return routeCreator(startNodeId, endNodeId, predecessor);
+                int currentNode = endNodeId;
+                while (currentNode != startNodeId) {
+                    edges.add(Edge.of(graph, getEdgeId(predecessor[currentNode], currentNode), predecessor[currentNode], currentNode));
+                    currentNode = predecessor[currentNode];
+                }
+                Collections.reverse(edges);
+                return new SingleRoute(edges);
             }
             int numberOfOutgoingEdges = graph.nodeOutDegree(nodeId);
             for (int edgeIndex = 0; edgeIndex < numberOfOutgoingEdges; edgeIndex++) {
@@ -103,25 +110,6 @@ public final class RouteComputer {
             }
         }
         return -1;
-    }
-
-    /**
-     * Creates a new SingleRoute composed of the edges connecting the best route
-     *
-     * @param startNodeId identity of the starting node
-     * @param endNodeId   identity of the last node
-     * @param predecessor an array of predecessor of each node in the route
-     * @return an instance of SingleRoute
-     */
-    private SingleRoute routeCreator(int startNodeId, int endNodeId, int[] predecessor) {
-        List<Edge> edges = new ArrayList<>();
-        int currentNode = endNodeId;
-        while (currentNode != startNodeId) {
-            edges.add(Edge.of(graph, getEdgeId(predecessor[currentNode], currentNode), predecessor[currentNode], currentNode));
-            currentNode = predecessor[currentNode];
-        }
-        Collections.reverse(edges);
-        return new SingleRoute(edges);
     }
 }
 
