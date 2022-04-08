@@ -18,11 +18,12 @@ public final class ElevationProfile {
     private final DoubleSummaryStatistics s = new DoubleSummaryStatistics();
 
     /**
-     * Build the profile of a route and whose elevation samples are contained in the array elevationSamples.
-     * @param length length (in meters)
+     * Builds the profile of a route and whose elevation samples are contained in the array elevationSamples.
+     *
+     * @param length           length (in meters)
      * @param elevationSamples sample of elevations uniformly distributed along the route
      * @throws IllegalArgumentException if the length is negative or zero, or if the array of samples
-     * contains less than 2 elements
+     *                                  contains less than 2 elements
      */
     public ElevationProfile(double length, float[] elevationSamples){
         this.length = length;
@@ -36,29 +37,32 @@ public final class ElevationProfile {
 
     /**
      * Getter for the length of the profile
+     *
      * @return a length (in meters)
      */
-    public double length(){
+    public double length() {
         return length;
     }
 
     /**
-     * Use the DoubleSummaryStatistics getMin method to compute the minimal altitude of a given profile in meters
+     * Uses the DoubleSummaryStatistics getMin method to compute the minimal altitude of a given profile in meters
+     *
      * @return the minimum altitude of the profile
      */
-    public double minElevation(){
+    public double minElevation() {
         return s.getMin();
     }
 
     /**
-     * Use the DoubleSummaryStatistics getMax method to compute the maximal altitude of a given profile in meters
+     * Uses the DoubleSummaryStatistics getMax method to compute the maximal altitude of a given profile in meters
+     *
      * @return the maximum altitude of the profile
      */
-    public double maxElevation(){
+    public double maxElevation() {
         return s.getMax();
     }
 
-    /** Compute the total elevation gain of a given profile in meters.
+    /** Computes the total elevation gain of a given profile in meters.
      * The total positive slope is equal to the sum of all the positive differences between a sample and its predecessor.
      * @return the total elevation gain of the profile
      */
@@ -73,7 +77,7 @@ public final class ElevationProfile {
         return Math.abs(totalAscent);
     }
 
-    /** Compute the total negative elevation of a given profile in meters.
+    /** Computes the total negative elevation of a given profile in meters.
      * The total negative elevation is equal to the sum of all the negative differences between a sample and its predecessor.
      * @return the total elevation gain of the profile (positive or zero)
      */
@@ -89,7 +93,7 @@ public final class ElevationProfile {
     }
 
     /**
-     * Compute the altitude of the profile at the given position in meters
+     * Computes the altitude of the profile at the given position in meters
      * @param position an x-axis position on the edge
      * @return the altitude at the given position
      */

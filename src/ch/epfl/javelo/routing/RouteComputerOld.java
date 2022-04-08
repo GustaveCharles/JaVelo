@@ -8,7 +8,7 @@ import java.util.*;
 /**
  * Represents a route planner
  */
-public final class RouteComputer {
+public final class RouteComputerOld {
     private final Graph graph;
     private final CostFunction costFunction;
 
@@ -18,13 +18,13 @@ public final class RouteComputer {
      * @param graph        a graph
      * @param costFunction a function that returns a multiplicative factor for the length of a route based on different parameters
      */
-    public RouteComputer(Graph graph, CostFunction costFunction) {
+    public RouteComputerOld(Graph graph, CostFunction costFunction) {
         this.graph = graph;
         this.costFunction = costFunction;
     }
 
     /**
-     * Compute the minimum total cost route from identity node startNodeId to identity node endNodeId in the graph
+     * Uses the A* algorithm to compute the minimum total cost route from identity node startNodeId to identity node endNodeId in the graph
      * passed to the constructor, or null if no route exists. If multiple minimum total cost routes exist,
      * bestRouteBetween returns any of them.
      *
@@ -65,7 +65,7 @@ public final class RouteComputer {
     }
 
     /**
-     * Find the node in exploring with the minimal distance from the starting node
+     * Finds the node in exploring with the minimal distance from the starting node
      *
      * @param exploringNode list of node
      * @param distance      array who represents the distance of all nodes from the starting node
@@ -84,7 +84,7 @@ public final class RouteComputer {
     }
 
     /**
-     * Compute the edge identity of a node which points to the next node (nodeAfter) by searching through the
+     * Computes the edge identity of a node which points to the next node (nodeAfter) by searching through the
      * outgoing edges of this node
      *
      * @param nodeBefore the first node
@@ -104,7 +104,7 @@ public final class RouteComputer {
     }
 
     /**
-     * Create a new SingleRoute composed of the edges connecting the best route
+     * Creates a new SingleRoute composed of the edges connecting the best route
      *
      * @param startNodeId identity of the starting node
      * @param endNodeId   identity of the last node

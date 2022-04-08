@@ -12,7 +12,7 @@ public final class Preconditions {
     }
 
     /**
-     * Check one or multiple conditions of a method before performing it
+     * Checks one or multiple conditions of a method before performing it
      *
      * @param shouldBeTrue the boolean value
      * @throws IllegalArgumentException if its argument is false and does nothing otherwise

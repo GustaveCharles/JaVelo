@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.function.DoubleUnaryOperator;
 
 /**
- * Calculate the longitudinal profile of a given route
+ * Calculates the longitudinal profile of a given route
  *
  * @author Gustave Charles -- Saigne (345945)
  * @author Baudoin Coispeau (339364)
@@ -85,7 +85,7 @@ public final class ElevationProfileComputer {
     }
 
     /**
-     * Find in array the index of the first valid value, that is to say a value that is not equal to Float.NaN
+     * Finds in array the index of the first valid value, that is to say a value that is not equal to Float.NaN
      *
      * @param sample the given array
      * @return the index of the first value different from Nan value
@@ -99,7 +99,7 @@ public final class ElevationProfileComputer {
     }
 
     /**
-     * Find in array the index of the last valid value, that is to say a value that is not equal to Float.NaN
+     * Finds in array the index of the last valid value, that is to say a value that is not equal to Float.NaN
      *
      * @param sample the given array
      * @return the index of the last value different from Nan value

@@ -8,9 +8,6 @@ import static java.lang.Math.fma;
  * @author Baudoin Coispeau (339364)
  * @author Gustave Charles-Saigne (345945)
  */
-//TODO regarder si le triple if/else on peut le condenser en un ?: (opérateur ternaire)
-// TODO voir quand utiliser squaredNorm : l'utiliser lorsqu 'on demande le point le plus proche
-//  d'un certain segment
 public final class Math2 {
 
     private Math2() {
@@ -43,7 +40,7 @@ public final class Math2 {
     }
 
     /**
-     * Limit a certain value (an integer) in a range between a maximum and a minimum
+     * Limits a certain value (an integer) in a range between a maximum and a minimum
      *
      * @param min minimum value in the range
      * @param v   value evaluated
@@ -53,17 +50,12 @@ public final class Math2 {
      */
     public static int clamp(int min, int v, int max) {
         Preconditions.checkArgument(min <= max);
-        if (v < min) {
-            return min;
-        } else if (v > max) {
-            return max;
-        } else {
-            return v;
-        }
+        return (v < min ? min :
+                (Math.min(v, max)));
     }
 
     /**
-     * Limit a certain value (a double) in a range between a maximum and a minimum
+     * Limits a certain value (a double) in a range between a maximum and a minimum
      *
      * @param min minimum value in the range
      * @param v   value evaluated
@@ -73,13 +65,8 @@ public final class Math2 {
      */
     public static double clamp(double min, double v, double max) {
         Preconditions.checkArgument(min <= max);
-        if (v < min) {
-            return min;
-        } else if (v > max) {
-            return max;
-        } else {
-            return v;
-        }
+        return (v < min ? min :
+                (Math.min(v, max)));
     }
 
     /**
@@ -89,7 +76,7 @@ public final class Math2 {
      * @return the inverse hyperbolic sine of x
      */
     public static double asinh(double x) {
-        return Math.log(x + Math.sqrt(Math.pow(x, 2) + 1));
+        return Math.log(x + Math.sqrt(x * x + 1));
     }
 
     /**
@@ -113,7 +100,7 @@ public final class Math2 {
      * @return the squared norm of a given vector
      */
     public static double squaredNorm(double uX, double uY) {
-        return Math.pow(uX, 2) + Math.pow(uY, 2);
+        return uX * uX + uY * uY;
     }
 
     /**
@@ -124,19 +111,20 @@ public final class Math2 {
      * @return the norm of a given vector
      */
     public static double norm(double uX, double uY) {
-        return Math.sqrt(Math.pow(uX, 2) + Math.pow(uY, 2));
+        return Math.sqrt(uX * uX + uY * uY);
     }
 
     /**
+     * Computes the length of the projection of the vector going from point A (of coordinates aX and aY)
+     * to point P (of coordinates pX and pY) on the vector going from point A to point B (of components bY and bY)
+     *
      * @param aX x-coordinate of vector A
      * @param aY y-coordinate of vector A
      * @param bX x-coordinate of vector B
      * @param bY y-coordinate of vector B
      * @param pX x-coordinate of vector P
      * @param pY y-coordinate of vector P
-     * @return the length of the projection of the vector going from point A (of coordinates aX and aY)
-     * to point P (of coordinates pX and pY) on the vector going from point A to point B
-     * (of components bY and bY)
+     * @return the length of a projection between vectors
      */
     public static double projectionLength(double aX, double aY, double bX, double bY, double pX, double pY) {
         double uX = pX - aX;
