@@ -1,5 +1,6 @@
 package ch.epfl.javelo.projection;
 
+import ch.epfl.javelo.Math2;
 import ch.epfl.javelo.Preconditions;
 
 import static java.lang.Math.hypot;
@@ -27,7 +28,7 @@ public record PointCh(double e, double n) {
      * @return a square distance in meters separating two points
      */
     public double squaredDistanceTo(PointCh that) {
-        return pow(hypot(that.e - this.e, that.n - this.n), 2);
+        return Math2.squaredNorm(that.e - this.e, that.n - this.n);
     }
 
     /**
@@ -37,7 +38,7 @@ public record PointCh(double e, double n) {
      * @return a distance in meters separating two points
      */
     public double distanceTo(PointCh that) {
-        return hypot(that.e - this.e, that.n - this.n);
+        return Math2.norm(that.e - this.e, that.n - this.n);
     }
 
     /**
