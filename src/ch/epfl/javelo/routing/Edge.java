@@ -31,7 +31,7 @@ public record Edge(int fromNodeId, int toNodeId, PointCh fromPoint,
     }
 
     /**
-     *computes the poisition closest to a given point along th edge
+     *computes the position closest to a given point along th edge
      * @param point the given point
      * @return returns the position along the edge, in meters,
      * that is closest to the given point

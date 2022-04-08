@@ -19,6 +19,12 @@ public record GraphNodes(IntBuffer buffer) {
     private static final int OFFSET_OUT_EDGES = OFFSET_N + 1;
     private static final int NODE_INTS = OFFSET_OUT_EDGES + 1;
 
+    private static final int EXTRACT_INT_3_START = 0;
+    private static final int EXTRACT_EDGE_ID = EXTRACT_INT_3_START + 28;
+    private static final int EXTRACT_OUT_DEGREE = 32 - EXTRACT_EDGE_ID;
+
+
+
 
     /**
      * we know that each NODE_INTS there is a new node so we divide de total number of nodes
@@ -63,7 +69,7 @@ public record GraphNodes(IntBuffer buffer) {
     public int outDegree(int nodeId) {
 
         int number3 = buffer.get(OFFSET_OUT_EDGES + NODE_INTS * nodeId);
-        return Bits.extractUnsigned(number3, 28, 4);
+        return Bits.extractUnsigned(number3, EXTRACT_EDGE_ID, EXTRACT_OUT_DEGREE);
     }
 
     /**
@@ -78,7 +84,7 @@ public record GraphNodes(IntBuffer buffer) {
     public int edgeId(int nodeId, int edgeIndex) {
 
         int number3 = buffer.get(OFFSET_OUT_EDGES + NODE_INTS * nodeId);
-        int index1 = Bits.extractUnsigned(number3, 0, 28);
+        int index1 = Bits.extractUnsigned(number3, EXTRACT_INT_3_START, EXTRACT_EDGE_ID);
 
         return index1 + edgeIndex;
     }

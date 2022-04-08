@@ -31,7 +31,7 @@ public final class MultiRoute implements Route {
      * {@inheritDoc}
      */
     public int indexOfSegmentAt(double position) {
-        double clampedPosition = Math2.clamp(0,position,length()), length = 0;
+        double clampedPosition = Math2.clamp(0,position,length()), length;
         int index=0;
 
        for(Route segment:segments){

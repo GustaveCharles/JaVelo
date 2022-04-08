@@ -27,6 +27,9 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
     private static final int EDGE_INTS = OFFSET_ATTRIBUTES + 2;
     private static final int DIVISE = 2;
 
+    private static final int FIRST_SAMPLE_ID_START = 0;
+    private static final int FIRST_SAMPLE_ID_LENGTH = FIRST_SAMPLE_ID_START + 30;
+    private static final int PROFILE_TYPE_LENGTH = 32 - FIRST_SAMPLE_ID_LENGTH;
 
     /**
      * enum representing each profile type
@@ -47,19 +50,14 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
     /**
      * the default should never happen
      */
-    private ProfileTypeEnum switchTypes(int nombre) {
-        switch (nombre) {
-            case 0:
-                return ProfileTypeEnum.PROFILE_TYPE_INEXISTANT;
-            case 1:
-                return ProfileTypeEnum.PROFILE_TYPE_1;
-            case 2:
-                return ProfileTypeEnum.PROFILE_TYPE_2;
-            case 3:
-                return ProfileTypeEnum.PROFILE_TYPE_3;
-            default:
-                throw new IllegalArgumentException();
-        }
+    private ProfileTypeEnum numberToTypes(int nombre) {
+        return switch (nombre) {
+            case 0 -> ProfileTypeEnum.PROFILE_TYPE_INEXISTANT;
+            case 1 -> ProfileTypeEnum.PROFILE_TYPE_1;
+            case 2 -> ProfileTypeEnum.PROFILE_TYPE_2;
+            case 3 -> ProfileTypeEnum.PROFILE_TYPE_3;
+            default -> throw new IllegalArgumentException();
+        };
     }
 
 
@@ -98,7 +96,9 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
      */
     public double length(int edgeId) {
 
-        return Q28_4.asDouble(Short.toUnsignedInt(edgesBuffer.getShort(OFFSET_LENGTH + edgeId * EDGE_INTS)));
+        return Q28_4.asDouble(Short
+                .toUnsignedInt(edgesBuffer
+                        .getShort(OFFSET_LENGTH + edgeId * EDGE_INTS)));
     }
 
     /**
@@ -109,7 +109,9 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
      */
     public double elevationGain(int edgeId) {
 
-        return Q28_4.asDouble(Short.toUnsignedInt(edgesBuffer.getShort(OFFSET_ELEVATION + edgeId * EDGE_INTS)));
+        return Q28_4.asDouble(Short
+                .toUnsignedInt(edgesBuffer
+                        .getShort(OFFSET_ELEVATION + edgeId * EDGE_INTS)));
     }
 
     /**
@@ -120,13 +122,13 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
      */
     public boolean hasProfile(int edgeId) {
 
-        int ProfilType = extractUnsigned(profileIds.get(edgeId), 30, 2);
+        int ProfilType = extractUnsigned(profileIds.get(edgeId), FIRST_SAMPLE_ID_LENGTH, PROFILE_TYPE_LENGTH);
 
         return ProfilType != 0;
     }
 
     /**
-     * extracts from the intbuffer the profile type and then treats each case with a switch
+     * extracts from the int buffer the profile type and then treats each case with a switch
      *
      * @param edgeId the given edge
      * @return returns the array of samples of the profile
@@ -134,8 +136,8 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
      */
     public float[] profileSamples(int edgeId) {
 
-        int profileType = extractUnsigned(profileIds.get(edgeId), 30, 2);
-        int firstSampleIndex = Bits.extractSigned(profileIds.get(edgeId), 0, 30);
+        int profileType = extractUnsigned(profileIds.get(edgeId), FIRST_SAMPLE_ID_LENGTH, PROFILE_TYPE_LENGTH);
+        int firstSampleIndex = Bits.extractSigned(profileIds.get(edgeId), FIRST_SAMPLE_ID_START, FIRST_SAMPLE_ID_LENGTH);
         int edgeLength = Short.toUnsignedInt(edgesBuffer.getShort(OFFSET_LENGTH + edgeId * EDGE_INTS));
 
         int nbSamplesOnEdge = (1 + Math2.ceilDiv(edgeLength, Q28_4.ofInt(DIVISE)));
@@ -145,7 +147,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
         float newSampleValue = firstSampleValue;
         profileSamples[0] = firstSampleValue;
 
-        switch (switchTypes(profileType)) {
+        switch (numberToTypes(profileType)) {
 
             case PROFILE_TYPE_INEXISTANT:
                 return new float[0];
@@ -201,7 +203,8 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
         for (int i = 1; i <= Math.ceil(nbSamplesOnEdge / delta); ++i) {
             short otherSampleValues = elevations.get(firstSampleIndex + i);
             for (int j = forIndex; j >= 0; --j) {
-                float difference = Q28_4.asFloat(Bits.extractSigned(otherSampleValues, j * lengthOfExtraction, lengthOfExtraction));
+                float difference = Q28_4.asFloat(Bits.extractSigned(otherSampleValues
+                        , j * lengthOfExtraction, lengthOfExtraction));
                 if (sum < nbSamplesOnEdge) {
                     NewSampleValue += difference;
                     profileSamples[sum] = NewSampleValue;

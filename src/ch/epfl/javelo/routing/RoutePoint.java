@@ -11,9 +11,11 @@ import static java.lang.Float.POSITIVE_INFINITY;
  * @author Gustave Charles -- Saigne (345945)
  * @author Baudoin Coispeau (339364)
  */
-//TODO aucune utilisation de NONE, bizarre? et commenter NONE
 public record RoutePoint (PointCh point, double position, double distanceToReference){
 
+    /**
+     * represents a non-existent point
+     */
     public static final RoutePoint NONE = new RoutePoint(null,NaN,POSITIVE_INFINITY);
 
     /**
