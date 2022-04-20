@@ -23,14 +23,32 @@ public final class TileManager {
     private final Path basePath;
     private final String servername;
 
+    /**
+     * Maximum capacity of the LinkedHashMap
+     */
     private static final int MAX_CAPACITY = 100;
 
+    /**
+     * represents the identity of an OSM tile
+     */
     public record TileId(int zoomLevel, int xIndex, int yIndex) {
 
+        /**
+         * @param zoomLevel the zoom level of the tile
+         * @param xIndex    the X index of the tile
+         * @param yIndex    the Y index of the tile
+         * @throws IllegalArgumentException if the tile is not within the limits
+         */
         public TileId {
             Preconditions.checkArgument(isValid(zoomLevel, xIndex, yIndex));
         }
 
+        /**
+         * @param zoomLevel the zoom level of the tile
+         * @param xIndex    the X index of the tile
+         * @param yIndex    the Y index of the tile
+         * @return returns true if—and only if—the parameters constitute a valid tile identity.
+         */
         public static boolean isValid(int zoomLevel, int xIndex, int yIndex) {
 
             int max = 1 << zoomLevel;
@@ -39,6 +57,13 @@ public final class TileManager {
         }
     }
 
+    /**
+     * Its role is to get the tiles from a tile server and store them
+     * in a memory cache and in a disk cache
+     *
+     * @param basePath   the access path to the directory containing the disk cache, of type Path
+     * @param serverName the name of the tile server
+     */
     public TileManager(Path basePath, String serverName) {
 
         this.cacheMemory = new LinkedHashMap<>(MAX_CAPACITY, 0.75F, true);
@@ -46,6 +71,17 @@ public final class TileManager {
         this.servername = serverName;
     }
 
+    /**
+     * The image is first sought in the memory cache, and if found there,
+     * is simply returned. Otherwise, it is searched in the disk cache, and if it is there,
+     * it is loaded, placed in the memory cache and returned. Otherwise, it is obtained from
+     * the tile server, placed in the disk cache, loaded, placed in the memory cache and finally returned.
+     *
+     * @param tile the identity of a tile
+     * @return returns the Image of the tile
+     * @throws IOException in the event of an input/output error,
+     *                     *                     if one of the expected files does not exist
+     */
     public Image imageForTileAt(TileId tile) throws IOException {
 
         Preconditions.checkArgument(TileId.isValid(tile.zoomLevel, tile.xIndex, tile.yIndex));
@@ -93,7 +129,7 @@ public final class TileManager {
         return null;
     }
 
-    private void checkCacheSize(LinkedHashMap<TileId,Image> cacheMemory) {
+    private void checkCacheSize(LinkedHashMap<TileId, Image> cacheMemory) {
         if (cacheMemory.size() == MAX_CAPACITY) {
             cacheMemory.remove(cacheMemory.keySet().iterator().next());
         }
