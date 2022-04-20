@@ -1,5 +1,7 @@
 package ch.epfl.javelo;
 
+import ch.epfl.javelo.Preconditions;
+
 /**
  * Extraction of a bit
  *

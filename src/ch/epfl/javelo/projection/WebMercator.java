@@ -21,10 +21,7 @@ public final class WebMercator {
      * @return returns the x value of the Web Mercator coordinate in a value between 0 and 1 ([0,1])
      */
     public static double x(double lon) {
-
-        double X = (lon + Math.PI) / (2 * Math.PI);
-
-        return X;
+        return (lon + Math.PI) / (2 * Math.PI);
     }
 
     /**
@@ -35,10 +32,7 @@ public final class WebMercator {
      */
 
     public static double y(double lat) {
-
-        double Y = (Math.PI - Math2.asinh(Math.tan(lat))) / (2 * Math.PI);
-
-        return Y;
+        return (Math.PI - Math2.asinh(Math.tan(lat))) / (2 * Math.PI);
     }
 
     /**
@@ -48,10 +42,7 @@ public final class WebMercator {
      * @return returns the longitude coordinate of the WGS 84 coordinates (in radians)
      */
     public static double lon(double x) {
-
-        double lon = 2 * Math.PI * x - Math.PI;
-
-        return lon;
+        return 2 * Math.PI * x - Math.PI;
     }
 
     /**
@@ -62,10 +53,7 @@ public final class WebMercator {
      */
 
     public static double lat(double y) {
-
-        double lat = Math.atan(Math.sinh(Math.PI - 2 * Math.PI * y));
-
-        return lat;
+        return Math.atan(Math.sinh(Math.PI - 2 * Math.PI * y));
     }
 
 }
