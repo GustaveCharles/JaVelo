@@ -17,7 +17,7 @@ public record MapViewParameters(int zoomLevel, double xTopLeft, double yTopLeft)
      * @return a 2D geometric point
      */
     public Point2D topLeft() {
-        return new javafx.geometry.Point2D(xTopLeft, yTopLeft);
+        return new Point2D(xTopLeft, yTopLeft);
     }
 
     /**
