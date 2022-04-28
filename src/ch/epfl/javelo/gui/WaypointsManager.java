@@ -5,13 +5,12 @@ import ch.epfl.javelo.projection.PointCh;
 import ch.epfl.javelo.projection.PointWebMercator;
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
+import javafx.geometry.Point2D;
 import javafx.scene.Group;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.SVGPath;
-
 import java.util.function.Consumer;
 
 public final class WaypointsManager {
@@ -31,35 +30,25 @@ public final class WaypointsManager {
         pane.setPickOnBounds(false);
         updatePane();
         listOfWayPoint.addListener((Observable o) -> updatePane());
-//      property.addListener((Observable o) -> );
+        property.addListener((Observable o) -> updatePane());
     }
 
     public Pane pane() {
         return pane;
     }
 
-    public void addWaypoint(int x, int y) {
+    public void addWaypoint(double x, double y) {
         PointCh point = property.getValue().pointAt(x, y).toPointCh();
         int closestPointId = graph.nodeClosestTo(point, 1000);
-
-        pane.setOnMouseDragged(e1 -> {
-            //deplacement
-        });
-        pane.setOnMouseReleased(e2 -> {
-            if (e2.isStillSincePress()) {
-                if (closestPointId != -1) {
-                    listOfWayPoint.add(new Waypoint(point, closestPointId));
-                } else {
-                    stringConsumer.accept("No road nearby!");
-                }
-            } else {
-                //delete
-                //
-            }
-        });
+        if (closestPointId != -1) {
+            listOfWayPoint.add(new Waypoint(point, closestPointId));
+        } else {
+            stringConsumer.accept("No road nearby!");
+        }
     }
 
     private void updatePane() {
+        pane.getChildren().clear();
         for (int i = 0; i < listOfWayPoint.size(); i++) {
             SVGPath path1 = new SVGPath();
             path1.getStyleClass().add("pin_outside");
@@ -79,27 +68,37 @@ public final class WaypointsManager {
                 wayPointGroup.getStyleClass().add("middle");
             }
 
-            relocate(wayPointGroup, i);
+            wayPointGroup.setLayoutX(property.getValue().viewX((PointWebMercator.ofPointCh(
+                    listOfWayPoint.get(i).crossingPosition()))));
+            wayPointGroup.setLayoutY(property.getValue().viewY((PointWebMercator.ofPointCh(
+                    listOfWayPoint.get(i).crossingPosition()))));
+
+            ObjectProperty<Point2D> initialPoint = new SimpleObjectProperty<>();
+            ObjectProperty<Point2D> initialCoordinates = new SimpleObjectProperty<>();
+
+            wayPointGroup.setOnMousePressed(e -> {
+                initialPoint.setValue(new Point2D(e.getX(), e.getY()));
+                initialCoordinates.setValue(new Point2D(pane.getScene().getX(), pane.getScene().getY()));
+            });
+
+            int finalI = i;
+            wayPointGroup.setOnMouseReleased(e1 -> {
+                if (e1.isStillSincePress()) {
+                    listOfWayPoint.remove(finalI);
+                } else {
+                    //if la position est bonne addWayPoint
+                    //c quoi la diff entre relocate et addWaypoint
+                    addWaypoint(e1.getX(), e1.getY());
+                }
+            });
+
+            wayPointGroup.setOnMouseDragged(e1 -> {
+                wayPointGroup.setLayoutX(e1.getSceneX() - initialPoint.getValue().getX());
+                wayPointGroup.setLayoutY(e1.getSceneY() - initialPoint.getValue().getY());
+            });
+
             pane.getChildren().add(wayPointGroup);
-            setEvent(wayPointGroup, i);
         }
-    }
-
-    private void relocate(Group wayPointGroup, int index) {
-        wayPointGroup.setLayoutX(property.getValue().viewX((PointWebMercator.ofPointCh(
-                listOfWayPoint.get(index).crossingPosition()))));
-        wayPointGroup.setLayoutY(property.getValue().viewY((PointWebMercator.ofPointCh(
-                listOfWayPoint.get(index).crossingPosition()))));
-    }
-
-    private void setEvent(Group wayPointGroup, int index) {
-        wayPointGroup.setOnMouseClicked(e -> {
-            listOfWayPoint.remove(index);
-        });
-
-        wayPointGroup.setOnMouseDragged(e1 -> {
-            relocate(wayPointGroup, index);
-        });
     }
 }
 
