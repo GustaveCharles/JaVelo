@@ -38,18 +38,16 @@ public final class WaypointsManager {
     }
 
     public void addWaypoint(double x, double y) {
-        PointCh point = property.getValue().pointAt(x, y).toPointCh();
-        int closestPointId = graph.nodeClosestTo(point, 1000);
-        if (closestPointId != -1) {
-            listOfWayPoint.add(new Waypoint(point, closestPointId));
-        } else {
-            stringConsumer.accept("No road nearby!");
+        if (isWaypointClosest(x, y) != null) {
+            listOfWayPoint.add(isWaypointClosest(x, y));
         }
     }
 
     private void updatePane() {
         pane.getChildren().clear();
+        System.out.println("");
         for (int i = 0; i < listOfWayPoint.size(); i++) {
+            System.out.println("Waypoint coord :" + listOfWayPoint.get(i).crossingPosition());
             SVGPath path1 = new SVGPath();
             path1.getStyleClass().add("pin_outside");
             path1.setContent("M-8-20C-5-14-2-7 0 0 2-7 5-14 8-20 20-40-20-40-8-20");
@@ -68,17 +66,12 @@ public final class WaypointsManager {
                 wayPointGroup.getStyleClass().add("middle");
             }
 
-            wayPointGroup.setLayoutX(property.getValue().viewX((PointWebMercator.ofPointCh(
-                    listOfWayPoint.get(i).crossingPosition()))));
-            wayPointGroup.setLayoutY(property.getValue().viewY((PointWebMercator.ofPointCh(
-                    listOfWayPoint.get(i).crossingPosition()))));
+            positionGroup(listOfWayPoint.get(i), wayPointGroup);
 
             ObjectProperty<Point2D> initialPoint = new SimpleObjectProperty<>();
-            ObjectProperty<Point2D> initialCoordinates = new SimpleObjectProperty<>();
 
             wayPointGroup.setOnMousePressed(e -> {
                 initialPoint.setValue(new Point2D(e.getX(), e.getY()));
-                initialCoordinates.setValue(new Point2D(pane.getScene().getX(), pane.getScene().getY()));
             });
 
             int finalI = i;
@@ -86,9 +79,14 @@ public final class WaypointsManager {
                 if (e1.isStillSincePress()) {
                     listOfWayPoint.remove(finalI);
                 } else {
-                    //if la position est bonne addWayPoint
-                    //c quoi la diff entre relocate et addWaypoint
-                    addWaypoint(e1.getX(), e1.getY());
+                    Waypoint w = isWaypointClosest(e1.getX(), e1.getY());
+                    if (w != null) {
+                        listOfWayPoint.set(finalI, w);
+                        positionGroup(w, wayPointGroup);
+                    } else {
+                        wayPointGroup.setLayoutX(initialPoint.getValue().getX());
+                        wayPointGroup.setLayoutY(initialPoint.getValue().getY());
+                    }
                 }
             });
 
@@ -99,6 +97,22 @@ public final class WaypointsManager {
 
             pane.getChildren().add(wayPointGroup);
         }
+    }
+
+    private void positionGroup(Waypoint w, Group wayPointGroup) {
+        wayPointGroup.setLayoutX(property.get().viewX((PointWebMercator.ofPointCh(w.crossingPosition()))));
+        wayPointGroup.setLayoutY(property.get().viewY((PointWebMercator.ofPointCh(w.crossingPosition()))));
+    }
+
+    private Waypoint isWaypointClosest(double x, double y) {
+        PointCh point = property.getValue().pointAt(x, y).toPointCh();
+        int closestPointId = graph.nodeClosestTo(point, 500);
+        if (closestPointId != -1) {
+            return new Waypoint(point, closestPointId);
+        } else {
+            stringConsumer.accept("No road nearby!");
+        }
+        return null;
     }
 }
 
