@@ -65,13 +65,15 @@ public final class BaseMapManager {
                     }
             );
 
-
+//TODO magic numbers nommer 8 et 18
         pane.setOnScroll(e -> {
            int newZoom = (int)Math2.clamp(8,property.get().zoomLevel() + (int)e.getDeltaY()/26,18);
             System.out.println(e.getDeltaY());
             System.out.println(newZoom);
 
-            PointWebMercator newCoordinates  = PointWebMercator.of(property.get().zoomLevel(),property.get().xTopLeft(),property.get().yTopLeft());
+            PointWebMercator newCoordinates  = PointWebMercator.of(property.get().zoomLevel(),
+                    property.get().xTopLeft() + e.getX(),
+                    property.get().yTopLeft() + e.getY());
 
             double newX = newCoordinates.xAtZoomLevel(newZoom);
             double newY = newCoordinates.yAtZoomLevel(newZoom);
@@ -82,9 +84,9 @@ public final class BaseMapManager {
 
             //scale factor entre new zoom level et level de avant scalb
             //multiplier la suris avec scale fctor pour le nouveau point et newpoint = top left -
-            //property.set(new MapViewParameters(newZoom,
-            //       newX+ mousePoint.xAtZoomLevel(newZoom)-e.getX(),
-              //    newY + mousePoint.xAtZoomLevel(newZoom)-e.getY()));
+            property.set(new MapViewParameters(newZoom,
+                  newX -e.getX(),
+                   newY -e.getY()));
 
            redrawOnNextPulse();
 
