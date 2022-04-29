@@ -15,6 +15,10 @@ import java.util.function.Consumer;
 
 public final class WaypointsManager {
 
+    //A VERIFIER A VERIFIER A VERIFIER A VERIFIER A VERIFIER A VERIFIER A VERIFIER A VERIFIER A VERIFIER A VERIFIER
+    // est-ce qu'il faut faire avec getLayout ou je peux garder mon truc avec updatePane() ???
+    //??????????????????????????????????????????????????????????????????????????????????????????????????????????????
+
     private final ObjectProperty<MapViewParameters> property;
     private final Consumer<String> stringConsumer;
     private final Graph graph;
@@ -29,6 +33,7 @@ public final class WaypointsManager {
         pane = new Pane();
         pane.setPickOnBounds(false);
         updatePane();
+
         listOfWayPoint.addListener((Observable o) -> updatePane());
         property.addListener((Observable o) -> updatePane());
     }
@@ -76,11 +81,13 @@ public final class WaypointsManager {
                 if (e1.isStillSincePress()) {
                     listOfWayPoint.remove(finalI);
                 } else {
-                    Waypoint w = isWaypointClosest(e1.getSceneX() - initialPoint.get().getX(), e1.getSceneY() - initialPoint.get().getY());
+                    Waypoint w = isWaypointClosest(e1.getSceneX() - initialPoint.get().getX(),
+                            e1.getSceneY() - initialPoint.get().getY());
                     if (w != null) {
                         positionGroup(w, wayPointGroup);
                         listOfWayPoint.set(finalI, w);
                     } else {
+
                         wayPointGroup.setLayoutX(initialPoint.get().getX());
                         wayPointGroup.setLayoutY(initialPoint.get().getY());
                         updatePane();
