@@ -11,6 +11,8 @@ import static java.lang.Math.scalb;
 
 public final class Q28_4 {
 
+    private static final int BIT_SHIFT = 4;
+
     private Q28_4() {
     }
 
@@ -21,7 +23,7 @@ public final class Q28_4 {
      * @return an integer in the Q28.4 representation
      */
     public static int ofInt(int i) {
-        return i << 4;
+        return i << BIT_SHIFT;
     }
 
     /**
@@ -31,7 +33,7 @@ public final class Q28_4 {
      * @return a decimal number in the 28.4 representation
      */
     public static double asDouble(int q28_4) {
-        return scalb((double) q28_4, -4);
+        return scalb((double) q28_4, -BIT_SHIFT);
     }
 
     /**
@@ -41,6 +43,6 @@ public final class Q28_4 {
      * @return a floating-point number in the 28.4 representation
      */
     public static float asFloat(int q28_4) {
-        return scalb(q28_4, -4);
+        return scalb(q28_4, -BIT_SHIFT);
     }
 }

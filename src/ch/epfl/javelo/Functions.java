@@ -1,5 +1,7 @@
 package ch.epfl.javelo;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.DoubleUnaryOperator;
 
 /**
@@ -36,17 +38,18 @@ public final class Functions {
      */
     public static DoubleUnaryOperator sampled(float[] samples, double xMax) {
         Preconditions.checkArgument(!(samples.length < 2 || xMax <= 0));
+        List<Float> temp = new ArrayList<>();
+        for (Float f : samples) {
+            temp.add(f);
+        }
+        List<Float> immutableSamples = List.copyOf(temp);
         return (x) -> {
-            if (x <= 0) {
-                return samples[0];
-            }
-            if (x >= xMax) {
-                return samples[samples.length - 1];
-            }
-            double interval = xMax / (samples.length - 1);
+            if (x <= 0) return immutableSamples.get(0);
+            if (x >= xMax) return immutableSamples.get(immutableSamples.size() - 1);
+            double interval = xMax / (immutableSamples.size() - 1);
             int position = (int) (x / interval);
-            double y0 = samples[position];
-            double y1 = samples[position + 1];
+            double y0 = immutableSamples.get(position);
+            double y1 = immutableSamples.get(position + 1);
             double xProportional = (x % interval) / interval;
             return Math2.interpolate(y0, y1, xProportional);
         };

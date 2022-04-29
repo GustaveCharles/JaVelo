@@ -22,7 +22,7 @@ public final class Math2 {
      * @throws IllegalArgumentException if the x is negative, y equals 0 or y is negative
      */
     public static int ceilDiv(int x, int y) {
-        Preconditions.checkArgument(!(x < 0 || y == 0 || y < 0));
+        Preconditions.checkArgument(!(x < 0 || y <= 0));
         return (x + y - 1) / y;
     }
 

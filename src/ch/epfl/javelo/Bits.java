@@ -11,6 +11,8 @@ import ch.epfl.javelo.Preconditions;
 
 public final class Bits {
 
+    private static final int VECTOR_SIZE = Integer.SIZE;
+
     private Bits() {
     }
 
@@ -27,9 +29,10 @@ public final class Bits {
      */
     public static int extractSigned(int value, int start, int length) {
         int range = start + length;
-        Preconditions.checkArgument((range >= 0 && range <= 32 && start >= 0 && start <= 31 && length >= 0 && length <= 32));
-        int shift1 = value << (32 - (range));
-        return shift1 >> (32 - length);
+        Preconditions.checkArgument((range >= 0 && range <= VECTOR_SIZE && start >= 0 && start < VECTOR_SIZE && length >= 0
+                && length <= VECTOR_SIZE));
+        int shift1 = value << (VECTOR_SIZE - (range));
+        return shift1 >> (VECTOR_SIZE - length);
     }
 
     /**
@@ -45,8 +48,9 @@ public final class Bits {
      */
     public static int extractUnsigned(int value, int start, int length) {
         int range = start + length;
-        Preconditions.checkArgument((range >= 0 && range <= 32 && start >= 0 && start <= 31 && length >= 0 && length < 32));
-        int shift1 = value << (32 - (start + length));
-        return shift1 >>> (32 - length);
+        Preconditions.checkArgument((range >= 0 && range <= VECTOR_SIZE && start >= 0 && start < VECTOR_SIZE &&
+                length >= 0 && length < VECTOR_SIZE));
+        int shift1 = value << (VECTOR_SIZE - (start + length));
+        return shift1 >>> (VECTOR_SIZE - length);
     }
 }
