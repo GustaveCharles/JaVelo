@@ -12,7 +12,6 @@ import javafx.scene.canvas.Canvas;
 
 
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * manages the display and interaction with the basemap
@@ -49,30 +48,11 @@ public final class BaseMapManager {
         canvas.heightProperty().addListener(o -> redrawOnNextPulse());
         canvas.widthProperty().addListener(o -> redrawOnNextPulse());
 
-//        AtomicInteger xvalue = null;
-//        AtomicInteger yvalue = null;
-//
-//        canvas.setOnMouseClicked(e->{
-//            xvalue.set((int)e.getX());
-//            yvalue.set((int) e.getY());
-//        }
-//        );
-//
-//        canvas.setOnMouseDragged(e-> {
-//            property.set(new MapViewParameters(property.get().zoomLevel(),
-//                    e.getX()-xvalue.get(),e.getY()-yvalue.get()));
-//            redrawOnNextPulse();
-//        }
-//        );
 
         ObjectProperty<Point2D> property1 = new SimpleObjectProperty<>();
         pane.setOnMousePressed(e -> {
             property1.set(new Point2D(e.getX(), e.getY()));
-            System.out.println("true");
         });
-
-
-          //  property1.addListener(e -> System.out.println("Simple Object Property 1: " + e));
 
             pane.setOnMouseDragged(e -> {
                         Point2D pd = new Point2D(property1.get().getX(), property1.get().getY());
@@ -82,34 +62,29 @@ public final class BaseMapManager {
                                 property.get().xTopLeft()  - pd1.getX(),
                                 property.get().yTopLeft()  - pd1.getY()));
                         redrawOnNextPulse();
-
-                 //       property.addListener(event -> System.out.println("Simple Object Property new top left X: " + (property.get().xTopLeft() + e.getX() + pd1.getX())));
-               // property.addListener(event -> System.out.println("Simple Object Property new top left Y: " + (property.get().yTopLeft() + e.getY() + pd1.getY())));
-
                     }
             );
 
 
         pane.setOnScroll(e -> {
-           int newZoom = (int)Math2.clamp(8,property.get().zoomLevel() + e.getDeltaY(),19);
+           int newZoom = (int)Math2.clamp(8,property.get().zoomLevel() + (int)e.getDeltaY()/26,18);
             System.out.println(e.getDeltaY());
             System.out.println(newZoom);
-
 
             PointWebMercator newCoordinates  = PointWebMercator.of(property.get().zoomLevel(),property.get().xTopLeft(),property.get().yTopLeft());
 
             double newX = newCoordinates.xAtZoomLevel(newZoom);
             double newY = newCoordinates.yAtZoomLevel(newZoom);
 
-            property.set(new MapViewParameters(newZoom,
-                    newX,
-                    newY));
-
+            property.set(new MapViewParameters(newZoom,newX,newY));
             PointWebMercator mousePoint = property.get().pointAt(e.getX(),e.getY());
 
-            property.set(new MapViewParameters(newZoom,
-                    newX+ mousePoint.xAtZoomLevel(newZoom)-e.getX(),
-                   newY + mousePoint.xAtZoomLevel(newZoom)-e.getY()));
+
+            //scale factor entre new zoom level et level de avant scalb
+            //multiplier la suris avec scale fctor pour le nouveau point et newpoint = top left -
+            //property.set(new MapViewParameters(newZoom,
+            //       newX+ mousePoint.xAtZoomLevel(newZoom)-e.getX(),
+              //    newY + mousePoint.xAtZoomLevel(newZoom)-e.getY()));
 
            redrawOnNextPulse();
 
