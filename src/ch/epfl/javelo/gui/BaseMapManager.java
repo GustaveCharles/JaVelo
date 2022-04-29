@@ -50,45 +50,43 @@ public final class BaseMapManager {
 
 
         ObjectProperty<Point2D> property1 = new SimpleObjectProperty<>();
-        pane.setOnMousePressed(e -> {
-            property1.set(new Point2D(e.getX(), e.getY()));
-        });
+        pane.setOnMousePressed(e ->
+                property1.set(new Point2D(e.getX(), e.getY())));
 
-            pane.setOnMouseDragged(e -> {
-                        Point2D pd = new Point2D(property1.get().getX(), property1.get().getY());
-                        Point2D pd1 = pd.subtract(e.getX(), e.getY());
+        pane.setOnMouseDragged(e -> {
+                    Point2D pd = new Point2D(property1.get().getX(), property1.get().getY());
+                    Point2D pd1 = pd.subtract(e.getX(), e.getY());
 
-                        property.set(new MapViewParameters(property.get().zoomLevel(),
-                                property.get().xTopLeft()  - pd1.getX(),
-                                property.get().yTopLeft()  - pd1.getY()));
-                        redrawOnNextPulse();
-                    }
-            );
+                    property.set(new MapViewParameters(property.get().zoomLevel(),
+                            property.get().xTopLeft() + pd1.getX(),
+                            property.get().yTopLeft() + pd1.getY()));
 
-//TODO magic numbers nommer 8 et 18
+                    property1.set(new Point2D(e.getX(),e.getY()));
+                    redrawOnNextPulse();
+                }
+        );
+
+        //TODO magic numbers nommer 8 et 18
+        //TODO regler problème de la mouse avec /26
         pane.setOnScroll(e -> {
-           int newZoom = (int)Math2.clamp(8,property.get().zoomLevel() + (int)e.getDeltaY()/26,18);
+            int newZoom = Math2.clamp(8, property.get().zoomLevel() + (int) e.getDeltaY() / 26, 18);
             System.out.println(e.getDeltaY());
             System.out.println(newZoom);
 
-            PointWebMercator newCoordinates  = PointWebMercator.of(property.get().zoomLevel(),
+            PointWebMercator newCoordinates = PointWebMercator.of(property.get().zoomLevel(),
                     property.get().xTopLeft() + e.getX(),
                     property.get().yTopLeft() + e.getY());
 
             double newX = newCoordinates.xAtZoomLevel(newZoom);
             double newY = newCoordinates.yAtZoomLevel(newZoom);
 
-            property.set(new MapViewParameters(newZoom,newX,newY));
-            PointWebMercator mousePoint = property.get().pointAt(e.getX(),e.getY());
+            property.set(new MapViewParameters(newZoom, newX, newY));
 
-
-            //scale factor entre new zoom level et level de avant scalb
-            //multiplier la suris avec scale fctor pour le nouveau point et newpoint = top left -
             property.set(new MapViewParameters(newZoom,
-                  newX -e.getX(),
-                   newY -e.getY()));
+                    newX - e.getX(),
+                    newY - e.getY()));
 
-           redrawOnNextPulse();
+            redrawOnNextPulse();
 
         });
 
