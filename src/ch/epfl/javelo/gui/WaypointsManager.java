@@ -45,9 +45,7 @@ public final class WaypointsManager {
 
     private void updatePane() {
         pane.getChildren().clear();
-        System.out.println("");
         for (int i = 0; i < listOfWayPoint.size(); i++) {
-            System.out.println("Waypoint coord :" + listOfWayPoint.get(i).crossingPosition());
             SVGPath path1 = new SVGPath();
             path1.getStyleClass().add("pin_outside");
             path1.setContent("M-8-20C-5-14-2-7 0 0 2-7 5-14 8-20 20-40-20-40-8-20");
@@ -69,7 +67,6 @@ public final class WaypointsManager {
             positionGroup(listOfWayPoint.get(i), wayPointGroup);
 
             ObjectProperty<Point2D> initialPoint = new SimpleObjectProperty<>();
-
             wayPointGroup.setOnMousePressed(e -> {
                 initialPoint.setValue(new Point2D(e.getX(), e.getY()));
             });
@@ -79,13 +76,14 @@ public final class WaypointsManager {
                 if (e1.isStillSincePress()) {
                     listOfWayPoint.remove(finalI);
                 } else {
-                    Waypoint w = isWaypointClosest(e1.getX(), e1.getY());
+                    Waypoint w = isWaypointClosest(e1.getSceneX() - initialPoint.get().getX(), e1.getSceneY() - initialPoint.get().getY());
                     if (w != null) {
-                        listOfWayPoint.set(finalI, w);
                         positionGroup(w, wayPointGroup);
+                        listOfWayPoint.set(finalI, w);
                     } else {
-                        wayPointGroup.setLayoutX(initialPoint.getValue().getX());
-                        wayPointGroup.setLayoutY(initialPoint.getValue().getY());
+                        wayPointGroup.setLayoutX(initialPoint.get().getX());
+                        wayPointGroup.setLayoutY(initialPoint.get().getY());
+                        updatePane();
                     }
                 }
             });
