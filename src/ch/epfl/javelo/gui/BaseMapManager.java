@@ -47,7 +47,37 @@ public final class BaseMapManager {
         redrawOnNextPulse();
         canvas.heightProperty().addListener(o -> redrawOnNextPulse());
         canvas.widthProperty().addListener(o -> redrawOnNextPulse());
+        handler();
+    }
 
+    public Pane pane() {
+        return pane;
+    }
+
+    private void paneDraw() {
+
+        canvas.widthProperty().bind(pane.widthProperty());
+        canvas.heightProperty().bind(pane.heightProperty());
+
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        double x = property.get().xTopLeft();
+        double y = property.get().yTopLeft();
+
+        for (int i = 0; i < canvas.getWidth() + 256; i += 256) {
+            for (int j = 0; j < canvas.getHeight() + 256; j += 256) {
+                try {
+                    TileManager.TileId tileID =
+                            new TileManager.TileId(property.get().zoomLevel(), Math.floorDiv((int) (i + x), 256), Math.floorDiv((int) (j + y), 256));
+                    gc.drawImage(tileManager.imageForTileAt(tileID), i - x % 256, j - y % 256);
+                } catch (IOException ignored) {
+                }
+            }
+        }
+
+    }
+
+    private void handler(){
 
         ObjectProperty<Point2D> property1 = new SimpleObjectProperty<>();
         pane.setOnMousePressed(e ->
@@ -69,9 +99,7 @@ public final class BaseMapManager {
         //TODO magic numbers nommer 8 et 18
         //TODO regler problème de la mouse avec /26
         pane.setOnScroll(e -> {
-            int newZoom = Math2.clamp(8, property.get().zoomLevel() + (int) e.getDeltaY() / 26, 18);
-            System.out.println(e.getDeltaY());
-            System.out.println(newZoom);
+            int newZoom = Math2.clamp(8, property.get().zoomLevel() + (int) e.getDeltaY() / 26, 19);
 
             PointWebMercator newCoordinates = PointWebMercator.of(property.get().zoomLevel(),
                     property.get().xTopLeft() + e.getX(),
@@ -96,34 +124,6 @@ public final class BaseMapManager {
                     }
                 }
         );
-    }
-
-    public Pane pane() {
-        return pane;
-    }
-
-    private void paneDraw() {
-
-        canvas.widthProperty().bind(pane.widthProperty());
-        canvas.heightProperty().bind(pane.heightProperty());
-
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-
-        double x = property.get().xTopLeft();
-        double y = property.get().yTopLeft();
-
-        for (int i = 0; i < canvas.getWidth() + 256; i += 256) {
-            for (int j = 0; j < canvas.getHeight() + 256; j += 256) {
-                try {
-                    TileManager.TileId tileID =
-                            new TileManager.TileId(property.get().zoomLevel(), Math.floorDiv((int) (i + x), 256), Math.floorDiv((int) (j + y), 256));
-                    gc.drawImage(tileManager.imageForTileAt(tileID), i - x % 256, j - y % 256);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
     }
 
     private void redrawIfNeeded() {
