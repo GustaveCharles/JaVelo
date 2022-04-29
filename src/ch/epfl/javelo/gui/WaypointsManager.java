@@ -67,7 +67,6 @@ public final class WaypointsManager {
             positionGroup(listOfWayPoint.get(i), wayPointGroup);
 
             ObjectProperty<Point2D> initialPoint = new SimpleObjectProperty<>();
-
             wayPointGroup.setOnMousePressed(e -> {
                 initialPoint.setValue(new Point2D(e.getX(), e.getY()));
             });
@@ -77,13 +76,14 @@ public final class WaypointsManager {
                 if (e1.isStillSincePress()) {
                     listOfWayPoint.remove(finalI);
                 } else {
-                    Waypoint w = isWaypointClosest(e1.getX(), e1.getY());
+                    Waypoint w = isWaypointClosest(e1.getSceneX() - initialPoint.get().getX(), e1.getSceneY() - initialPoint.get().getY());
                     if (w != null) {
                         positionGroup(w, wayPointGroup);
                         listOfWayPoint.set(finalI, w);
                     } else {
-                        wayPointGroup.setLayoutX(initialPoint.getValue().getX());
-                        wayPointGroup.setLayoutY(initialPoint.getValue().getY());
+                        wayPointGroup.setLayoutX(initialPoint.get().getX());
+                        wayPointGroup.setLayoutY(initialPoint.get().getY());
+                        updatePane();
                     }
                 }
             });
