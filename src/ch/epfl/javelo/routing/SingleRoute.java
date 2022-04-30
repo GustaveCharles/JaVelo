@@ -59,7 +59,7 @@ public final class SingleRoute implements Route {
      * {@inheritDoc}
      */
     public List<Edge> edges() {
-        return List.copyOf(edges);
+        return edges;
     }
 
     @Override
@@ -124,11 +124,14 @@ public final class SingleRoute implements Route {
     public RoutePoint pointClosestTo(PointCh point) {
         RoutePoint pointCompare = RoutePoint.NONE;
 
+        int counter = 0;
+
         for (Edge edge : edges) {
             double pointPositionOnEdge = Math2.clamp(0, edge.positionClosestTo(point), edge.length());
-            double pointPositionOnRoute = pointPositionOnEdge + routePositions[edges.indexOf(edge)];
+            double pointPositionOnRoute = pointPositionOnEdge + routePositions[counter];
             pointCompare = pointCompare.min(edge.pointAt(pointPositionOnEdge),
                     pointPositionOnRoute, point.distanceTo(edge.pointAt(pointPositionOnEdge)));
+            ++counter;
         }
         return pointCompare;
     }

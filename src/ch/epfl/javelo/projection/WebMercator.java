@@ -2,6 +2,8 @@ package ch.epfl.javelo.projection;
 
 import ch.epfl.javelo.Math2;
 
+import static java.lang.Math.PI;
+
 /**
  * converts between WGS 84 coordinates and Web Mercator coordinates and vice versa
  *
@@ -21,7 +23,7 @@ public final class WebMercator {
      * @return returns the x value of the Web Mercator coordinate in a value between 0 and 1 ([0,1])
      */
     public static double x(double lon) {
-        return (lon + Math.PI) / (2 * Math.PI);
+        return (lon + PI) / (2 * PI);
     }
 
     /**
@@ -32,7 +34,7 @@ public final class WebMercator {
      */
 
     public static double y(double lat) {
-        return (Math.PI - Math2.asinh(Math.tan(lat))) / (2 * Math.PI);
+        return (PI - Math2.asinh(Math.tan(lat))) / (2 * PI);
     }
 
     /**
@@ -42,7 +44,7 @@ public final class WebMercator {
      * @return returns the longitude coordinate of the WGS 84 coordinates (in radians)
      */
     public static double lon(double x) {
-        return 2 * Math.PI * x - Math.PI;
+        return 2 * PI * x - PI;
     }
 
     /**
@@ -53,7 +55,7 @@ public final class WebMercator {
      */
 
     public static double lat(double y) {
-        return Math.atan(Math.sinh(Math.PI - 2 * Math.PI * y));
+        return Math.atan(Math.sinh(PI - 2 * PI * y));
     }
 
 }

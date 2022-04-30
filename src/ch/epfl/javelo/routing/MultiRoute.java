@@ -72,9 +72,7 @@ public final class MultiRoute implements Route {
         List<Edge> edges = new ArrayList<>();
 
         for (Route segment : segments) {
-            for (Edge edge : segment.edges()) {
-                edges.add(edge);
-            }
+            edges.addAll(segment.edges());
         }
         return List.copyOf(edges);
     }
