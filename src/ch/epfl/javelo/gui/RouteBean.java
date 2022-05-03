@@ -1,13 +1,16 @@
 package ch.epfl.javelo.gui;
 
 import ch.epfl.javelo.Preconditions;
+import ch.epfl.javelo.projection.PointCh;
 import ch.epfl.javelo.routing.*;
 import javafx.beans.Observable;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public final class RouteBean {
 
@@ -21,34 +24,35 @@ public final class RouteBean {
     private ObjectProperty<Route> route = new SimpleObjectProperty<>();
     private ObservableList<Waypoint> waypoints = FXCollections.observableArrayList();
     private ObjectProperty<ElevationProfile> elevationProfile = new SimpleObjectProperty();
+    private final static int MAX_LENGTH = 5;
 
     public RouteBean(RouteComputer routeComputer) {
         this.routeComputer = routeComputer;
-        route.addListener((Observable o) ->);
-
+        waypoints.addListener((Observable o) -> createSingleRoute());
     }
 
     ElevationProfile getElevationProfile() {
-        return ElevationProfileComputer.elevationProfile(route(), 5);
+        return ElevationProfileComputer.elevationProfile(route.getValue(), MAX_LENGTH);
     }
 
     public ReadOnlyObjectProperty<Route> getRoute() {
         return route;
     }
 
-    public void setRoute(Route route) {
-        this.route.set(route);
-    }
-
-    private Route route() {
-        return route.getValue();
-    }
-
     //highlighted
     //routeProperty
 
     private Route createSingleRoute() {
-
+        record nodePair(int nodeId1, int nodeId2) {
+        }
+        List<Route> listRoute = new ArrayList<>();
+        for (int i = 1; i < waypoints.size(); i++) {
+            int point1 = waypoints.get(i - 1).closestJaVeloNode();
+            int point2 = waypoints.get(i).closestJaVeloNode();
+            Route r = routeComputer.bestRouteBetween(point1, point2);
+            listRoute.add(r);
+        }
+        return new MultiRoute(listRoute);
     }
 
     public double getHighlightedPosition() {
