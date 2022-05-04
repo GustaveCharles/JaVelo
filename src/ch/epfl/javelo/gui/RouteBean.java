@@ -10,6 +10,8 @@ import javafx.util.Pair;
 import javax.swing.*;
 import java.util.*;
 
+import static java.lang.Double.NaN;
+
 public final class RouteBean {
 
     private final RouteComputer routeComputer;
@@ -18,7 +20,7 @@ public final class RouteBean {
     private final ObservableList<Waypoint> waypoints;
     private final ObjectProperty<ElevationProfile> elevationProfile;
     private final static int MAX_LENGTH = 5;
-    private HashMap<Pair<Waypoint, Waypoint>, Route> map;
+    private HashMap<Pair<Integer, Integer>, Route> map;
 
     public RouteBean(RouteComputer routeComputer) {
         this.routeComputer = routeComputer;
@@ -44,7 +46,8 @@ public final class RouteBean {
             List<Route> listRoute = new ArrayList<>();
             for (int i = 1; i < waypoints.size(); i++) {
                 int point1 = waypoints.get(i - 1).closestJaVeloNode();
-                int point2 = waypoints.get(i).closestJaVeloNode();
+                int point2 = waypoints.get(i).closestJaVeloNode()
+                map.put(new Pair(point1, point2), route.get());
                 Route r = routeComputer.bestRouteBetween(point1, point2);
                 if (r != null) {
                     listRoute.add(r);
@@ -67,7 +70,8 @@ public final class RouteBean {
     }
 
     public void setHighlightedPosition(double newHighlightedPosition) {
-        highlightedPosition.setValue(newHighlightedPosition);
+        highlightedPosition.setValue(newHighlightedPosition <= route.get().length() && newHighlightedPosition >= 0 ?
+                newHighlightedPosition : NaN);
     }
 
     public DoubleProperty highlightedPositionProperty() {
