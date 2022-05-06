@@ -35,7 +35,6 @@ public final class BaseMapManager {
         this.waypointsManager = waypointsManager;
         canvas = new Canvas();
         pane = new Pane(canvas);
-        //pane.getChildren().add(canvas);
 
         redrawNeeded = false;
 
@@ -87,9 +86,14 @@ public final class BaseMapManager {
                     Point2D pd = new Point2D(property1.get().getX(), property1.get().getY());
                     Point2D pd1 = pd.subtract(e.getX(), e.getY());
 
-                    property.set(new MapViewParameters(property.get().zoomLevel(),
-                            property.get().xTopLeft() + pd1.getX(),
-                            property.get().yTopLeft() + pd1.getY()));
+                    property.setValue(property.get().
+                            withMinXY(property.get().xTopLeft() + pd1.getX(),
+                                    property.get().yTopLeft() + pd1.getY()));
+
+                       //     property.set(
+                         //   new MapViewParameters(property.get().zoomLevel(),
+                           // property.get().xTopLeft() + pd1.getX(),
+                            //property.get().yTopLeft() + pd1.getY()));
 
                     property1.set(new Point2D(e.getX(),e.getY()));
                     redrawOnNextPulse();
@@ -101,14 +105,14 @@ public final class BaseMapManager {
         pane.setOnScroll(e -> {
             int newZoom = Math2.clamp(8, property.get().zoomLevel() + (int) e.getDeltaY() / 26, 19);
 
-            PointWebMercator newCoordinates = PointWebMercator.of(property.get().zoomLevel(),
-                    property.get().xTopLeft() + e.getX(),
-                    property.get().yTopLeft() + e.getY());
+            PointWebMercator newCoordinates = property.get().pointAt(e.getX(),e.getY());
+
+           // PointWebMercator newCoordinates = PointWebMercator.of(property.get().zoomLevel(),
+             //       property.get().xTopLeft() + e.getX(),
+               //     property.get().yTopLeft() + e.getY());
 
             double newX = newCoordinates.xAtZoomLevel(newZoom);
             double newY = newCoordinates.yAtZoomLevel(newZoom);
-
-            property.set(new MapViewParameters(newZoom, newX, newY));
 
             property.set(new MapViewParameters(newZoom,
                     newX - e.getX(),

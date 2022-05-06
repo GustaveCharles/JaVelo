@@ -48,10 +48,13 @@ public final class RouteManager {
 
         routeBean.highlightedPositionProperty().addListener( e -> {
             PointWebMercator point = PointWebMercator.
-                    ofPointCh(routeBean.routeProperty().get().pointAt(routeBean.getHighlightedPosition()));
+                    ofPointCh(routeBean.routeProperty().get()
+                            .pointAt(routeBean.getHighlightedPosition()));
 
-            circle.setCenterX(point.xAtZoomLevel(mapParameters.get().zoomLevel()) - mapParameters.get().xTopLeft());
-            circle.setCenterY(point.yAtZoomLevel(mapParameters.get().zoomLevel()) - mapParameters.get().yTopLeft());
+
+            circle.setCenterX(mapParameters.get().viewX(point));
+            circle.setCenterY(mapParameters.get().viewY(point));
+
         });
 
         //rendre invisible la ligne lorsque lorsque itinéraire est nul
@@ -75,7 +78,7 @@ public final class RouteManager {
         //reconstruire ligne lorsque itinéraire change
         // reconstruire le disque lorsque les paramètres de la carte changent (xtopleft ytopleft)
         routeBean.routeProperty().addListener((e,oV,nV) -> {
-            if(oV != nV && e!=null){
+            if(oV != nV && nV!=null){
                 pointsSequence();
                 line.setLayoutX(-mapParameters.get().xTopLeft());
                 line.setLayoutY(-mapParameters.get().yTopLeft());
@@ -85,8 +88,8 @@ public final class RouteManager {
                 PointWebMercator point = PointWebMercator.
                         ofPointCh(routeBean.routeProperty().get().pointAt(routeBean.getHighlightedPosition()));
 
-                circle.setCenterX(point.xAtZoomLevel(mapParameters.get().zoomLevel()) - mapParameters.get().xTopLeft());
-                circle.setCenterY(point.yAtZoomLevel(mapParameters.get().zoomLevel()) - mapParameters.get().yTopLeft());
+                circle.setCenterX(mapParameters.get().viewX(point));
+                circle.setCenterY(mapParameters.get().viewY(point));
             }
         });
 
@@ -96,7 +99,7 @@ public final class RouteManager {
 
         mapParameters.addListener((e, oV, nV) -> {
 
-            if (oV.zoomLevel() != nV.zoomLevel() && e!=null) {
+            if (oV.zoomLevel() != nV.zoomLevel() && routeBean.routeProperty().get()!=null) {
 
                 pointsSequence();
                 line.setLayoutX(-nV.xTopLeft());
@@ -136,7 +139,7 @@ public final class RouteManager {
                     PointCh point = mapParameters.getValue().pointAt(point2D.getX(), point2D.getY()).toPointCh();
                     int closestPointId = routeBean.routeProperty().get()
                             .nodeClosestTo(routeBean.highlightedPosition());
-                    if (closestPointId != -1) {
+                    if (!routeBean.waypointsProperty().contains(point)) {
                         int index= routeBean.routeProperty().get()
                                 .indexOfSegmentAt(routeBean.highlightedPosition())+1;
                         routeBean.waypointsProperty().add(index,new Waypoint(point,closestPointId));
@@ -147,7 +150,6 @@ public final class RouteManager {
                 }
         );
     }
-
 
     private void pointsSequence() {
 
