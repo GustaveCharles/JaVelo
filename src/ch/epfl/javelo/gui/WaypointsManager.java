@@ -76,8 +76,9 @@ public final class WaypointsManager {
             if (e1.isStillSincePress()) {
                 listOfWayPoint.remove(i);
             } else {
-                Waypoint w = isWaypointClosest(e1.getSceneX() - initialPoint.get().getX(),
-                        e1.getSceneY() - initialPoint.get().getY());
+                Point2D point = new Point2D(wayPointGroup.getLayoutX(), wayPointGroup.getLayoutY())
+                        .add(e1.getX(), e1.getY()).subtract(initialPoint.get());
+                Waypoint w = isWaypointClosest(point.getX(), point.getY());
                 if (w != null) {
                     positionGroup(w, wayPointGroup);
                     listOfWayPoint.set(i, w);
@@ -90,8 +91,10 @@ public final class WaypointsManager {
         });
 
         wayPointGroup.setOnMouseDragged(e1 -> {
-            wayPointGroup.setLayoutX(e1.getSceneX() - initialPoint.getValue().getX());
-            wayPointGroup.setLayoutY(e1.getSceneY() - initialPoint.getValue().getY());
+            Point2D newPoint = new Point2D(wayPointGroup.getLayoutX(), wayPointGroup.getLayoutY())
+                    .add(e1.getX(), e1.getY()).subtract(initialPoint.get());
+            wayPointGroup.setLayoutX(newPoint.getX());
+            wayPointGroup.setLayoutY(newPoint.getY());
         });
     }
 
