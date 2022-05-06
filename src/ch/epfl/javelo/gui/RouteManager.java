@@ -137,12 +137,12 @@ public final class RouteManager {
                     int closestPointId = routeBean.routeProperty().get()
                             .nodeClosestTo(routeBean.highlightedPosition());
 
-            int index = routeBean.routeProperty().get()
-                    .indexOfSegmentAt(routeBean.highlightedPosition()) + 1;
-            Waypoint waypoint = new Waypoint(point, closestPointId);
+                    int index = routeBean.routeProperty().get()
+                            .indexOfSegmentAt(routeBean.highlightedPosition()) + 1;
+                    Waypoint waypoint = new Waypoint(point, closestPointId);
 
                     if (waypointNotOnRoute(waypoint)) {
-                        routeBean.waypointsProperty().add(index, waypoint );
+                        routeBean.waypointsProperty().add(index, waypoint);
                     } else {
                         this.errors.accept("Un point de passage est déjà présent à cet endroit !");
                     }
