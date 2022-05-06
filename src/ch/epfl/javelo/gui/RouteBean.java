@@ -41,37 +41,6 @@ public final class RouteBean {
         return elevationProfile;
     }
 
-    //Problème : lorsque je met à null après le for ça le remet à autre chose
-    //c quoi le mieux entre stocker des waypoints ou des id de waypoints ??
-
-//    private void createRoute() {
-//        if (waypoints.size() >= 2) {
-//            List<Route> listRoute = new ArrayList<>();
-//            for (int i = 1; i < waypoints.size(); i++) {
-//                int point1 = waypoints.get(i - 1).closestJaVeloNode();
-//                int point2 = waypoints.get(i).closestJaVeloNode();
-//                if (!map.containsKey(new Pair<>(point1,point2))){
-//                    Route r = routeComputer.bestRouteBetween(point1, point2);
-//                    if (r != null) {
-//                        map.put(new Pair<>(point1, point2), r);
-//                        listRoute.add(r);
-//                    } else {
-//                        route.setValue(null);
-//                        elevationProfile.setValue(null);
-//                    }
-//                } else {
-//                    listRoute.add(map.get(new Pair<>(point1, point2)));
-//                }
-//            }
-//            MultiRoute m = new MultiRoute(listRoute);
-//            route.setValue(m);
-//            elevationProfile.setValue(ElevationProfileComputer.elevationProfile(m, MAX_LENGTH));
-//        } else {
-//            route.setValue(null);
-//            elevationProfile.setValue(null);
-//        }
-//    }
-
     private void createRoute() {
         if (waypoints.size() >= 2) {
             List<Route> listRoute = new ArrayList<>();
@@ -80,6 +49,10 @@ public final class RouteBean {
                 int point2 = waypoints.get(i).closestJaVeloNode();
                 if (!map.containsKey(new Pair<>(point1,point2))){
                     Route r = routeComputer.bestRouteBetween(point1, point2);
+                    if (r == null) {
+                        setRouteAndElevation(null, null);
+                        return;
+                    }
                     map.put(new Pair<>(point1, point2), r);
                     listRoute.add(r);
                 } else {
@@ -87,12 +60,15 @@ public final class RouteBean {
                 }
             }
             MultiRoute m = new MultiRoute(listRoute);
-            route.setValue(m);
-            elevationProfile.setValue(ElevationProfileComputer.elevationProfile(m, MAX_LENGTH));
+            setRouteAndElevation(m, ElevationProfileComputer.elevationProfile(m, MAX_LENGTH));
         } else {
-            route.setValue(null);
-            elevationProfile.setValue(null);
+            setRouteAndElevation(null, null);
         }
+    }
+
+    private void setRouteAndElevation(MultiRoute m, ElevationProfile ele) {
+        route.setValue(m);
+        elevationProfile.setValue(ele);
     }
 
     public double getHighlightedPosition() {
@@ -113,7 +89,7 @@ public final class RouteBean {
     }
 
     public void addWaypoints(Waypoint waypoint) {
-            waypoints.add(waypoint);
+        waypoints.add(waypoint);
     }
 
     public ObservableList<Waypoint> waypointsProperty() {

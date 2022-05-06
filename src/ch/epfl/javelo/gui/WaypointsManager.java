@@ -15,27 +15,22 @@ import java.util.function.Consumer;
 
 public final class WaypointsManager {
 
-    //A VERIFIER A VERIFIER A VERIFIER A VERIFIER A VERIFIER A VERIFIER A VERIFIER A VERIFIER A VERIFIER A VERIFIER
-    // est-ce qu'il faut faire avec getLayout ou je peux garder mon truc avec updatePane() ???
-    //??????????????????????????????????????????????????????????????????????????????????????????????????????????????
-
     private final ObjectProperty<MapViewParameters> property;
     private final Consumer<String> stringConsumer;
     private final Graph graph;
     private final ObservableList<Waypoint> listOfWayPoint;
     private final Pane pane;
 
-    WaypointsManager(Graph graph, ObjectProperty<MapViewParameters> property, ObservableList<Waypoint> listOfWayPoint, Consumer<String> stringConsumer) {
+    WaypointsManager(Graph graph, ObjectProperty<MapViewParameters> mapParameters, ObservableList<Waypoint> listOfWayPoint, Consumer<String> stringConsumer) {
         this.graph = graph;
-        this.property = property;
+        this.property = mapParameters;
         this.listOfWayPoint = listOfWayPoint;
         this.stringConsumer = stringConsumer;
         pane = new Pane();
         pane.setPickOnBounds(false);
         updatePane();
-
         listOfWayPoint.addListener((Observable o) -> updatePane());
-        property.addListener((Observable o) -> updatePane());
+        mapParameters.addListener((Observable o) -> updatePane());
     }
 
     public Pane pane() {
@@ -48,59 +43,63 @@ public final class WaypointsManager {
         }
     }
 
+    private Group createSVGPath(int i) {
+        SVGPath path1 = new SVGPath();
+        path1.getStyleClass().add("pin_outside");
+        path1.setContent("M-8-20C-5-14-2-7 0 0 2-7 5-14 8-20 20-40-20-40-8-20");
+
+        SVGPath path2 = new SVGPath();
+        path2.getStyleClass().add("pin_inside");
+        path2.setContent("M0-23A1 1 0 000-29 1 1 0 000-23");
+
+        Group wayPointGroup = new Group(path1, path2);
+        wayPointGroup.getStyleClass().add("pin");
+
+        if (i == 0) {
+            wayPointGroup.getStyleClass().add("first");
+        } else if (i == listOfWayPoint.size() - 1) {
+            wayPointGroup.getStyleClass().add("last");
+        } else {
+            wayPointGroup.getStyleClass().add("middle");
+        }
+        positionGroup(listOfWayPoint.get(i), wayPointGroup);
+        pane.getChildren().add(wayPointGroup);
+        return wayPointGroup;
+    }
+
+    private void handler(int i, Group wayPointGroup) {
+        ObjectProperty<Point2D> initialPoint = new SimpleObjectProperty<>();
+
+        wayPointGroup.setOnMousePressed(e -> initialPoint.setValue(new Point2D(e.getX(), e.getY())));
+
+        wayPointGroup.setOnMouseReleased(e1 -> {
+            if (e1.isStillSincePress()) {
+                listOfWayPoint.remove(i);
+            } else {
+                Waypoint w = isWaypointClosest(e1.getSceneX() - initialPoint.get().getX(),
+                        e1.getSceneY() - initialPoint.get().getY());
+                if (w != null) {
+                    positionGroup(w, wayPointGroup);
+                    listOfWayPoint.set(i, w);
+                } else {
+                    wayPointGroup.setLayoutX(initialPoint.get().getX());
+                    wayPointGroup.setLayoutY(initialPoint.get().getY());
+                    updatePane();
+                }
+            }
+        });
+
+        wayPointGroup.setOnMouseDragged(e1 -> {
+            wayPointGroup.setLayoutX(e1.getSceneX() - initialPoint.getValue().getX());
+            wayPointGroup.setLayoutY(e1.getSceneY() - initialPoint.getValue().getY());
+        });
+    }
+
     private void updatePane() {
         pane.getChildren().clear();
         for (int i = 0; i < listOfWayPoint.size(); i++) {
-            SVGPath path1 = new SVGPath();
-            path1.getStyleClass().add("pin_outside");
-            path1.setContent("M-8-20C-5-14-2-7 0 0 2-7 5-14 8-20 20-40-20-40-8-20");
-            SVGPath path2 = new SVGPath();
-            path2.getStyleClass().add("pin_inside");
-            path2.setContent("M0-23A1 1 0 000-29 1 1 0 000-23");
-
-            Group wayPointGroup = new Group(path1, path2);
-            wayPointGroup.getStyleClass().add("pin");
-
-            if (i == 0) {
-                wayPointGroup.getStyleClass().add("first");
-            } else if (i == listOfWayPoint.size() - 1) {
-                wayPointGroup.getStyleClass().add("last");
-            } else {
-                wayPointGroup.getStyleClass().add("middle");
-            }
-
-            positionGroup(listOfWayPoint.get(i), wayPointGroup);
-
-            ObjectProperty<Point2D> initialPoint = new SimpleObjectProperty<>();
-            wayPointGroup.setOnMousePressed(e -> {
-                initialPoint.setValue(new Point2D(e.getX(), e.getY()));
-            });
-
-            int finalI = i;
-            wayPointGroup.setOnMouseReleased(e1 -> {
-                if (e1.isStillSincePress()) {
-                    listOfWayPoint.remove(finalI);
-                } else {
-                    Waypoint w = isWaypointClosest(e1.getSceneX() - initialPoint.get().getX(),
-                            e1.getSceneY() - initialPoint.get().getY());
-                    if (w != null) {
-                        positionGroup(w, wayPointGroup);
-                        listOfWayPoint.set(finalI, w);
-                    } else {
-
-                        wayPointGroup.setLayoutX(initialPoint.get().getX());
-                        wayPointGroup.setLayoutY(initialPoint.get().getY());
-                        updatePane();
-                    }
-                }
-            });
-
-            wayPointGroup.setOnMouseDragged(e1 -> {
-                wayPointGroup.setLayoutX(e1.getSceneX() - initialPoint.getValue().getX());
-                wayPointGroup.setLayoutY(e1.getSceneY() - initialPoint.getValue().getY());
-            });
-
-            pane.getChildren().add(wayPointGroup);
+            Group wayPointGroup = createSVGPath(i);
+            handler(i, wayPointGroup);
         }
     }
 
@@ -120,5 +119,3 @@ public final class WaypointsManager {
         return null;
     }
 }
-
-
