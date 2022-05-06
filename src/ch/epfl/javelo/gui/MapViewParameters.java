@@ -26,8 +26,8 @@ public record MapViewParameters(int zoomLevel, double xTopLeft, double yTopLeft)
      * @param newXTopLeft the new x-parameter
      * @param newYTopLeft the new y-parameter
      */
-    public void withMinXY(int newXTopLeft, int newYTopLeft) {
-        new MapViewParameters(zoomLevel, newXTopLeft, newYTopLeft);
+    public MapViewParameters withMinXY(double newXTopLeft, double newYTopLeft) {
+        return new MapViewParameters(zoomLevel, newXTopLeft, newYTopLeft);
     }
 
     /**

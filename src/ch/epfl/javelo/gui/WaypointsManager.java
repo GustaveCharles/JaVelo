@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 
 public final class WaypointsManager {
 
-    private final ObjectProperty<MapViewParameters> property;
+    private final ObjectProperty<MapViewParameters> mapParameters;
     private final Consumer<String> stringConsumer;
     private final Graph graph;
     private final ObservableList<Waypoint> listOfWayPoint;
@@ -23,7 +23,7 @@ public final class WaypointsManager {
 
     WaypointsManager(Graph graph, ObjectProperty<MapViewParameters> mapParameters, ObservableList<Waypoint> listOfWayPoint, Consumer<String> stringConsumer) {
         this.graph = graph;
-        this.property = mapParameters;
+        this.mapParameters = mapParameters;
         this.listOfWayPoint = listOfWayPoint;
         this.stringConsumer = stringConsumer;
         pane = new Pane();
@@ -107,12 +107,12 @@ public final class WaypointsManager {
     }
 
     private void positionGroup(Waypoint w, Group wayPointGroup) {
-        wayPointGroup.setLayoutX(property.get().viewX((PointWebMercator.ofPointCh(w.crossingPosition()))));
-        wayPointGroup.setLayoutY(property.get().viewY((PointWebMercator.ofPointCh(w.crossingPosition()))));
+        wayPointGroup.setLayoutX(mapParameters.get().viewX((PointWebMercator.ofPointCh(w.crossingPosition()))));
+        wayPointGroup.setLayoutY(mapParameters.get().viewY((PointWebMercator.ofPointCh(w.crossingPosition()))));
     }
 
     private Waypoint isWaypointClosest(double x, double y) {
-        PointCh point = property.getValue().pointAt(x, y).toPointCh();
+        PointCh point = mapParameters.getValue().pointAt(x, y).toPointCh();
         int closestPointId = graph.nodeClosestTo(point, 500);
         if (closestPointId != -1) {
             return new Waypoint(point, closestPointId);
