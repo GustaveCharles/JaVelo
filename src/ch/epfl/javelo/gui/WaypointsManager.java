@@ -19,6 +19,7 @@ public final class WaypointsManager {
     private final Consumer<String> stringConsumer;
     private final Graph graph;
     private final ObservableList<Waypoint> listOfWayPoint;
+    private final static int RADIUS = 500;
     private final Pane pane;
 
     public WaypointsManager(Graph graph, ObjectProperty<MapViewParameters> mapParameters, ObservableList<Waypoint> listOfWayPoint, Consumer<String> stringConsumer) {
@@ -113,7 +114,7 @@ public final class WaypointsManager {
 
     private Waypoint isWaypointClosest(double x, double y) {
         PointCh point = mapParameters.getValue().pointAt(x, y).toPointCh();
-        int closestPointId = graph.nodeClosestTo(point, 500);
+        int closestPointId = graph.nodeClosestTo(point, RADIUS);
         if (closestPointId != -1) {
             return new Waypoint(point, closestPointId);
         } else {

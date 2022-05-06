@@ -18,6 +18,7 @@ public final class RouteBean {
     private final ObjectProperty<ElevationProfile> elevationProfile;
     private final static int MAX_LENGTH = 5;
     private final static int MAX_CAPACITY = 80;
+    private final static int MIN_GROUP_SIZE = 2;
     private final LinkedHashMap<Pair<Integer, Integer>, Route> map;
 
     public RouteBean(RouteComputer routeComputer) {
@@ -40,12 +41,12 @@ public final class RouteBean {
     }
 
     private void createRoute() {
-        if (waypoints.size() >= 2) {
+        if (waypoints.size() >= MIN_GROUP_SIZE) {
             List<Route> listRoute = new ArrayList<>();
             for (int i = 1; i < waypoints.size(); i++) {
                 int point1 = waypoints.get(i - 1).closestJaVeloNode();
                 int point2 = waypoints.get(i).closestJaVeloNode();
-                if (!map.containsKey(new Pair<>(point1,point2))){
+                if (!map.containsKey(new Pair<>(point1, point2))) {
                     Route r = routeComputer.bestRouteBetween(point1, point2);
                     if (r == null) {
                         setRouteAndElevation(null, null);
