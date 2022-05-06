@@ -38,8 +38,6 @@ public final class RouteManager {
         this.routeNodesDouble = new ArrayList<>();
 
         pane = new Pane(line, circle);
-        // pane.getChildren().add(line);
-        //pane.getChildren().add(circle);
         pane.setPickOnBounds(false);
 
 
@@ -61,6 +59,8 @@ public final class RouteManager {
 
 
             if (e != null || oV != nV) {
+                routeNodes.clear();
+                routeNodesDouble.clear();
                 line.getPoints().clear();
                 pointsSequence();
                 line.setLayoutX(-property.get().xTopLeft());
@@ -80,9 +80,11 @@ public final class RouteManager {
             }
         });
 
-
         property.addListener((e, oV, nV) -> {
-            if (oV.zoomLevel() != nV.zoomLevel()) {
+            if (oV.zoomLevel() != nV.zoomLevel() && e!=null) {
+                routeNodes.clear();
+                routeNodesDouble.clear();
+                line.getPoints().clear();
                 pointsSequence();
                 line.setLayoutX(-nV.xTopLeft());
                 line.setLayoutY(-nV.yTopLeft());
