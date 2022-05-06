@@ -6,9 +6,7 @@ import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.util.Pair;
-
 import java.util.*;
-
 import static java.lang.Double.NaN;
 
 public final class RouteBean {

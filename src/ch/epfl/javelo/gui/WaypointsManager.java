@@ -21,7 +21,7 @@ public final class WaypointsManager {
     private final ObservableList<Waypoint> listOfWayPoint;
     private final Pane pane;
 
-    WaypointsManager(Graph graph, ObjectProperty<MapViewParameters> mapParameters, ObservableList<Waypoint> listOfWayPoint, Consumer<String> stringConsumer) {
+    public WaypointsManager(Graph graph, ObjectProperty<MapViewParameters> mapParameters, ObservableList<Waypoint> listOfWayPoint, Consumer<String> stringConsumer) {
         this.graph = graph;
         this.mapParameters = mapParameters;
         this.listOfWayPoint = listOfWayPoint;
