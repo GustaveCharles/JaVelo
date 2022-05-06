@@ -12,7 +12,7 @@ import javafx.scene.canvas.Canvas;
 
 
 import java.io.IOException;
-
+//TODO constate pour 256
 /**
  * manages the display and interaction with the basemap
  *
@@ -76,7 +76,7 @@ public final class BaseMapManager {
 
     }
 
-    private void handler(){
+    private void handler() {
 
         ObjectProperty<Point2D> property1 = new SimpleObjectProperty<>();
         pane.setOnMousePressed(e ->
@@ -90,12 +90,12 @@ public final class BaseMapManager {
                             withMinXY(property.get().xTopLeft() + pd1.getX(),
                                     property.get().yTopLeft() + pd1.getY()));
 
-                       //     property.set(
-                         //   new MapViewParameters(property.get().zoomLevel(),
-                           // property.get().xTopLeft() + pd1.getX(),
-                            //property.get().yTopLeft() + pd1.getY()));
+                    //     property.set(
+                    //   new MapViewParameters(property.get().zoomLevel(),
+                    // property.get().xTopLeft() + pd1.getX(),
+                    //property.get().yTopLeft() + pd1.getY()));
 
-                    property1.set(new Point2D(e.getX(),e.getY()));
+                    property1.set(new Point2D(e.getX(), e.getY()));
                     redrawOnNextPulse();
                 }
         );
@@ -105,11 +105,11 @@ public final class BaseMapManager {
         pane.setOnScroll(e -> {
             int newZoom = Math2.clamp(8, property.get().zoomLevel() + (int) e.getDeltaY() / 26, 19);
 
-            PointWebMercator newCoordinates = property.get().pointAt(e.getX(),e.getY());
+            PointWebMercator newCoordinates = property.get().pointAt(e.getX(), e.getY());
 
-           // PointWebMercator newCoordinates = PointWebMercator.of(property.get().zoomLevel(),
-             //       property.get().xTopLeft() + e.getX(),
-               //     property.get().yTopLeft() + e.getY());
+            // PointWebMercator newCoordinates = PointWebMercator.of(property.get().zoomLevel(),
+            //       property.get().xTopLeft() + e.getX(),
+            //     property.get().yTopLeft() + e.getY());
 
             double newX = newCoordinates.xAtZoomLevel(newZoom);
             double newY = newCoordinates.yAtZoomLevel(newZoom);
