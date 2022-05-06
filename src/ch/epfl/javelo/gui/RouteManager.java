@@ -12,7 +12,7 @@ import javafx.scene.shape.Polyline;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-
+//TODO ta mere la pute
 public final class RouteManager {
 
     private final Pane pane;

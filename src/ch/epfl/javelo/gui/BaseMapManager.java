@@ -12,7 +12,7 @@ import javafx.scene.canvas.Canvas;
 
 
 import java.io.IOException;
-
+//TODO constate pour 256
 /**
  * manages the display and interaction with the basemap
  *
