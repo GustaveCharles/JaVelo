@@ -26,10 +26,8 @@ public final class RouteManager {
     private List<Double> routeNodesDouble;
 
     public RouteManager(RouteBean routeBean, SimpleObjectProperty<MapViewParameters> property, Consumer<String> errors) {
-        //ajouter les points lors de la construction de la polyline
         this.line = new Polyline();
         this.routeBean = routeBean;
-        //est ce qu il faut mettre des parametrees centrex et centrey a la construction?
         this.circle = new Circle(5);
         this.property = property;
         this.errors = errors;
@@ -52,16 +50,15 @@ public final class RouteManager {
 
         routeBean.routeProperty().addListener((e, oV, nV) -> {
 
-            if ((e == null)) {
+            if ((nV == null)) {
+                System.out.println("coucou");
                 line.setVisible(false);
                 circle.setVisible(false);
             }
 
 
             if (e != null || oV != nV) {
-                routeNodes.clear();
-                routeNodesDouble.clear();
-                line.getPoints().clear();
+
                 pointsSequence();
                 line.setLayoutX(-property.get().xTopLeft());
                 line.setLayoutY(-property.get().yTopLeft());
@@ -82,9 +79,7 @@ public final class RouteManager {
 
         property.addListener((e, oV, nV) -> {
             if (oV.zoomLevel() != nV.zoomLevel() && e!=null) {
-                routeNodes.clear();
-                routeNodesDouble.clear();
-                line.getPoints().clear();
+
                 pointsSequence();
                 line.setLayoutX(-nV.xTopLeft());
                 line.setLayoutY(-nV.yTopLeft());
@@ -110,12 +105,15 @@ public final class RouteManager {
     private void handler() {
 
         circle.setOnMouseClicked(e -> {
-                    Point2D pd = circle.localToParent(e.getX(), e.getY());
-                    PointCh point = property.getValue().pointAt(pd.getX(), pd.getY()).toPointCh();
-                    int closestPointId = routeBean.routeProperty().get().nodeClosestTo(routeBean.highlightedPosition());
-
+                    Point2D point2D = circle.localToParent(e.getX(), e.getY());
+                    PointCh point = property.getValue().pointAt(point2D.getX(), point2D.getY()).toPointCh();
+                    int closestPointId = routeBean.routeProperty().get()
+                            .nodeClosestTo(routeBean.highlightedPosition());
                     if (closestPointId != -1) {
-                        routeBean.addWaypoints(new Waypoint(point, closestPointId));
+                        int index= routeBean.routeProperty().get()
+                                .indexOfSegmentAt(routeBean.highlightedPosition())+1;
+                        routeBean.waypointsProperty().add(index,new Waypoint(point,closestPointId));
+
                     } else {
                         errors.accept("Un point de passage est déjà présent à cet endroit !");
                     }
@@ -125,6 +123,10 @@ public final class RouteManager {
 
 
     private void pointsSequence() {
+
+        routeNodes.clear();
+        routeNodesDouble.clear();
+        line.getPoints().clear();
 
         routeNodes = new ArrayList<>(routeBean.routeProperty().get().points());
         routeNodes.forEach(o -> {
