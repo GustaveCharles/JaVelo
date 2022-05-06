@@ -46,7 +46,7 @@ public final class RouteManager {
         line.setVisible(false);
         circle.setVisible(false);
 
-        routeBean.highlightedPositionProperty().addListener( e -> {
+        routeBean.highlightedPositionProperty().addListener(e -> {
             PointWebMercator point = PointWebMercator.
                     ofPointCh(routeBean.routeProperty().get()
                             .pointAt(routeBean.getHighlightedPosition()));
@@ -66,10 +66,7 @@ public final class RouteManager {
             if ((routeBean.routeProperty().get() == null)) {
                 line.setVisible(false);
                 circle.setVisible(false);
-            }
-
-            if (routeBean.routeProperty().get() != null) {
-
+            } else {
                 line.setVisible(true);
                 circle.setVisible(true);
             }
@@ -77,8 +74,8 @@ public final class RouteManager {
 
         //reconstruire ligne lorsque itinéraire change
         // reconstruire le disque lorsque les paramètres de la carte changent (xtopleft ytopleft)
-        routeBean.routeProperty().addListener((e,oV,nV) -> {
-            if(oV != nV && nV!=null){
+        routeBean.routeProperty().addListener((e, oV, nV) -> {
+            if (oV != nV && nV != null) {
                 pointsSequence();
                 line.setLayoutX(-mapParameters.get().xTopLeft());
                 line.setLayoutY(-mapParameters.get().yTopLeft());
@@ -99,7 +96,7 @@ public final class RouteManager {
 
         mapParameters.addListener((e, oV, nV) -> {
 
-            if (oV.zoomLevel() != nV.zoomLevel() && routeBean.routeProperty().get()!=null) {
+            if (oV.zoomLevel() != nV.zoomLevel() && routeBean.routeProperty().get() != null) {
 
                 pointsSequence();
                 line.setLayoutX(-nV.xTopLeft());
@@ -139,18 +136,28 @@ public final class RouteManager {
                     PointCh point = mapParameters.getValue().pointAt(point2D.getX(), point2D.getY()).toPointCh();
                     int closestPointId = routeBean.routeProperty().get()
                             .nodeClosestTo(routeBean.highlightedPosition());
-                    if (!routeBean.waypointsProperty().contains(point)) {
-                        int index= routeBean.routeProperty().get()
-                                .indexOfSegmentAt(routeBean.highlightedPosition())+1;
-                        routeBean.waypointsProperty().add(index,new Waypoint(point,closestPointId));
 
+            int index = routeBean.routeProperty().get()
+                    .indexOfSegmentAt(routeBean.highlightedPosition()) + 1;
+            Waypoint waypoint = new Waypoint(point, closestPointId);
+
+                    if (waypointNotOnRoute(waypoint)) {
+                        routeBean.waypointsProperty().add(index, waypoint );
                     } else {
-                        errors.accept("Un point de passage est déjà présent à cet endroit !");
+                        this.errors.accept("Un point de passage est déjà présent à cet endroit !");
                     }
                 }
         );
     }
 
+    private boolean waypointNotOnRoute(Waypoint compare){
+        for(Waypoint waypoint: routeBean.waypointsProperty()){
+            if(waypoint.closestJaVeloNode() == compare.closestJaVeloNode()){
+                return false;
+            }
+        }
+        return true;
+    }
     private void pointsSequence() {
 
         routeNodes.clear();
