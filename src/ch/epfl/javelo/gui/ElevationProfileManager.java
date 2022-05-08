@@ -31,7 +31,7 @@ public final class ElevationProfileManager {
         worldToScreen = new SimpleObjectProperty<>();
         this.elevationProfileProperty = new SimpleObjectProperty<ElevationProfile>();
         this.highlightedProperty = new SimpleObjectProperty<>();
-
+//
         affine = new Affine();
 
         this.path = new Path();
