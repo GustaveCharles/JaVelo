@@ -24,6 +24,18 @@ public final class ElevationProfileManager {
     private final Pane pane;
     private final BorderPane borderPane;
     private final VBox vBox;
+    private final Path path;
+    private final Polygon polygone;
+    private final Line line;
+    private final Group group;
+    private final Text textGroup_1, textGroup_2, textVbox;
+    private final ObjectProperty<Transform> screenToWorld;
+    private final ObjectProperty<Transform> worldToScreen;
+    private final Affine affine;
+    private final Insets insets;
+    private final ObjectProperty<ElevationProfile> elevationProfileProperty;
+    private final ObjectProperty<Double> highlightedProperty;
+    private final ObjectProperty<Rectangle2D> rectangle2DProperty;
 
     public ElevationProfileManager(ObjectProperty<ElevationProfile> elevationProfileProperty,
                                    ObjectProperty<Double> highlightedProperty) {
@@ -46,16 +58,31 @@ public final class ElevationProfileManager {
         textGroup_1.getStyleClass().setAll("grid_label", "horizontal");
         textGroup_2.getStyleClass().setAll("grid_label", "vertical");
 
+        this.group = new Group(textGroup_1, textGroup_2);
 
+        this.textVbox = new Text();
+        this.vBox = new VBox(textVbox);
 
-        vBox = new VBox();
-        pane = new Pane();
+        vBox.setId("profile_data");
+        pane = new Pane(path, polygone, line, group);
 
-        borderPane = new BorderPane();
+        borderPane = new BorderPane(pane, null, null, vBox, null);
+        borderPane.getStylesheets().setAll("elevation_profile.css");
+
+        insets = new Insets(10, 10, 20, 40);
+
+        Rectangle2D r = new Rectangle2D(0, 0,
+                pane.getWidth() - insets.getLeft() - insets.getRight(),
+                pane.getHeight() - insets.getBottom() - insets.getTop());
+
+        this.rectangle2DProperty = new SimpleObjectProperty<>(r);
+
+        Bindings.createObjectBinding(rectangle2DProperty, );
+        line.setLayoutX(Bindings.createDoubleBinding(highlightedProperty, ));
     }
 
     public Pane pane() {
-        return pane;
+        return borderPane;
     }
 
     public ReadOnlyObjectProperty<Integer> mousePositionOnProfileProperty() {
