@@ -3,7 +3,6 @@ package ch.epfl.javelo.gui;
 import ch.epfl.javelo.routing.ElevationProfile;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Insets;
@@ -11,13 +10,11 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.*;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Transform;
 import javafx.scene.Group;
-import javafx.scene.shape.Line;
-import javafx.scene.shape.Path;
-import javafx.scene.shape.Polygon;
 import javafx.scene.text.Text;
 
 public final class ElevationProfileManager {
@@ -31,7 +28,7 @@ public final class ElevationProfileManager {
     private final Text textGroup_1, textGroup_2, textVbox;
     private final ObjectProperty<Transform> screenToWorld;
     private final ObjectProperty<Transform> worldToScreen;
-    private final Affine affine;
+    private final Affine transformation;
     private final Insets insets;
     private final ObjectProperty<ElevationProfile> elevationProfileProperty;
     private final ObjectProperty<Double> highlightedProperty;
@@ -44,7 +41,7 @@ public final class ElevationProfileManager {
         this.elevationProfileProperty = new SimpleObjectProperty<ElevationProfile>();
         this.highlightedProperty = new SimpleObjectProperty<>();
 //
-        affine = new Affine();
+        transformation = new Affine();
 
         this.path = new Path();
         path.setId("grid");
@@ -71,7 +68,7 @@ public final class ElevationProfileManager {
 
         insets = new Insets(10, 10, 20, 40);
 
-        Rectangle2D r = new Rectangle2D(0, 0,
+        Rectangle2D r = new Rectangle2D(insets.getLeft(), insets.getTop(),
                 pane.getWidth() - insets.getLeft() - insets.getRight(),
                 pane.getHeight() - insets.getBottom() - insets.getTop());
 
@@ -88,21 +85,35 @@ public final class ElevationProfileManager {
     public ReadOnlyObjectProperty<Integer> mousePositionOnProfileProperty() {
     }
 
-    private ObjectProperty<Transform> screenToWorldProperty() {
-        affine.appendTranslation();
-    }
+    private void createTransformation() {
+        transformation.prependTranslation(-rectangle2DProperty.get().getMinX(), -rectangle2DProperty.get().getMinY());
+        transformation.prependScale(elevationProfileProperty.get().length() / rectangle2DProperty.get().getWidth(),
+                -(elevationProfileProperty.get().maxElevation() - elevationProfileProperty.get().minElevation()) / rectangle2DProperty.get().getHeight());
+        transformation.prependTranslation(0, elevationProfileProperty.get().maxElevation());
+        screenToWorld.setValue(transformation);
 
-    private Transform worldToScreenProperty() {
         try {
-            return screenToWorld.get().createInverse();
+            worldToScreen.setValue(screenToWorld.get().createInverse());
         } catch (NonInvertibleTransformException e) {
             e.printStackTrace();
         }
-        return null;
     }
 
-    private void createPolygon() {
+    private void createGrid() {
+        int[] POS_STEPS =
+                {1000, 2000, 5000, 10_000, 25_000, 50_000, 100_000};
+        int[] ELE_STEPS =
+                {5, 10, 20, 25, 50, 100, 200, 250, 500, 1_000};
 
+        Path p = new Path();
+        p.getElements().addAll(new MoveTo(rectangle2DProperty.get().getMinX(), rectangle2DProperty.get().getMinY()),
+                new LineTo(rectangle2DProperty.get().getMaxX(), rectangle2DProperty.get().getMaxY()));
+        //worldToScreen.get().deltaTransform(rectangle2DProperty.get().getMinX(), rectangle2DProperty.get().getMaxX())
+    }
+
+
+    private void createPolygon() {
+        rectangle2DProperty.get().
     }
 
     public void grid() {
