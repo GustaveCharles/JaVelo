@@ -3,9 +3,11 @@ package ch.epfl.javelo.gui;
 import ch.epfl.javelo.routing.ElevationProfile;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
@@ -30,16 +32,16 @@ public final class ElevationProfileManager {
     private final ObjectProperty<Transform> worldToScreen;
     private final Affine transformation;
     private final Insets insets;
-    private final ObjectProperty<ElevationProfile> elevationProfileProperty;
-    private final ObjectProperty<Double> highlightedProperty;
+    private final ReadOnlyObjectProperty<ElevationProfile> elevationProfileProperty;
+    private final ReadOnlyDoubleProperty highlightedProperty;
     private final ObjectProperty<Rectangle2D> rectangle2DProperty;
 
-    public ElevationProfileManager(ObjectProperty<ElevationProfile> elevationProfileProperty,
-                                   ObjectProperty<Double> highlightedProperty) {
+    public ElevationProfileManager(ReadOnlyObjectProperty<ElevationProfile> elevationProfileProperty,
+                                   ReadOnlyDoubleProperty highlightedProperty) {
         screenToWorld = new SimpleObjectProperty<>();
         worldToScreen = new SimpleObjectProperty<>();
         this.elevationProfileProperty = new SimpleObjectProperty<ElevationProfile>();
-        this.highlightedProperty = new SimpleObjectProperty<>();
+        this.highlightedProperty = highlightedProperty;
 //
         transformation = new Affine();
 
@@ -68,14 +70,31 @@ public final class ElevationProfileManager {
 
         insets = new Insets(10, 10, 20, 40);
 
-        Rectangle2D r = new Rectangle2D(insets.getLeft(), insets.getTop(),
-                pane.getWidth() - insets.getLeft() - insets.getRight(),
-                pane.getHeight() - insets.getBottom() - insets.getTop());
+        this.rectangle2DProperty = new SimpleObjectProperty<>();
 
-        this.rectangle2DProperty = new SimpleObjectProperty<>(r);
+        rectangle2DProperty.bind(Bindings.createObjectBinding(() -> {
 
-        Bindings.createObjectBinding(rectangle2DProperty, highlightedProperty);
-        line.setLayoutX(Bindings.createDoubleBinding(highlightedProperty, ));
+                    Rectangle2D r = new Rectangle2D(insets.getLeft(), insets.getTop(),
+                            pane.getWidth() - insets.getLeft() - insets.getRight(),
+                            pane.getHeight() - insets.getBottom() - insets.getTop());
+
+                    return r;
+                },pane.widthProperty(),pane.heightProperty()
+
+        ));
+
+        line.startYProperty().bind(Bindings.select(rectangle2DProperty,"minY"));
+        line.endYProperty().bind(Bindings.select(rectangle2DProperty,"maxY"));
+
+        line.visibleProperty().bind(
+                highlightedProperty.greaterThanOrEqualTo(0)
+        );
+
+        line.layoutXProperty().bind(Bindings.createDoubleBinding(() -> {
+            Point2D pd = worldToScreen.get().transform(highlightedProperty.get(),0);
+            return pd.getX();
+        },line.layoutXProperty()));
+
     }
 
     public Pane pane() {

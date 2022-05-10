@@ -12,7 +12,8 @@ import javafx.scene.canvas.Canvas;
 
 
 import java.io.IOException;
-//TODO constate pour 256
+//TODO regler problème de la mouse avec /26
+
 /**
  * manages the display and interaction with the basemap
  *
@@ -21,14 +22,22 @@ import java.io.IOException;
  */
 public final class BaseMapManager {
 
-    private TileManager tileManager;
+    private final TileManager tileManager;
     private final ObjectProperty<MapViewParameters> property;
     private final WaypointsManager waypointsManager;
     private boolean redrawNeeded;
-    private Canvas canvas;
-    private Pane pane;
+    private final Canvas canvas;
+    private final Pane pane;
 
+    public final static int TILE_HEIGHT = 256;
+    public final static int MIN_ZOOM = 8;
+    public final static int MAX_ZOOM = 19;
 
+    /**
+     * @param tileManager      the tile manager to use to get the tiles from the map
+     * @param waypointsManager waypoint manager
+     * @param property         a JavaFX property containing the parameters of the map displayed
+     */
     public BaseMapManager(TileManager tileManager, WaypointsManager waypointsManager, ObjectProperty<MapViewParameters> property) {
         this.tileManager = tileManager;
         this.property = property;
@@ -49,6 +58,9 @@ public final class BaseMapManager {
         handler();
     }
 
+    /**
+     * @return returns the current pane
+     */
     public Pane pane() {
         return pane;
     }
@@ -63,12 +75,12 @@ public final class BaseMapManager {
         double x = property.get().xTopLeft();
         double y = property.get().yTopLeft();
 
-        for (int i = 0; i < canvas.getWidth() + 256; i += 256) {
-            for (int j = 0; j < canvas.getHeight() + 256; j += 256) {
+        for (int i = 0; i < canvas.getWidth() + TILE_HEIGHT; i += TILE_HEIGHT) {
+            for (int j = 0; j < canvas.getHeight() + TILE_HEIGHT; j += TILE_HEIGHT) {
                 try {
                     TileManager.TileId tileID =
-                            new TileManager.TileId(property.get().zoomLevel(), Math.floorDiv((int) (i + x), 256), Math.floorDiv((int) (j + y), 256));
-                    gc.drawImage(tileManager.imageForTileAt(tileID), i - x % 256, j - y % 256);
+                            new TileManager.TileId(property.get().zoomLevel(), Math.floorDiv((int) (i + x), TILE_HEIGHT), Math.floorDiv((int) (j + y), 256));
+                    gc.drawImage(tileManager.imageForTileAt(tileID), i - x % TILE_HEIGHT, j - y % TILE_HEIGHT);
                 } catch (IOException ignored) {
                 }
             }
@@ -100,10 +112,8 @@ public final class BaseMapManager {
                 }
         );
 
-        //TODO magic numbers nommer 8 et 18
-        //TODO regler problème de la mouse avec /26
         pane.setOnScroll(e -> {
-            int newZoom = Math2.clamp(8, property.get().zoomLevel() + (int) e.getDeltaY() / 26, 19);
+            int newZoom = Math2.clamp(MIN_ZOOM, property.get().zoomLevel() + (int) e.getDeltaY() / 26, MAX_ZOOM);
 
             PointWebMercator newCoordinates = property.get().pointAt(e.getX(), e.getY());
 
