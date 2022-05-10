@@ -74,7 +74,7 @@ public final class ElevationProfileManager {
 
         this.rectangle2DProperty = new SimpleObjectProperty<>(r);
 
-        Bindings.createObjectBinding(rectangle2DProperty, );
+        Bindings.createObjectBinding(rectangle2DProperty, highlightedProperty);
         line.setLayoutX(Bindings.createDoubleBinding(highlightedProperty, ));
     }
 
@@ -110,6 +110,7 @@ public final class ElevationProfileManager {
                 new LineTo(rectangle2DProperty.get().getMaxX(), rectangle2DProperty.get().getMaxY()));
         //worldToScreen.get().deltaTransform(rectangle2DProperty.get().getMinX(), rectangle2DProperty.get().getMaxX())
     }
+    //
 
 
     private void createPolygon() {
