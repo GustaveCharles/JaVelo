@@ -1,5 +1,6 @@
 package ch.epfl.javelo.gui;
 
+import ch.epfl.javelo.Math2;
 import ch.epfl.javelo.routing.ElevationProfile;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
@@ -165,8 +166,8 @@ public final class ElevationProfileManager {
                 yStep = ELE_STEPS[ELE_STEPS.length - 1];
             }
         }
-
-        for (double i = Math.floor(minElevation/xStep); i < maxElevation; i += yStep) {
+        double closestStepBound = Math2.ceilDiv((int) minElevation, yStep)*yStep;
+        for (double i = closestStepBound; i < maxElevation; i += yStep) {
             Point2D startHorizontal = worldToScreen.get().transform(0, i);
             Point2D endHorizontal = worldToScreen.get().transform(length, i);
             path.getElements().addAll(new MoveTo(startHorizontal.getX(), startHorizontal.getY()),
