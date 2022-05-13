@@ -129,11 +129,14 @@ public final class ElevationProfileManager {
 
     private void createGrid() {
 
+
+        group.getChildren().clear();
+        path.getElements().clear();
+
         double minElevation = elevationProfileProperty.get().minElevation();
         double maxElevation = elevationProfileProperty.get().maxElevation();
         double length = elevationProfileProperty.get().length();
 
-        path.getElements().clear();
 
         int[] POS_STEPS =
                 {1000, 2000, 5000, 10_000, 25_000, 50_000, 100_000};
@@ -163,23 +166,20 @@ public final class ElevationProfileManager {
             }
         }
 
-        System.out.println("ceil :" + Math.ceil(minElevation / xStep));
-
-        for (double i = Math.ceil(minElevation / xStep); i < maxElevation; i += yStep) {
+        for (double i = Math.floor(minElevation/xStep); i < maxElevation; i += yStep) {
             Point2D startHorizontal = worldToScreen.get().transform(0, i);
             Point2D endHorizontal = worldToScreen.get().transform(length, i);
             path.getElements().addAll(new MoveTo(startHorizontal.getX(), startHorizontal.getY()),
                     new LineTo(endHorizontal.getX(), endHorizontal.getY()));
 
             Text textGroup_1 = new Text();
-            textGroup_1.getStyleClass().setAll("grid_label", "horizontal");
-            textGroup_1.setTextOrigin(VPos.TOP);
+            textGroup_1.getStyleClass().setAll("grid_label", "vertical");
+            textGroup_1.setTextOrigin(VPos.CENTER);
             textGroup_1.setFont(Font.font("Avenir", 10));
-            textGroup_1.setLayoutX(startHorizontal.getX() - textGroup_1.prefWidth(0) / 2);
+            textGroup_1.setText(Integer.toString((int) i));
+            textGroup_1.setLayoutX( textGroup_1.prefWidth(0) + 2);
             textGroup_1.setLayoutY(startHorizontal.getY());
             //textGroup_1.setLayoutX(-textGroup_1.prefWidth(0)/2);
-            System.out.println(i);
-            textGroup_1.setText(Integer.toString((int) i));
             group.getChildren().add(textGroup_1);
 
         }
@@ -192,12 +192,13 @@ public final class ElevationProfileManager {
                     new LineTo(endVertical.getX(), endVertical.getY()));
 
             Text textGroup_2 = new Text();
-            textGroup_2.getStyleClass().setAll("grid_label", "vertical");
-            textGroup_2.setTextOrigin(VPos.CENTER);
+            textGroup_2.getStyleClass().setAll("grid_label", "horizontal");
+            textGroup_2.setTextOrigin(VPos.TOP);
             textGroup_2.setFont(Font.font("Avenir", 10));
-            textGroup_2.setLayoutX(startVertical.getX());
-            textGroup_2.setLayoutY(startVertical.getY() - textGroup_2.prefWidth(0) - 2);
-            textGroup_2.setText(Double.toString(i * 0.001));
+            textGroup_2.setText(Integer.toString((int)(i * 0.001)));
+            textGroup_2.setLayoutY(rectangle2DProperty.get().getMaxY());
+            textGroup_2.setLayoutX(startVertical.getX() - textGroup_2.prefWidth(0) / 2);
+            //faire une methode separee pour la muoltiplication : tokilometers
             group.getChildren().add(textGroup_2);
         }
     }
@@ -249,7 +250,6 @@ public final class ElevationProfileManager {
         line.startYProperty().bind(Bindings.select(rectangle2DProperty, "minY"));
         line.endYProperty().bind(Bindings.select(rectangle2DProperty, "maxY"));
 
-        //pas sur du tout
         line.visibleProperty().bind(
                 highlightedProperty.greaterThanOrEqualTo(0)
         );
