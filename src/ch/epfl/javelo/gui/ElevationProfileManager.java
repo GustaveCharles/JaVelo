@@ -1,5 +1,6 @@
 package ch.epfl.javelo.gui;
 
+import ch.epfl.javelo.Math2;
 import ch.epfl.javelo.routing.ElevationProfile;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
@@ -9,9 +10,11 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
+import javafx.geometry.VPos;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
+import javafx.scene.text.Font;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Transform;
@@ -29,7 +32,6 @@ public final class ElevationProfileManager {
     private final Text textGroup_1, textGroup_2, textVbox;
     private final ObjectProperty<Transform> screenToWorld;
     private final ObjectProperty<Transform> worldToScreen;
-    private final Affine transformation;
     private final Insets insets;
     private final ReadOnlyObjectProperty<ElevationProfile> elevationProfileProperty;
     private final ReadOnlyDoubleProperty highlightedProperty;
@@ -42,7 +44,6 @@ public final class ElevationProfileManager {
         this.elevationProfileProperty = elevationProfileProperty;
         this.highlightedProperty = highlightedProperty;
 
-        transformation = new Affine();
 
         this.path = new Path();
         path.setId("grid");
@@ -69,49 +70,55 @@ public final class ElevationProfileManager {
 
         insets = new Insets(10, 10, 20, 40);
         BorderPane.setMargin(pane,insets);
-        this.rectangle2DProperty = new SimpleObjectProperty<>();
+        this.rectangle2DProperty = new SimpleObjectProperty<>(Rectangle2D.EMPTY);
 
+        rectangle2DProperty.bind(Bindings.createObjectBinding(() -> {
+
+                    return new Rectangle2D(insets.getLeft(), insets.getTop(),
+                            Math.max(0,pane.getWidth() - insets.getLeft() - insets.getRight()),
+                            Math.max(0,pane.getHeight() - insets.getBottom() - insets.getTop()));
+                },pane.widthProperty(),pane.heightProperty()
+
+        ));
+        //pane.setBackground(Background.fill(Color.BLUE));
+        //borderPane.setBackground(Background.fill(Color.RED));
         //besoin des deux ou 1 des deux c'est bon?
-        borderPane.widthProperty().addListener(nV -> {
-            createRectangle();
+        pane.widthProperty().addListener(nV -> {
             createTransformation();
             createPolygon();
             createLine();
+            createGrid();
+            createBox();
         });
-        borderPane.heightProperty().addListener(e -> {
-            createRectangle();
+        pane.heightProperty().addListener(e -> {
             createTransformation();
             createPolygon();
             createLine();
+            createGrid();
+            createBox();
         });
 
-        pane.setBorder(new Border(new BorderStroke(Color.BLACK,
-                BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+        //pane.setBorder(new Border(new BorderStroke(Color.BLACK,
+        //      BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
 
         //pas sur
         //elevationProfileProperty.addListener(nV->
         //   createPolygon()   );
 
-        //le rectangle il a un bleme - cette partie est bien faite?
-        //rectangle2DProperty.bind(Bindings.createObjectBinding(() -> {
-
-        //return new Rectangle2D(insets.getLeft(), insets.getTop(),
-        //      Math.max(0,pane.getWidth() - insets.getLeft() - insets.getRight()),
-        //          Math.max(0,pane.getHeight() - insets.getBottom() - insets.getTop()));
-        //        },pane.widthProperty(),pane.heightProperty()
-
-        //  ));
-
+        //  pane.setOnMouseMoved(() -> return mousePositionOnProfileProperty());
+        // pane.setOnMouseExited(e -> mousePositionOnProfileProperty());
     }
 
     public Pane pane() {
         return borderPane;
     }
 
-   // public ReadOnlyObjectProperty<Integer> mousePositionOnProfileProperty() {
-   // }
+    //public ReadOnlyObjectProperty<Integer> mousePositionOnProfileProperty() {
+    //}
 
     private void createTransformation() {
+        Affine transformation = new Affine();
+
         transformation.prependTranslation(-rectangle2DProperty.get().getMinX(), -rectangle2DProperty.get().getMinY());
         transformation.prependScale(elevationProfileProperty.get().length() / rectangle2DProperty.get().getWidth(),
                 -(elevationProfileProperty.get().maxElevation() - elevationProfileProperty.get().minElevation()) / rectangle2DProperty.get().getHeight());
@@ -123,9 +130,12 @@ public final class ElevationProfileManager {
         } catch (NonInvertibleTransformException e) {
             e.printStackTrace();
         }
+        System.out.println(worldToScreen.get().transform(0,663));
+
     }
 
     private void createGrid() {
+
         int[] POS_STEPS =
                 {1000, 2000, 5000, 10_000, 25_000, 50_000, 100_000};
         int[] ELE_STEPS =
@@ -168,29 +178,64 @@ public final class ElevationProfileManager {
         }
     }
 
+    private void createLabel(){
+        //horizontal = position = group1      vertical = altitude = group2
+
+        textGroup_1.setTextOrigin(VPos.TOP);
+        textGroup_1.setFont(Font.font("Avenir", 10));
+        textGroup_1.setLayoutX(-textGroup_1.prefWidth(0)/2);
+
+        textGroup_2.setTextOrigin(VPos.CENTER);
+        textGroup_2.setFont(Font.font("Avenir", 10));
+        textGroup_2.setLayoutX(-textGroup_2.prefWidth(0) -2);
+
+    }
+
+    private void createBox(){
+
+        textVbox.setText("Longueur : %.1f km".formatted(elevationProfileProperty.get().length()*0.001) +
+                "     Montée : %.0f m".formatted(elevationProfileProperty.get().totalAscent()) +
+                "     Descente : %.0f m".formatted(elevationProfileProperty.get().totalDescent()) +
+                "     Altitude : de %.0f m à %.0f m".formatted(
+                        elevationProfileProperty.get().minElevation(),
+                        elevationProfileProperty.get().maxElevation()
+                ));
+
+    }
+
 
     private void createPolygon() {
         polygone.getPoints().clear();
 
         System.out.println("minX" + rectangle2DProperty.get().getMinX());
-        //System.out.println("maxX" + rectangle2DProperty.get().getMaxX());
-        System.out.println("maxX" + rectangle2DProperty.get().getWidth());
+        System.out.println("maxX" + rectangle2DProperty.get().getMaxX());
+        //System.out.println("width" + rectangle2DProperty.get().getWidth());
 
-        for(int i=(int)rectangle2DProperty.get().getMinX(); i<rectangle2DProperty.get().getMaxX(); ++i){
-            Point2D pd = screenToWorld.get().transform(i,0);
-            double point = elevationProfileProperty.get().elevationAt(pd.getX());
+
+        for(int i=(int)rectangle2DProperty.get().getMinX(); i<=rectangle2DProperty.get().getMaxX() ; ++i){
+            Point2D point2Dd = screenToWorld.get().transform(i,0);
+            double point = elevationProfileProperty.get().elevationAt(point2Dd.getX());
             Point2D pd2=  worldToScreen.get().transform(0,point);
-            System.out.println(pd2.getX());
-            System.out.println(pd2.getY());
-            polygone.getPoints().add(pd2.getX());
+            //Math2.clamp(); --post 1551
+            polygone.getPoints().add((double)i);
             polygone.getPoints().add(pd2.getY());
         }
+        polygone.getPoints().add(rectangle2DProperty.get().getMaxX());
+        polygone.getPoints().add(rectangle2DProperty.get().getMaxY());
+        polygone.getPoints().add(rectangle2DProperty.get().getMinX());
+        polygone.getPoints().add(rectangle2DProperty.get().getMaxY());
+
+
+
     }
     private void createRectangle(){
 
-        rectangle2DProperty.set(new Rectangle2D(insets.getLeft(), insets.getTop(),
-                Math.max(0,pane.getWidth() - insets.getLeft() - insets.getRight()),
-                Math.max(0,pane.getHeight() - insets.getBottom() - insets.getTop())));
+        //   rectangle2DProperty.set(new Rectangle2D(insets.getLeft(), insets.getTop(),
+        //           Math.max(0,pane.getWidth() - insets.getLeft() - insets.getRight()),
+        //         Math.max(0,pane.getHeight() - insets.getBottom() - insets.getTop())));
+
+        //le rectangle il a un bleme - cette partie est bien faite?
+
     }
 
     private void createLine(){
@@ -208,5 +253,6 @@ public final class ElevationProfileManager {
             return pd.getX();
         },line.layoutXProperty()));
     }
+
 
 }
