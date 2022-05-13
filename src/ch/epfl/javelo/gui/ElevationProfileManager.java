@@ -88,17 +88,17 @@ public final class ElevationProfileManager {
         //   createPolygon()   );
 
         pane.setOnMouseMoved(e -> {
-                    if (rectangle2DProperty.get().contains(new Point2D(e.getX(),e.getY()))) {
+                    if (rectangle2DProperty.get().contains(new Point2D(e.getX(), e.getY()))) {
 
                         Point2D point2D = screenToWorld.get().transform(e.getX(), e.getY());
-                        mousePosition.set( point2D.getX());
+                        mousePosition.set(point2D.getX());
                     } else {
-                        mousePosition.set( Double.NaN);
+                        mousePosition.set(Double.NaN);
                     }
                 }
         );
         pane.setOnMouseExited(e -> {
-            if (!rectangle2DProperty.get().contains(new Point2D(e.getX(),e.getY()))) {
+            if (!rectangle2DProperty.get().contains(new Point2D(e.getX(), e.getY()))) {
                 mousePosition.set(Double.NaN);
             }
         });
@@ -166,7 +166,7 @@ public final class ElevationProfileManager {
                 yStep = ELE_STEPS[ELE_STEPS.length - 1];
             }
         }
-        double closestStepBound = Math2.ceilDiv((int) minElevation, yStep)*yStep;
+        double closestStepBound = Math2.ceilDiv((int) minElevation, yStep) * yStep;
         for (double i = closestStepBound; i < maxElevation; i += yStep) {
             Point2D startHorizontal = worldToScreen.get().transform(0, i);
             Point2D endHorizontal = worldToScreen.get().transform(length, i);
@@ -178,7 +178,7 @@ public final class ElevationProfileManager {
             textGroup_1.setTextOrigin(VPos.CENTER);
             textGroup_1.setFont(Font.font("Avenir", 10));
             textGroup_1.setText(Integer.toString((int) i));
-            textGroup_1.setLayoutX( textGroup_1.prefWidth(0) + 2);
+            textGroup_1.setLayoutX(textGroup_1.prefWidth(0) + 2);
             textGroup_1.setLayoutY(startHorizontal.getY());
             //textGroup_1.setLayoutX(-textGroup_1.prefWidth(0)/2);
             group.getChildren().add(textGroup_1);
@@ -196,7 +196,7 @@ public final class ElevationProfileManager {
             textGroup_2.getStyleClass().setAll("grid_label", "horizontal");
             textGroup_2.setTextOrigin(VPos.TOP);
             textGroup_2.setFont(Font.font("Avenir", 10));
-            textGroup_2.setText(Integer.toString((int)(i * 0.001)));
+            textGroup_2.setText(Integer.toString((int) (i * 0.001)));
             textGroup_2.setLayoutY(rectangle2DProperty.get().getMaxY());
             textGroup_2.setLayoutX(startVertical.getX() - textGroup_2.prefWidth(0) / 2);
             //faire une methode separee pour la muoltiplication : tokilometers
@@ -237,12 +237,9 @@ public final class ElevationProfileManager {
 
     private void createRectangle() {
 
-        rectangle2DProperty.bind(Bindings.createObjectBinding(() -> {
-
-                    return new Rectangle2D(insets.getLeft(), insets.getTop(),
-                            Math.max(0, pane.getWidth() - insets.getLeft() - insets.getRight()),
-                            Math.max(0, pane.getHeight() - insets.getBottom() - insets.getTop()));
-                }, pane.widthProperty(), pane.heightProperty()
+        rectangle2DProperty.bind(Bindings.createObjectBinding(() -> new Rectangle2D(insets.getLeft(), insets.getTop(),
+                Math.max(0, pane.getWidth() - insets.getLeft() - insets.getRight()),
+                Math.max(0, pane.getHeight() - insets.getBottom() - insets.getTop())), pane.widthProperty(), pane.heightProperty()
 
         ));
     }
