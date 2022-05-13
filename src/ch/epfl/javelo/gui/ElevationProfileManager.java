@@ -135,45 +135,54 @@ public final class ElevationProfileManager {
 
     private void createGrid() {
 
+        double minElevation = elevationProfileProperty.get().minElevation();
+        double maxElevation = elevationProfileProperty.get().maxElevation();
+        double length = elevationProfileProperty.get().length();
+
+        path.getElements().clear();
+
         int[] POS_STEPS =
                 {1000, 2000, 5000, 10_000, 25_000, 50_000, 100_000};
         int[] ELE_STEPS =
                 {5, 10, 20, 25, 50, 100, 200, 250, 500, 1_000};
 
-        int x_steps = 0;
-        int y_steps = 0;
+        int xStep = 0;
+        int yStep = 0;
 
         for (int i : POS_STEPS) {
             if (worldToScreen.get().deltaTransform(i, 0).getX() >= 50) {
-                x_steps = i;
+                xStep = i;
                 break;
             }
             if (worldToScreen.get().deltaTransform(POS_STEPS[POS_STEPS.length - 1], 0).getX() < 50) {
-                x_steps = POS_STEPS[POS_STEPS.length - 1];
+                xStep = POS_STEPS[POS_STEPS.length - 1];
             }
         }
 
         for (int i : ELE_STEPS) {
-            if (worldToScreen.get().deltaTransform(0, i).getY() >= 25) {
-                y_steps = i;
+            if (worldToScreen.get().deltaTransform(0, -i).getY() >= 25) {
+                yStep = i;
                 break;
             }
             if (worldToScreen.get().deltaTransform(0, ELE_STEPS[ELE_STEPS.length - 1]).getY() < 25) {
-                y_steps = ELE_STEPS[ELE_STEPS.length - 1];
+                yStep = ELE_STEPS[ELE_STEPS.length - 1];
             }
         }
 
-        for (int i = x_steps; i < elevationProfileProperty.get().length(); i = i + x_steps) {
-            PathElement horizontalLineStart = new MoveTo(0, i);
-            PathElement horizontalLineEnd = new LineTo(pane.getWidth(), i);
-            path.getElements().addAll(horizontalLineStart, horizontalLineEnd);
+        for (double i = minElevation; i < maxElevation; i += yStep) {
+
+            Point2D startHorizontal = worldToScreen.get().transform(0, i);
+            Point2D endHorizontal = worldToScreen.get().transform(length, i);
+            path.getElements().addAll(new MoveTo(startHorizontal.getX(), startHorizontal.getY()),
+                    new LineTo(endHorizontal.getX(), endHorizontal.getY()));
         }
 
-        double elevation = elevationProfileProperty.get().maxElevation() - elevationProfileProperty.get().minElevation();
-        for (int i = y_steps; i < elevation; i = i + y_steps) {
-            PathElement verticalLineStart = new MoveTo(i, 0);
-            PathElement verticalLineEnd = new LineTo(i, pane.getHeight());
-            path.getElements().addAll(verticalLineStart, verticalLineEnd);
+        //creer le premier y au bon positionnement (modifier le i = bon positionnement
+        for (double i = 0; i < length; i = i + xStep) {
+            Point2D startVertical = worldToScreen.get().transform(i, minElevation);
+            Point2D endVertical = worldToScreen.get().transform(i, maxElevation);
+            path.getElements().addAll(new MoveTo(startVertical.getX(), startVertical.getY()),
+                    new LineTo(endVertical.getX(), endVertical.getY()));
         }
     }
 
