@@ -27,7 +27,7 @@ public final class ElevationProfileManager {
     private final Polygon polygone;
     private final Line line;
     private final Group group;
-    private final Text textHorizontal1, textVertical1, textVbox;
+    private final Text textVbox;
     private final ObjectProperty<Transform> screenToWorld;
     private final ObjectProperty<Transform> worldToScreen;
     private final Insets insets;
@@ -49,13 +49,7 @@ public final class ElevationProfileManager {
         polygone.setId("profile");
         this.line = new Line();
 
-        //y'en a peut etre plus
-        this.textHorizontal1 = new Text();
-        this.textVertical1 = new Text();
-        textHorizontal1.getStyleClass().setAll("grid_label", "horizontal");
-        textVertical1.getStyleClass().setAll("grid_label", "vertical");
-
-        this.group = new Group(textHorizontal1, textVertical1);
+        this.group = new Group();
 
         this.textVbox = new Text();
         this.vBox = new VBox(textVbox);
@@ -170,11 +164,21 @@ public final class ElevationProfileManager {
         }
 
         for (double i = minElevation; i < maxElevation; i += yStep) {
-
             Point2D startHorizontal = worldToScreen.get().transform(0, i);
             Point2D endHorizontal = worldToScreen.get().transform(length, i);
             path.getElements().addAll(new MoveTo(startHorizontal.getX(), startHorizontal.getY()),
                     new LineTo(endHorizontal.getX(), endHorizontal.getY()));
+
+            Text textGroup_1 = new Text();
+            textGroup_1.getStyleClass().setAll("grid_label", "horizontal");
+            textGroup_1.setTextOrigin(VPos.TOP);
+            textGroup_1.setFont(Font.font("Avenir", 10));
+            textGroup_1.setLayoutX(startHorizontal.getX() - textGroup_1.prefWidth(0) / 2);
+            textGroup_1.setLayoutY(startHorizontal.getY());
+            //textGroup_1.setLayoutX(-textGroup_1.prefWidth(0)/2);
+            textGroup_1.setText(Integer.toString((int) i));
+            group.getChildren().add(textGroup_1);
+
         }
 
         //creer le premier y au bon positionnement (modifier le i = bon positionnement
@@ -183,20 +187,16 @@ public final class ElevationProfileManager {
             Point2D endVertical = worldToScreen.get().transform(i, maxElevation);
             path.getElements().addAll(new MoveTo(startVertical.getX(), startVertical.getY()),
                     new LineTo(endVertical.getX(), endVertical.getY()));
+
+            Text textGroup_2 = new Text();
+            textGroup_2.getStyleClass().setAll("grid_label", "vertical");
+            textGroup_2.setTextOrigin(VPos.CENTER);
+            textGroup_2.setFont(Font.font("Avenir", 10));
+            textGroup_2.setLayoutX(startVertical.getX());
+            textGroup_2.setLayoutY(startVertical.getY() - textGroup_2.prefWidth(0) - 2);
+            textGroup_2.setText(Double.toString(i * 0.001));
+            group.getChildren().add(textGroup_2);
         }
-    }
-
-    private void createLabel() {
-        //horizontal = position = group1      vertical = altitude = group2
-
-        textHorizontal1.setTextOrigin(VPos.TOP);
-        textHorizontal1.setFont(Font.font("Avenir", 10));
-        textHorizontal1.setLayoutX(-textHorizontal1.prefWidth(0) / 2);
-
-        textVertical1.setTextOrigin(VPos.CENTER);
-        textVertical1.setFont(Font.font("Avenir", 10));
-        textVertical1.setLayoutX(-textVertical1.prefWidth(0) - 2);
-
     }
 
     private void createBox() {
