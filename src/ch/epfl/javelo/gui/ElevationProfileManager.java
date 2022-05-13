@@ -124,12 +124,42 @@ public final class ElevationProfileManager {
         int[] ELE_STEPS =
                 {5, 10, 20, 25, 50, 100, 200, 250, 500, 1_000};
 
-        Path p = new Path();
-        p.getElements().addAll(new MoveTo(rectangle2DProperty.get().getMinX(), rectangle2DProperty.get().getMinY()),
-                new LineTo(rectangle2DProperty.get().getMaxX(), rectangle2DProperty.get().getMaxY()));
-        //worldToScreen.get().deltaTransform(rectangle2DProperty.get().getMinX(), rectangle2DProperty.get().getMaxX())
+        int x_steps = 0;
+        int y_steps = 0;
+
+        for (int i : POS_STEPS) {
+            if (worldToScreen.get().deltaTransform(i, 0).getX() >= 50) {
+                x_steps = i;
+                break;
+            }
+            if (worldToScreen.get().deltaTransform(POS_STEPS[POS_STEPS.length - 1], 0).getX() < 50) {
+                x_steps = POS_STEPS[POS_STEPS.length - 1];
+            }
+        }
+
+        for (int i : ELE_STEPS) {
+            if (worldToScreen.get().deltaTransform(0, i).getY() >= 25) {
+                y_steps = i;
+                break;
+            }
+            if (worldToScreen.get().deltaTransform(0, ELE_STEPS[ELE_STEPS.length - 1]).getY() < 25) {
+                y_steps = ELE_STEPS[ELE_STEPS.length - 1];
+            }
+        }
+
+        for (int i = x_steps; i < elevationProfileProperty.get().length(); i = i + x_steps) {
+            PathElement horizontalLineStart = new MoveTo(0, i);
+            PathElement horizontalLineEnd = new LineTo(pane.getWidth(), i);
+            path.getElements().addAll(horizontalLineStart, horizontalLineEnd);
+        }
+
+        double elevation = elevationProfileProperty.get().maxElevation() - elevationProfileProperty.get().minElevation();
+        for (int i = y_steps; i < elevation; i = i + y_steps) {
+            PathElement verticalLineStart = new MoveTo(i, 0);
+            PathElement verticalLineEnd = new LineTo(i, pane.getHeight());
+            path.getElements().addAll(verticalLineStart, verticalLineEnd);
+        }
     }
-    //
 
 
     private void createPolygon() {
