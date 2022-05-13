@@ -163,7 +163,9 @@ public final class ElevationProfileManager {
             }
         }
 
-        for (double i = minElevation; i < maxElevation; i += yStep) {
+        System.out.println("ceil :" + Math.ceil(minElevation / xStep));
+
+        for (double i = Math.ceil(minElevation / xStep); i < maxElevation; i += yStep) {
             Point2D startHorizontal = worldToScreen.get().transform(0, i);
             Point2D endHorizontal = worldToScreen.get().transform(length, i);
             path.getElements().addAll(new MoveTo(startHorizontal.getX(), startHorizontal.getY()),
@@ -176,6 +178,7 @@ public final class ElevationProfileManager {
             textGroup_1.setLayoutX(startHorizontal.getX() - textGroup_1.prefWidth(0) / 2);
             textGroup_1.setLayoutY(startHorizontal.getY());
             //textGroup_1.setLayoutX(-textGroup_1.prefWidth(0)/2);
+            System.out.println(i);
             textGroup_1.setText(Integer.toString((int) i));
             group.getChildren().add(textGroup_1);
 
