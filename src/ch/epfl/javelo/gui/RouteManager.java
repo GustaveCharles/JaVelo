@@ -94,7 +94,7 @@ public final class RouteManager {
             routeBean.setHighlightedPosition(HIGHLIGHTED_PROPERTY);
 
             PointWebMercator point = PointWebMercator.
-                    ofPointCh(routeBean.routeProperty().get().pointAt(routeBean.getHighlightedPosition()));
+                    ofPointCh(routeBean.routeProperty().get().pointAt(routeBean.highlightedPosition()));
 
             circle.setCenterX(mapParameters.get().viewX(point));
             circle.setCenterY(mapParameters.get().viewY(point));
@@ -116,7 +116,7 @@ public final class RouteManager {
             line.setLayoutY(-nV.yTopLeft());
 
             PointWebMercator point = PointWebMercator.
-                    ofPointCh(routeBean.routeProperty().get().pointAt(routeBean.getHighlightedPosition()));
+                    ofPointCh(routeBean.routeProperty().get().pointAt(routeBean.highlightedPosition()));
 
             circle.setCenterX(point.xAtZoomLevel(nV.zoomLevel()) - nV.xTopLeft());
             circle.setCenterY(point.yAtZoomLevel(nV.zoomLevel()) - nV.yTopLeft());
@@ -135,7 +135,7 @@ public final class RouteManager {
     private void setCircle() {
         PointWebMercator point = PointWebMercator.
                 ofPointCh(routeBean.routeProperty().get()
-                        .pointAt(routeBean.getHighlightedPosition()));
+                        .pointAt(routeBean.highlightedPosition()));
 
         circle.setCenterX(mapParameters.get().viewX(point));
         circle.setCenterY(mapParameters.get().viewY(point));

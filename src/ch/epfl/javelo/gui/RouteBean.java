@@ -9,6 +9,12 @@ import javafx.util.Pair;
 import java.util.*;
 import static java.lang.Double.NaN;
 
+/**
+ * Represents a JavaFX bean for a route
+ *
+ * @author Gustave Charles -- Saigne (345945)
+ * @author Baudoin Coispeau (339364)
+ */
 public final class RouteBean {
 
     private final RouteComputer routeComputer;
@@ -16,11 +22,16 @@ public final class RouteBean {
     private final ObjectProperty<Route> route;
     private final ObservableList<Waypoint> waypoints;
     private final ObjectProperty<ElevationProfile> elevationProfile;
-    private final static int MAX_LENGTH = 5;
-    private final static int MAX_CAPACITY = 80;
-    private final static int MIN_GROUP_SIZE = 2;
     private final LinkedHashMap<Pair<Integer, Integer>, Route> map;
+    public final static int MAX_LENGTH = 5;
+    public final static int MAX_CAPACITY = 80;
+    public final static int MIN_GROUP_SIZE = 2;
 
+    /**
+     * Builds a JavaFX bean grouping properties related to waypoints and the corresponding route
+     *
+     * @param routeComputer a route calculator, of RouteComputer type, used to determine the best route connecting two waypoints.
+     */
     public RouteBean(RouteComputer routeComputer) {
         this.routeComputer = routeComputer;
         map = new LinkedHashMap<>(MAX_CAPACITY);
@@ -32,14 +43,18 @@ public final class RouteBean {
         createRoute();
     }
 
+    /**
+     * A getter for the route
+     *
+     * @return a read-only property which contains the route
+     */
     public ReadOnlyObjectProperty<Route> routeProperty() {
         return route;
     }
 
-    public ReadOnlyObjectProperty<ElevationProfile> elevationProfileProperty() {
-        return elevationProfile;
-    }
-
+    /**
+     * Creates a route connecting waypoints, returns null if there is no road between two waypoints or there are less than 2 waypoints
+     */
     private void createRoute() {
         if (waypoints.size() >= MIN_GROUP_SIZE) {
             List<Route> listRoute = new ArrayList<>();
@@ -58,39 +73,55 @@ public final class RouteBean {
                     listRoute.add(map.get(new Pair<>(point1, point2)));
                 }
             }
-            MultiRoute m = new MultiRoute(listRoute);
-            setRouteAndElevation(m, ElevationProfileComputer.elevationProfile(m, MAX_LENGTH));
+            MultiRoute multiRoute = new MultiRoute(listRoute);
+            setRouteAndElevation(multiRoute, ElevationProfileComputer.elevationProfile(multiRoute, MAX_LENGTH));
         } else {
             setRouteAndElevation(null, null);
         }
     }
 
-    private void setRouteAndElevation(MultiRoute m, ElevationProfile ele) {
-        route.setValue(m);
+    /**
+     * A setter for the route and the elevation profile
+     *
+     * @param multiRoute the route connecting every waypoint
+     * @param ele        the elevation profile of the route
+     */
+    private void setRouteAndElevation(MultiRoute multiRoute, ElevationProfile ele) {
+        route.setValue(multiRoute);
         elevationProfile.setValue(ele);
     }
 
-    public double getHighlightedPosition() {
-        return highlightedPosition.get();
-    }
-
+    /**
+     * A setter for the highlighted position
+     */
     public void setHighlightedPosition(double newHighlightedPosition) {
         highlightedPosition.setValue((newHighlightedPosition <= route.get().length()) && (newHighlightedPosition >= 0) ?
                 newHighlightedPosition : NaN);
     }
 
+    /**
+     * A getter for the highlighted position
+     *
+     * @return a double property which contains the highlighted position
+     */
     public DoubleProperty highlightedPositionProperty() {
         return highlightedPosition;
     }
 
+    /**
+     * A getter for the highlighted position
+     *
+     * @return the highlighted position
+     */
     public double highlightedPosition() {
         return highlightedPosition.getValue();
     }
 
-    public void addWaypoints(Waypoint waypoint) {
-        waypoints.add(waypoint);
-    }
-
+    /**
+     * A getter for the list of waypoints
+     *
+     * @return an observable list containing waypoints
+     */
     public ObservableList<Waypoint> waypointsProperty() {
         return waypoints;
     }
