@@ -6,7 +6,9 @@ import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.util.Pair;
+
 import java.util.*;
+
 import static java.lang.Double.NaN;
 
 /**
@@ -81,6 +83,22 @@ public final class RouteBean {
     }
 
     /**
+     * Calculates in which segment/singleroute our position is in, ignoring empty segments
+     *
+     * @param position a position along the route
+     * @return an index
+     */
+    public int indexOfNonEmptySegmentAt(double position) {
+        int index = route().indexOfSegmentAt(position);
+        for (int i = 0; i <= index; i += 1) {
+            int n1 = waypoints.get(i).closestJaVeloNode();
+            int n2 = waypoints.get(i + 1).closestJaVeloNode();
+            if (n1 == n2) index += 1;
+        }
+        return index;
+    }
+
+    /**
      * A setter for the route and the elevation profile
      *
      * @param multiRoute the route connecting every waypoint
@@ -89,6 +107,15 @@ public final class RouteBean {
     private void setRouteAndElevation(MultiRoute multiRoute, ElevationProfile ele) {
         route.setValue(multiRoute);
         elevationProfile.setValue(ele);
+    }
+
+    /**
+     * A getter for the route
+     *
+     * @return a route
+     */
+    private Route route() {
+        return route.get();
     }
 
     /**
