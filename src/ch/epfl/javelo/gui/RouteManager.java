@@ -12,7 +12,6 @@ import javafx.scene.shape.Polyline;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * manages the display of the route and part of the interaction with it
@@ -27,7 +26,6 @@ public final class RouteManager {
     private final Circle circle;
     private final RouteBean routeBean;
     private final ObjectProperty<MapViewParameters> mapParameters;
-    private final Consumer<String> errors;
     private List<PointCh> routeNodes;
     private final List<Double> routeNodesDouble;
     //TODO public ou private la constante?
@@ -37,14 +35,12 @@ public final class RouteManager {
     /**
      * @param routeBean     the route bean
      * @param mapParameters a JavaFX property, read-only, containing the parameters of the map displayed,
-     * @param errors        an “error consumer” to report an error
      */
-    public RouteManager(RouteBean routeBean, SimpleObjectProperty<MapViewParameters> mapParameters, Consumer<String> errors) {
+    public RouteManager(RouteBean routeBean, SimpleObjectProperty<MapViewParameters> mapParameters) {
         this.line = new Polyline();
         this.routeBean = routeBean;
         this.circle = new Circle(5);
         this.mapParameters = mapParameters;
-        this.errors = errors;
 
         this.routeNodes = new ArrayList<>();
         this.routeNodesDouble = new ArrayList<>();
@@ -172,26 +168,13 @@ public final class RouteManager {
                     int closestPointId = routeBean.routeProperty().get()
                             .nodeClosestTo(routeBean.highlightedPosition());
 
-                    int index = routeBean.routeProperty().get()
-                            .indexOfSegmentAt(routeBean.highlightedPosition()) + 1;
+                    int index = routeBean.indexOfNonEmptySegmentAt(routeBean.highlightedPosition()) + 1;
                     Waypoint waypoint = new Waypoint(point, closestPointId);
 
-                    if (waypointNotOnRoute(waypoint)) {
                         routeBean.waypointsProperty().add(index, waypoint);
-                    } else {
-                        this.errors.accept("Un point de passage est déjà présent à cet endroit !");
-                    }
+
                 }
         );
-    }
-
-    private boolean waypointNotOnRoute(Waypoint compare) {
-        for (Waypoint waypoint : routeBean.waypointsProperty()) {
-            if (waypoint.closestJaVeloNode() == compare.closestJaVeloNode()) {
-                return false;
-            }
-        }
-        return true;
     }
 
     /**
