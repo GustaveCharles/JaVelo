@@ -44,6 +44,18 @@ public final class WaypointsManager {
         }
     }
 
+    private Waypoint isWaypointClosest(double x, double y) {
+        PointCh point = mapParameters.getValue().pointAt(x, y).toPointCh();
+        int closestPointId = graph.nodeClosestTo(point, RADIUS);
+        if (closestPointId != -1) {
+            return new Waypoint(point, closestPointId);
+        } else {
+            stringConsumer.accept("No road nearby!");
+        }
+        return null;
+    }
+
+
     private Group createSVGPath(int i) {
         SVGPath path1 = new SVGPath();
         path1.getStyleClass().add("pin_outside");
@@ -110,16 +122,5 @@ public final class WaypointsManager {
     private void positionGroup(Waypoint w, Group wayPointGroup) {
         wayPointGroup.setLayoutX(mapParameters.get().viewX((PointWebMercator.ofPointCh(w.crossingPosition()))));
         wayPointGroup.setLayoutY(mapParameters.get().viewY((PointWebMercator.ofPointCh(w.crossingPosition()))));
-    }
-
-    private Waypoint isWaypointClosest(double x, double y) {
-        PointCh point = mapParameters.getValue().pointAt(x, y).toPointCh();
-        int closestPointId = graph.nodeClosestTo(point, RADIUS);
-        if (closestPointId != -1) {
-            return new Waypoint(point, closestPointId);
-        } else {
-            stringConsumer.accept("No road nearby!");
-        }
-        return null;
     }
 }

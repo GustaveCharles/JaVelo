@@ -12,6 +12,7 @@ import java.util.*;
 import static java.lang.Double.NaN;
 
 //TODO vérifier si la correction à la ligne 68 est correcte
+// quand on ajoute 3 waypoints alors le dernier quand on le déplace ne recalcule pas l'itinéraire
 
 /**
  * Represents a JavaFX bean for a route
@@ -156,6 +157,10 @@ public final class RouteBean {
      */
     public ObservableList<Waypoint> waypointsProperty() {
         return waypoints;
+    }
+
+    public ReadOnlyObjectProperty<ElevationProfile> elevationProfileProperty() {
+        return elevationProfileProperty();
     }
 }
 
