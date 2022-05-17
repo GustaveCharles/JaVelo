@@ -4,23 +4,22 @@ import ch.epfl.javelo.data.Graph;
 import ch.epfl.javelo.routing.CityBikeCF;
 import ch.epfl.javelo.routing.RouteComputer;
 import javafx.application.Application;
+import javafx.beans.Observable;
 import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
-import java.util.function.Consumer;
 
 //TODO est-ce qu'il faut nommer des variables pour la height et la width (800 et 600)
-//TODO implémenter ma classe ErrorManager
 
 public final class JaVelo extends Application {
     public static void main(String[] args) {
@@ -39,42 +38,33 @@ public final class JaVelo extends Application {
 
         CityBikeCF costFunction = new CityBikeCF(graph);
 
-        Consumer<String> errorConsumer = new ErrorConsumer();
-
         RouteComputer routeComputer = new RouteComputer(graph, costFunction);
 
         RouteBean routeBean = new RouteBean(routeComputer);
 
-        AnnotatedMapManager annotatedMapManager = new AnnotatedMapManager(graph, tileManager, routeBean, errorConsumer);
-        SplitPane splitPane = new SplitPane(annotatedMapManager.pane());
+        ErrorManager errorManager = new ErrorManager();
+
+        AnnotatedMapManager annotatedMapManager = new AnnotatedMapManager(graph, tileManager, routeBean, errorManager::displayError);
+
+        BorderPane profilePane = new ElevationProfileManager(routeBean.elevationProfileProperty(), routeBean.highlightedPositionProperty()).pane();
+
+        SplitPane splitPane = new SplitPane(annotatedMapManager.pane(), profilePane);
         splitPane.setOrientation(Orientation.VERTICAL);
 
-        if (routeBean.routeProperty().get() != null) {
-            System.out.println("cc");
-            ElevationProfileManager elevationProfileComputer = new ElevationProfileManager(routeBean.elevationProfileProperty(),
-                    routeBean.highlightedPositionProperty());
+        routeBean.routeProperty().addListener(e -> {
+            profilePane.visibleProperty().setValue(routeBean.routeProperty().get() != null);
+        });
 
-            splitPane.getItems().add(elevationProfileComputer.pane());
-
-            //TODO faire du conditional binding
-            // au lieu d'avoir des if les faire dans le bind
-
-            if (annotatedMapManager.mousePositionOnRouteProperty().getValue() >= 0) {
-                routeBean.highlightedPositionProperty().bind(annotatedMapManager.mousePositionOnRouteProperty());
-            } else {
-                routeBean.highlightedPositionProperty().bind(elevationProfileComputer.mousePositionOnProfileProperty());
-            }
-
-        }
+        //vérifier ligne en dessous
+        SplitPane.setResizableWithParent(profilePane, false);
 
         Menu menu = new Menu("Fichier");
         MenuItem menuItemExport = new MenuItem("Exporter GPX");
-        //menuItemExport.disableProperty().setValue(routeBean.elevationProfileProperty().get().length() == 0);
+        menuItemExport.disableProperty().setValue(routeBean.elevationProfileProperty() == null);
         menu.getItems().add(menuItemExport);
         MenuBar menuBar = new MenuBar(menu);
         menuBar.setUseSystemMenuBar(true);
         splitPane.getItems().add(menuBar);
-        //splitPane.getItems().setResizable
 
         menuItemExport.setOnAction(e -> {
             if (!menuItemExport.isDisable()) {
@@ -85,22 +75,15 @@ public final class JaVelo extends Application {
                 }
             }
         });
-        ErrorManager errorManager = new ErrorManager();
         Pane errorManagerPane = errorManager.pane();
+
         StackPane stackPane = new StackPane(menuBar, splitPane, errorManagerPane);
+
         stackPane.getStylesheets().add("map.css");
         primaryStage.setMinWidth(800);
         primaryStage.setMinHeight(600);
         primaryStage.setTitle("JaVelo");
         primaryStage.setScene(new Scene(stackPane));
         primaryStage.show();
-    }
-
-    private static final class ErrorConsumer
-            implements Consumer<String> {
-        @Override
-        public void accept(String s) {
-            System.out.println(s);
-        }
     }
 }

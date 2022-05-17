@@ -76,21 +76,9 @@ public final class ElevationProfileManager {
         borderPane.getStylesheets().setAll("elevation_profile.css");
         createRectangle();
 
-        pane.widthProperty().addListener(nV -> {
-            createTransformation();
-            createPolygon();
-            createLine();
-            createGrid();
-            createBox();
-        });
+        pane.widthProperty().addListener(nV -> displayElevation());
 
-        pane.heightProperty().addListener(e -> {
-            createTransformation();
-            createPolygon();
-            createLine();
-            createGrid();
-            createBox();
-        });
+        pane.heightProperty().addListener(e -> displayElevation());
 
         pane.setOnMouseMoved(e -> {
             if (rectangle2DProperty.get().contains(new Point2D(e.getX(), e.getY()))) {
@@ -106,6 +94,8 @@ public final class ElevationProfileManager {
                 mousePosition.set(Double.NaN);
             }
         });
+
+        elevationProfileProperty.addListener(e -> displayElevation());
     }
 
     /**
@@ -113,7 +103,7 @@ public final class ElevationProfileManager {
      *
      * @return the border pane
      */
-    public Pane pane() {
+    public BorderPane pane() {
         return borderPane;
     }
 
@@ -275,5 +265,13 @@ public final class ElevationProfileManager {
             Point2D p2d = worldToScreen.get().transform(highlightedProperty.get(), 0);
             return p2d.getX();
         }, highlightedProperty, worldToScreen));
+    }
+
+    private void displayElevation() {
+        createTransformation();
+        createPolygon();
+        createLine();
+        createGrid();
+        createBox();
     }
 }

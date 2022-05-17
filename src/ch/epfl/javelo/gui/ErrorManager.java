@@ -10,18 +10,23 @@ import javafx.scene.text.Text;
 import javafx.util.Duration;
 
 public final class ErrorManager {
+
+    public ErrorManager() {
+        vBoxError.setMouseTransparent(true);
+        vBoxError.getStylesheets().setAll("error.css");
+    }
+
     private static final VBox vBoxError = new VBox();
     //
 
-    public Pane pane(){
+    public Pane pane() {
         return vBoxError;
     }
 
-    public void displayError(String errorMessage){
+    public void displayError(String errorMessage) {
+        vBoxError.getChildren().clear();
         java.awt.Toolkit.getDefaultToolkit().beep();
         vBoxError.getChildren().add(new Text(errorMessage));
-        vBoxError.getStylesheets().setAll("error.css");
-        vBoxError.setMouseTransparent(true);
         FadeTransition fadeTransition1 = new FadeTransition(Duration.seconds(0.2), vBoxError);
         fadeTransition1.setFromValue(0);
         fadeTransition1.setToValue(0.8);
@@ -34,8 +39,8 @@ public final class ErrorManager {
 
         if (sequentialTransition.getStatus() == Animation.Status.RUNNING) {
             sequentialTransition.stop();
-        } else {
-            sequentialTransition.play();
         }
+
+        sequentialTransition.play();
     }
 }
