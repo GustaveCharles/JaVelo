@@ -89,13 +89,17 @@ public final class JaVelo extends Application {
         primaryStage.setScene(new Scene(stackPane));
         primaryStage.show();
 
-        routeBean.highlightedPositionProperty().bind(
-                Bindings
-                        .when(annotatedMapManager.mousePositionOnRouteProperty().greaterThanOrEqualTo(0))
-                        .then(annotatedMapManager.mousePositionOnRouteProperty().get())
-                        .otherwise(elevationProfileManager.mousePositionOnProfileProperty().get())
-        );
-
+        routeBean.routeProperty().addListener(e -> {
+            if(e != null) {
+                routeBean.highlightedPositionProperty().bind(
+                        Bindings
+                                .when(annotatedMapManager.mousePositionOnRouteProperty().greaterThanOrEqualTo(0))
+                                .then(annotatedMapManager.mousePositionOnRouteProperty().get())
+                                .otherwise(elevationProfileManager.mousePositionOnProfileProperty().get())
+                );
+            }
+        });
+        
     }
 
 
