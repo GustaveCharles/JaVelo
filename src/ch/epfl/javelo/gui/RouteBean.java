@@ -160,7 +160,7 @@ public final class RouteBean {
     }
 
     public ReadOnlyObjectProperty<ElevationProfile> elevationProfileProperty() {
-        return elevationProfileProperty();
+        return elevationProfile;
     }
 }
 

@@ -10,6 +10,8 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -27,28 +29,36 @@ public final class JaVelo extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Graph graph = Graph.loadFrom(Path.of("javelo-data"));
+
+        Graph graph = Graph.loadFrom(Path.of("lausanne"));
         Path cacheBasePath = Path.of("osm-cache");
         String tileServerHost = "tile.openstreetmap.org";
+
         TileManager tileManager =
                 new TileManager(cacheBasePath, tileServerHost);
+
         CityBikeCF costFunction = new CityBikeCF(graph);
+
         Consumer<String> errorConsumer = new ErrorConsumer();
+
         RouteComputer routeComputer = new RouteComputer(graph, costFunction);
+
         RouteBean routeBean = new RouteBean(routeComputer);
+
         AnnotatedMapManager annotatedMapManager = new AnnotatedMapManager(graph, tileManager, routeBean, errorConsumer);
         SplitPane splitPane = new SplitPane(annotatedMapManager.pane());
         splitPane.setOrientation(Orientation.VERTICAL);
 
-        if (routeBean.elevationProfileProperty().get().length() != 0) {
+        if (routeBean.routeProperty().get() != null) {
+            System.out.println("cc");
             ElevationProfileManager elevationProfileComputer = new ElevationProfileManager(routeBean.elevationProfileProperty(),
                     routeBean.highlightedPositionProperty());
 
             splitPane.getItems().add(elevationProfileComputer.pane());
 
-
             //TODO faire du conditional binding
             // au lieu d'avoir des if les faire dans le bind
+
             if (annotatedMapManager.mousePositionOnRouteProperty().getValue() >= 0) {
                 routeBean.highlightedPositionProperty().bind(annotatedMapManager.mousePositionOnRouteProperty());
             } else {
@@ -59,11 +69,12 @@ public final class JaVelo extends Application {
 
         Menu menu = new Menu("Fichier");
         MenuItem menuItemExport = new MenuItem("Exporter GPX");
-        menuItemExport.disableProperty().setValue(routeBean.elevationProfileProperty().get().length() == 0);
+        //menuItemExport.disableProperty().setValue(routeBean.elevationProfileProperty().get().length() == 0);
         menu.getItems().add(menuItemExport);
         MenuBar menuBar = new MenuBar(menu);
         menuBar.setUseSystemMenuBar(true);
         splitPane.getItems().add(menuBar);
+        //splitPane.getItems().setResizable
 
         menuItemExport.setOnAction(e -> {
             if (!menuItemExport.isDisable()) {
@@ -74,12 +85,15 @@ public final class JaVelo extends Application {
                 }
             }
         });
+        ErrorManager errorManager = new ErrorManager();
+        Pane errorManagerPane = errorManager.pane();
+        StackPane stackPane = new StackPane(menuBar, splitPane, errorManagerPane);
+        stackPane.getStylesheets().add("map.css");
         primaryStage.setMinWidth(800);
         primaryStage.setMinHeight(600);
         primaryStage.setTitle("JaVelo");
-        primaryStage.setScene(new Scene(splitPane));
+        primaryStage.setScene(new Scene(stackPane));
         primaryStage.show();
-        //
     }
 
     private static final class ErrorConsumer
