@@ -1,7 +1,14 @@
 package ch.epfl.javelo.gui;
 
+import ch.epfl.javelo.Math2;
 import ch.epfl.javelo.data.Graph;
+import ch.epfl.javelo.projection.PointCh;
+import ch.epfl.javelo.projection.PointWebMercator;
+import ch.epfl.javelo.routing.RoutePoint;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.layout.Pane;
@@ -31,11 +38,14 @@ public final class AnnotatedMapManager {
     //MapViewParameters c'est bien??
     public AnnotatedMapManager(Graph graph, TileManager tileManager, RouteBean routeBean, Consumer<String> stringConsumer) throws Exception {
 
-        this.graph = Graph.loadFrom(Path.of("lausanne"));
+        this.graph = graph;
         this.tileManager = tileManager;
         this.routeBean = routeBean;
         this.stringConsumer = stringConsumer;
-
+        double mouse = Double.NaN;
+        this.mouseProperty = new SimpleDoubleProperty(mouse);
+        Point2D point2D = Point2D.ZERO;
+        this.point2DProperty = new SimpleObjectProperty<>(point2D);
         SimpleObjectProperty<MapViewParameters> mapViewParametersP =
                 new SimpleObjectProperty<>(MAP_VIEW_PARAMETERS);
 
@@ -50,17 +60,28 @@ public final class AnnotatedMapManager {
         mainPane.getStylesheets().add("map.css");
 
 
-        mapViewParametersP.addListener(e -> {
-            //           mouseProperty.set();
-        });
+        mouseProperty.bind(Bindings.createDoubleBinding(
+                () -> {
+                    Point2D point2DMouse = point2DProperty.get();
+                    PointWebMercator pointWebMercator = mapViewParametersP.get().pointAt(point2DMouse.getX(),point2DMouse.getY());
+                   PointCh pointCh =  pointWebMercator.toPointCh();
+                    RoutePoint point = routeBean.routeProperty().get().pointClosestTo(pointCh);
 
-        routeBean.routeProperty().addListener(e -> {
-            //   mouseProperty.set();
-        });
+                    double x = mapViewParametersP.get().viewX(PointWebMercator.ofPointCh(point.point()));
+                   double y = mapViewParametersP.get().viewY(PointWebMercator.ofPointCh(point.point()));
+                   Point2D point2D1 = new Point2D(x,y);
+                   if(Math2.norm(point2D.getX()-point2D1.getX(),point2D.getY()-point2D1.getY()) <= 15){
+                       return x;
+                   }else return Double.NaN;
+
+                },
+                 point2DProperty,routeBean.routeProperty(),mapViewParametersP
+        ));
+
 
         mainPane.setOnMouseMoved(e -> {
             if (mainPane.contains(point2DProperty.get())) {
-                mouseProperty.set(e.getX());
+                //mouseProperty.set(e.getX());
                 point2DProperty.set(new Point2D(e.getX(), e.getY()));
             } else {
                 mouseProperty.set(Double.NaN);
@@ -79,7 +100,7 @@ public final class AnnotatedMapManager {
     }
 
     //retourne en lecture seule ou pas?
-    public DoubleProperty mousePositionOnRouteProperty() {
+    public ReadOnlyDoubleProperty mousePositionOnRouteProperty() {
         return mouseProperty;
     }
 }

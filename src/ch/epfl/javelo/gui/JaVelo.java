@@ -5,6 +5,7 @@ import ch.epfl.javelo.routing.CityBikeCF;
 import ch.epfl.javelo.routing.RouteComputer;
 import javafx.application.Application;
 import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
 import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
@@ -46,7 +47,9 @@ public final class JaVelo extends Application {
 
         AnnotatedMapManager annotatedMapManager = new AnnotatedMapManager(graph, tileManager, routeBean, errorManager::displayError);
 
-        BorderPane profilePane = new ElevationProfileManager(routeBean.elevationProfileProperty(), routeBean.highlightedPositionProperty()).pane();
+        ElevationProfileManager elevationProfileManager = new ElevationProfileManager(routeBean.elevationProfileProperty(), routeBean.highlightedPositionProperty());
+        BorderPane profilePane = elevationProfileManager.pane();
+
 
         SplitPane splitPane = new SplitPane(annotatedMapManager.pane(), profilePane);
         splitPane.setOrientation(Orientation.VERTICAL);
@@ -85,5 +88,15 @@ public final class JaVelo extends Application {
         primaryStage.setTitle("JaVelo");
         primaryStage.setScene(new Scene(stackPane));
         primaryStage.show();
+
+        routeBean.highlightedPositionProperty().bind(
+                Bindings
+                        .when(annotatedMapManager.mousePositionOnRouteProperty().greaterThanOrEqualTo(0))
+                        .then(annotatedMapManager.mousePositionOnRouteProperty().get())
+                        .otherwise(elevationProfileManager.mousePositionOnProfileProperty().get())
+        );
+
     }
+
+
 }
