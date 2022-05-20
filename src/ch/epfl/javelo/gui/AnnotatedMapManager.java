@@ -34,9 +34,8 @@ public final class AnnotatedMapManager {
     public final static MapViewParameters MAP_VIEW_PARAMETERS =
             new MapViewParameters(12, 543200, 370650);
 
-    //le throws exception est bien??
     //MapViewParameters c'est bien??
-    public AnnotatedMapManager(Graph graph, TileManager tileManager, RouteBean routeBean, Consumer<String> stringConsumer) throws Exception {
+    public AnnotatedMapManager(Graph graph, TileManager tileManager, RouteBean routeBean, Consumer<String> stringConsumer) {
 
         this.graph = graph;
         this.tileManager = tileManager;
@@ -62,7 +61,7 @@ public final class AnnotatedMapManager {
 
         mouseProperty.bind(Bindings.createDoubleBinding(
                 () -> {
-                    if(routeBean.routeProperty().get() != null){
+                    if(routeBean.routeProperty().get() != null && point2DProperty.get() != null){
                         Point2D point2DMouse = point2DProperty.get();
                         PointWebMercator pointWebMercator = mapViewParametersP.get().pointAt(point2DMouse.getX(),point2DMouse.getY());
                         PointCh pointCh =  pointWebMercator.toPointCh();
@@ -80,21 +79,9 @@ public final class AnnotatedMapManager {
         ));
 
 
-        mainPane.setOnMouseMoved(e -> {
-            if (mainPane.contains(new Point2D(e.getX(), e.getY()))) {
-                //mouseProperty.set(e.getX());
-                Point2D point2D1 = new Point2D(e.getX(), e.getY());
-                point2DProperty.set(point2D1);
-            } else {
-                point2DProperty.set(new Point2D(Double.NaN,Double.NaN));
-            }
-        });
+        mainPane.setOnMouseMoved(e -> point2DProperty.set(new Point2D(e.getX(), e.getY())));
 
-        mainPane.setOnMouseExited(e -> {
-            if (!mainPane.contains(new Point2D(e.getX(), e.getY()))) {
-                point2DProperty.set(new Point2D(Double.NaN,Double.NaN));
-            }
-        });
+        mainPane.setOnMouseExited(e -> point2DProperty.set(null));
 
 
     }
