@@ -33,9 +33,10 @@ public record AttributeSet(long bits) {
      */
     public static AttributeSet of(Attribute... attributes) {
         long set = 0;
-
+        long attribute = 0 ;
         for (Attribute a : attributes) {
-            set += 1L << a.ordinal();
+            attribute += 1L << a.ordinal();
+            set = set | attribute;
         }
 
         return new AttributeSet(set);

@@ -15,8 +15,10 @@ public final class SwissBounds {
      * The bounds of the Swiss territory represented by a rectangle with a maximum
      * or a minimum on the north, south, east and west sides of the rectangle
      */
-    public static final double MIN_E = 2485000, MAX_E = 2834000, MIN_N = 1075000,
-            MAX_N = 1296000;
+    public static final double MIN_E = 2485000;
+    public static final double MAX_E = 2834000;
+    public static final double MIN_N = 1075000;
+    public static final double MAX_N = 1296000;
 
     /**
      * The width and the height of the rectangle delimiting the Swiss territory

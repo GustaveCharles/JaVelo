@@ -76,7 +76,10 @@ public final class ElevationProfileManager {
         borderPane.getStylesheets().setAll("elevation_profile.css");
         createRectangle();
 
-        pane.widthProperty().addListener(e -> displayElevation());
+        pane.widthProperty().addListener(e -> {
+            displayElevation();
+            System.out.println(screenToWorld.get().transform(0,663));
+        });
 
         pane.heightProperty().addListener(e -> displayElevation());
 

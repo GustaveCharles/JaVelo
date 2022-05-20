@@ -62,17 +62,20 @@ public final class AnnotatedMapManager {
 
         mouseProperty.bind(Bindings.createDoubleBinding(
                 () -> {
-                    Point2D point2DMouse = point2DProperty.get();
-                    PointWebMercator pointWebMercator = mapViewParametersP.get().pointAt(point2DMouse.getX(),point2DMouse.getY());
-                   PointCh pointCh =  pointWebMercator.toPointCh();
-                    RoutePoint point = routeBean.routeProperty().get().pointClosestTo(pointCh);
+                    if(routeBean.routeProperty().get() != null){
+                        Point2D point2DMouse = point2DProperty.get();
+                        PointWebMercator pointWebMercator = mapViewParametersP.get().pointAt(point2DMouse.getX(),point2DMouse.getY());
+                        PointCh pointCh =  pointWebMercator.toPointCh();
+                        RoutePoint point = routeBean.routeProperty().get().pointClosestTo(pointCh);
 
-                    double x = mapViewParametersP.get().viewX(PointWebMercator.ofPointCh(point.point()));
-                   double y = mapViewParametersP.get().viewY(PointWebMercator.ofPointCh(point.point()));
-                   Point2D point2D1 = new Point2D(x,y);
-                   if(Math2.norm(point2D.getX()-point2D1.getX(),point2D.getY()-point2D1.getY()) <= 15){
-                       return x;
-                   }else return Double.NaN;
+                        double x = mapViewParametersP.get().viewX(PointWebMercator.ofPointCh(point.point()));
+                        double y = mapViewParametersP.get().viewY(PointWebMercator.ofPointCh(point.point()));
+                        Point2D point2D1 = new Point2D(x,y);
+                        if(Math2.norm(point2D.getX()-point2D1.getX(),point2D.getY()-point2D1.getY()) <= 15){
+                            return x;
+                        }else return Double.NaN;
+                    }else return Double.NaN;
+
 
                 },
                  point2DProperty,routeBean.routeProperty(),mapViewParametersP
@@ -82,7 +85,8 @@ public final class AnnotatedMapManager {
         mainPane.setOnMouseMoved(e -> {
             if (mainPane.contains(point2DProperty.get())) {
                 //mouseProperty.set(e.getX());
-                point2DProperty.set(new Point2D(e.getX(), e.getY()));
+                Point2D point2D1 = new Point2D(e.getX(), e.getY());
+                point2DProperty.set(point2D1);
             } else {
                 mouseProperty.set(Double.NaN);
             }
@@ -93,6 +97,8 @@ public final class AnnotatedMapManager {
                 mouseProperty.set(Double.NaN);
             }
         });
+
+
     }
 
     public Pane pane() {
