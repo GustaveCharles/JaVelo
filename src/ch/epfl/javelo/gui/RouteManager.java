@@ -128,7 +128,7 @@ public final class RouteManager {
     }
 
     private void setCircle() {
-        if(routeBean.routeProperty().get() != null) {
+        if(routeBean.routeProperty().get() != null && !Double.isNaN(routeBean.highlightedPosition())) {
             PointWebMercator point = PointWebMercator.
                     ofPointCh(routeBean.routeProperty().get()
                             .pointAt(routeBean.highlightedPosition()));
