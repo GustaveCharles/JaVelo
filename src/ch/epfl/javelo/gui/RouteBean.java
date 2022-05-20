@@ -66,19 +66,18 @@ public final class RouteBean {
             for (int i = 1; i < waypoints.size(); i++) {
                 int point1 = waypoints.get(i - 1).closestJaVeloNode();
                 int point2 = waypoints.get(i).closestJaVeloNode();
-                if (point1 == point2) {
-                    return;
-                }
-                if (!map.containsKey(new Pair<>(point1, point2))) {
-                    Route r = routeComputer.bestRouteBetween(point1, point2);
-                    if (r == null) {
-                        setRouteAndElevation(null, null);
-                        return;
+                if (!(point1 == point2)) {
+                    if (!map.containsKey(new Pair<>(point1, point2))) {
+                        Route r = routeComputer.bestRouteBetween(point1, point2);
+                        if (r == null) {
+                            setRouteAndElevation(null, null);
+                            return;
+                        }
+                        map.put(new Pair<>(point1, point2), r);
+                        listRoute.add(r);
+                    } else {
+                        listRoute.add(map.get(new Pair<>(point1, point2)));
                     }
-                    map.put(new Pair<>(point1, point2), r);
-                    listRoute.add(r);
-                } else {
-                    listRoute.add(map.get(new Pair<>(point1, point2)));
                 }
             }
             MultiRoute multiRoute = new MultiRoute(listRoute);

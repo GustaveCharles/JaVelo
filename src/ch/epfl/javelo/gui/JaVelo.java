@@ -29,8 +29,8 @@ public final class JaVelo extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-//
-        Graph graph = Graph.loadFrom(Path.of("lausanne"));
+
+        Graph graph = Graph.loadFrom(Path.of("javelo-data"));
         Path cacheBasePath = Path.of("osm-cache");
         String tileServerHost = "tile.openstreetmap.org";
 
@@ -61,7 +61,6 @@ public final class JaVelo extends Application {
         menuItemExport.disableProperty().setValue(true);
         MenuBar menuBar = new MenuBar(menu);
         menuBar.setUseSystemMenuBar(true);
-        splitPane.getItems().add(menuBar);
 
         routeBean.routeProperty().addListener((e, oV, nV) -> {
             menuItemExport.disableProperty().setValue(e.getValue() == null);
@@ -88,26 +87,24 @@ public final class JaVelo extends Application {
 
         Pane errorManagerPane = errorManager.pane();
 
-        StackPane stackPane = new StackPane(menuBar, splitPane, errorManagerPane);
+        StackPane stackPane = new StackPane(splitPane, errorManagerPane);
+        BorderPane borderPane = new BorderPane();
 
-        stackPane.getStylesheets().add("map.css");
+        borderPane.setCenter(stackPane);
+        borderPane.setTop(menuBar);
+
+        borderPane.getStylesheets().add("map.css");
         primaryStage.setMinWidth(800);
         primaryStage.setMinHeight(600);
         primaryStage.setTitle("JaVelo");
-        primaryStage.setScene(new Scene(stackPane));
+        primaryStage.setScene(new Scene(borderPane));
         primaryStage.show();
 
-
-        System.out.println(annotatedMapManager.mousePositionOnRouteProperty().greaterThanOrEqualTo(0).get());
         routeBean.highlightedPositionProperty().bind(
                 Bindings
                         .when(annotatedMapManager.mousePositionOnRouteProperty().greaterThanOrEqualTo(0))
                         .then(annotatedMapManager.mousePositionOnRouteProperty())
                         .otherwise(elevationProfileManager.mousePositionOnProfileProperty())
         );
-
-
     }
-
-
 }
