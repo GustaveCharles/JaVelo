@@ -50,12 +50,17 @@ public final class JaVelo extends Application {
         ElevationProfileManager elevationProfileManager = new ElevationProfileManager(routeBean.elevationProfileProperty(), routeBean.highlightedPositionProperty());
         BorderPane profilePane = elevationProfileManager.pane();
 
-
-        SplitPane splitPane = new SplitPane(annotatedMapManager.pane(), profilePane);
+        SplitPane splitPane = new SplitPane(annotatedMapManager.pane());
         splitPane.setOrientation(Orientation.VERTICAL);
 
-        routeBean.routeProperty().addListener(e -> {
-            profilePane.visibleProperty().setValue(routeBean.routeProperty().get() != null);
+        routeBean.elevationProfileProperty().addListener((e, oV, nV) -> {
+            System.out.println("cc");
+            if (oV == null & nV != null) {
+                splitPane.getItems().add(1, profilePane);
+            }
+            if (nV == null & oV != null) {
+                splitPane.getItems().remove(1);
+            }
         });
 
         //vérifier ligne en dessous
