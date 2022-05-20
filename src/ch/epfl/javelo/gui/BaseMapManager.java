@@ -99,7 +99,7 @@ public final class BaseMapManager {
                     Point2D pd = new Point2D(property1.get().getX(), property1.get().getY());
                     Point2D pd1 = pd.subtract(e.getX(), e.getY());
 
-                    property.set(property.get().
+                    property.setValue(property.get().
                             withMinXY(property.get().xTopLeft() + pd1.getX(),
                                     property.get().yTopLeft() + pd1.getY()));
 

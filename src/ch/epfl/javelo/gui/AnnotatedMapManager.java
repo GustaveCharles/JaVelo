@@ -65,6 +65,10 @@ public final class AnnotatedMapManager {
                         Point2D point2DMouse = point2DProperty.get();
                         PointWebMercator pointWebMercator = mapViewParametersP.get().pointAt(point2DMouse.getX(), point2DMouse.getY());
                         PointCh pointCh = pointWebMercator.toPointCh();
+                        if (pointCh == null) {
+                            return Double.NaN;
+                        }
+
                         RoutePoint point = routeBean.routeProperty().get().pointClosestTo(pointCh);
 
                         double x = mapViewParametersP.get().viewX(PointWebMercator.ofPointCh(point.point()));

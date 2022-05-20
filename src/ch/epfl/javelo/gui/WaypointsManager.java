@@ -41,22 +41,23 @@ public final class WaypointsManager {
     public void addWaypoint(double x, double y) {
         if (isWaypointClosest(x, y) != null) {
             listOfWayPoint.add(isWaypointClosest(x, y));
+        } else {
+            stringConsumer.accept("No road nearby!");
         }
     }
 
     private Waypoint isWaypointClosest(double x, double y) {
         PointCh point = mapParameters.get().pointAt(x, y).toPointCh();
         if (point == null) {
-            stringConsumer.accept("No road nearby!");
+            return null;
         } else {
             int closestPointId = graph.nodeClosestTo(point, RADIUS);
             if (closestPointId != -1) {
                 return new Waypoint(point, closestPointId);
             } else {
-                stringConsumer.accept("No road nearby!");
+                return null;
             }
         }
-        return null;
     }
 
 
@@ -100,6 +101,7 @@ public final class WaypointsManager {
                     positionGroup(w, wayPointGroup);
                     listOfWayPoint.set(i, w);
                 } else {
+                    stringConsumer.accept("No road nearby!");
                     wayPointGroup.setLayoutX(initialPoint.get().getX());
                     wayPointGroup.setLayoutY(initialPoint.get().getY());
                     updatePane();
@@ -128,3 +130,4 @@ public final class WaypointsManager {
         wayPointGroup.setLayoutY(mapParameters.get().viewY((PointWebMercator.ofPointCh(w.crossingPosition()))));
     }
 }
+

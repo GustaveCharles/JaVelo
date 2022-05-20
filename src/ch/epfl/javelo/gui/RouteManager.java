@@ -173,14 +173,14 @@ public final class RouteManager {
 
         circle.setOnMouseClicked(e -> {
                     Point2D point2D = circle.localToParent(e.getX(), e.getY());
-            PointCh point = mapParameters.get().pointAt(point2D.getX(), point2D.getY()).toPointCh();
-            int closestPointId = routeBean.routeProperty().get()
-                    .nodeClosestTo(routeBean.highlightedPosition());
+                    PointCh point = mapParameters.getValue().pointAt(point2D.getX(), point2D.getY()).toPointCh();
+                    int closestPointId = routeBean.routeProperty().get()
+                            .nodeClosestTo(routeBean.highlightedPosition());
 
                     int index = routeBean.indexOfNonEmptySegmentAt(routeBean.highlightedPosition()) + 1;
                     Waypoint waypoint = new Waypoint(point, closestPointId);
 
-                        routeBean.waypointsProperty().add(index, waypoint);
+                    routeBean.waypointsProperty().add(index, waypoint);
 
                 }
         );

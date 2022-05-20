@@ -110,8 +110,8 @@ public final class RouteBean {
      * @param ele        the elevation profile of the route
      */
     private void setRouteAndElevation(MultiRoute multiRoute, ElevationProfile ele) {
-        route.set(multiRoute);
-        elevationProfile.set(ele);
+        route.setValue(multiRoute);
+        elevationProfile.setValue(ele);
     }
 
     /**
@@ -127,7 +127,7 @@ public final class RouteBean {
      * A setter for the highlighted position
      */
     public void setHighlightedPosition(double newHighlightedPosition) {
-        highlightedPosition.set((newHighlightedPosition <= route.get().length()) && (newHighlightedPosition >= 0) ?
+        highlightedPosition.setValue((newHighlightedPosition <= route.get().length()) && (newHighlightedPosition >= 0) ?
                 newHighlightedPosition : NaN);
     }
 

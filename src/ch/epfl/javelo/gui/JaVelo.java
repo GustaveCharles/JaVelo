@@ -52,16 +52,18 @@ public final class JaVelo extends Application {
 
         SplitPane splitPane = new SplitPane(annotatedMapManager.pane());
         splitPane.setOrientation(Orientation.VERTICAL);
+
+        //vérifier ligne en dessous
         SplitPane.setResizableWithParent(profilePane, false);
         Menu menu = new Menu("Fichier");
         MenuItem menuItemExport = new MenuItem("Exporter GPX");
         menu.getItems().add(menuItemExport);
-        menuItemExport.disableProperty().set(true);
+        menuItemExport.disableProperty().setValue(true);
         MenuBar menuBar = new MenuBar(menu);
         menuBar.setUseSystemMenuBar(true);
 
         routeBean.routeProperty().addListener((e, oV, nV) -> {
-            menuItemExport.disableProperty().set(e.getValue() == null);
+            menuItemExport.disableProperty().setValue(e.getValue() == null);
         });
 
         menuItemExport.setOnAction(e -> {
@@ -97,7 +99,6 @@ public final class JaVelo extends Application {
         primaryStage.setTitle("JaVelo");
         primaryStage.setScene(new Scene(borderPane));
         primaryStage.show();
-
 
         routeBean.highlightedPositionProperty().bind(
                 Bindings
