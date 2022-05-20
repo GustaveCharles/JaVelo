@@ -75,26 +75,24 @@ public final class AnnotatedMapManager {
                             return x;
                         }else return Double.NaN;
                     }else return Double.NaN;
-
-
                 },
                  point2DProperty,routeBean.routeProperty(),mapViewParametersP
         ));
 
 
         mainPane.setOnMouseMoved(e -> {
-            if (mainPane.contains(point2DProperty.get())) {
+            if (mainPane.contains(new Point2D(e.getX(), e.getY()))) {
                 //mouseProperty.set(e.getX());
                 Point2D point2D1 = new Point2D(e.getX(), e.getY());
                 point2DProperty.set(point2D1);
             } else {
-                mouseProperty.set(Double.NaN);
+                point2DProperty.set(new Point2D(Double.NaN,Double.NaN));
             }
         });
 
         mainPane.setOnMouseExited(e -> {
-            if (!mainPane.contains(point2DProperty.get())) {
-                mouseProperty.set(Double.NaN);
+            if (!mainPane.contains(new Point2D(e.getX(), e.getY()))) {
+                point2DProperty.set(new Point2D(Double.NaN,Double.NaN));
             }
         });
 

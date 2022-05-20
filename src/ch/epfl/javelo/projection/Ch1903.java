@@ -22,7 +22,10 @@ public final class Ch1903 {
         double lambda1 = Math.pow(10, -4) * (3600 * Math.toDegrees(lon) - 26782.5),
                 phi = Math.pow(10, -4) * (3600 * Math.toDegrees(lat) - 169028.66);
 
-        return 2600072.37 + 211455.93 * lambda1 - 10938.51 * lambda1 * phi - 0.36 * lambda1 * Math.pow(phi, 2)
+        return 2600072.37
+                + 211455.93 * lambda1
+                - 10938.51 * lambda1 * phi
+                - 0.36 * lambda1 * Math.pow(phi, 2)
                 - 44.54 * (Math.pow(lambda1, 3));
     }
 
@@ -37,8 +40,12 @@ public final class Ch1903 {
         double lambda1 = Math.pow(10, -4) * (3600 * Math.toDegrees(lon) - 26782.5),
                 phi = Math.pow(10, -4) * (3600 * Math.toDegrees(lat) - 169028.66);
 
-        return 1200147.07 + 308807.95 * phi + 3745.25 * Math.pow(lambda1, 2)
-                + 76.63 * Math.pow(phi, 2) - 194.56 * Math.pow(lambda1, 2) * phi + 119.79 * Math.pow(phi, 3);
+        return 1200147.07
+                + 308807.95 * phi
+                + 3745.25 * Math.pow(lambda1, 2)
+                + 76.63 * Math.pow(phi, 2)
+                - 194.56 * Math.pow(lambda1, 2) * phi
+                + 119.79 * Math.pow(phi, 3);
     }
 
     /**
