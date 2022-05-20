@@ -152,13 +152,11 @@ public final class RouteManager {
             circle.setVisible(false);
 
         } else if(routeBean.highlightedPositionProperty().get() == 0){
-            System.out.println("coucou");
                 circle.setVisible(false);
                 line.setVisible(true);
             }
 
         else {
-            System.out.println("coucou2");
             line.setVisible(true);
             circle.setVisible(true);
         }
