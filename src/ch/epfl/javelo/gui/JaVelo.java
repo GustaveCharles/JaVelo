@@ -53,25 +53,19 @@ public final class JaVelo extends Application {
         SplitPane splitPane = new SplitPane(annotatedMapManager.pane());
         splitPane.setOrientation(Orientation.VERTICAL);
 
-        routeBean.elevationProfileProperty().addListener((e, oV, nV) -> {
-            if (oV == null & nV != null) {
-                splitPane.getItems().add(1, profilePane);
-            }
-            if (nV == null & oV != null) {
-                splitPane.getItems().remove(1);
-            }
-        });
-
         //vérifier ligne en dessous
         SplitPane.setResizableWithParent(profilePane, false);
-
         Menu menu = new Menu("Fichier");
         MenuItem menuItemExport = new MenuItem("Exporter GPX");
-        menuItemExport.disableProperty().setValue(routeBean.elevationProfileProperty() == null);
         menu.getItems().add(menuItemExport);
+        menuItemExport.disableProperty().setValue(true);
         MenuBar menuBar = new MenuBar(menu);
         menuBar.setUseSystemMenuBar(true);
         splitPane.getItems().add(menuBar);
+
+        routeBean.routeProperty().addListener((e, oV, nV) -> {
+            menuItemExport.disableProperty().setValue(e.getValue() == null);
+        });
 
         menuItemExport.setOnAction(e -> {
             if (!menuItemExport.isDisable()) {
@@ -82,6 +76,16 @@ public final class JaVelo extends Application {
                 }
             }
         });
+
+        routeBean.elevationProfileProperty().addListener((e, oV, nV) -> {
+            if (oV == null & nV != null) {
+                splitPane.getItems().add(1, profilePane);
+            }
+            if (nV == null & oV != null) {
+                splitPane.getItems().remove(1);
+            }
+        });
+
         Pane errorManagerPane = errorManager.pane();
 
         StackPane stackPane = new StackPane(menuBar, splitPane, errorManagerPane);
