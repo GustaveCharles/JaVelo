@@ -91,7 +91,6 @@ public final class AnnotatedMapManager {
         return mainPane;
     }
 
-    ///retourne en lecture seule ou pas?
     public ReadOnlyDoubleProperty mousePositionOnRouteProperty() {
         return mouseProperty;
     }

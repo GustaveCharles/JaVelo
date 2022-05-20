@@ -29,7 +29,6 @@ public final class RouteManager {
     private List<PointCh> routeNodes;
     private final List<Double> routeNodesDouble;
     //TODO public ou private la constante?
-    public static final double HIGHLIGHTED_PROPERTY = 1000;
     //TODO problème lorsque la distance entre les points verts et rouge sont plus petits que highlited property
 
     /**
@@ -57,8 +56,10 @@ public final class RouteManager {
         line.setVisible(false);
         circle.setVisible(false);
 
-        routeBean.highlightedPositionProperty().addListener(e ->
-                setCircle()
+        routeBean.highlightedPositionProperty().addListener(e -> {
+            setCircle();
+            visibleProperty();
+                }
         );
 
         routeBean.routeProperty().addListener(e ->
@@ -86,8 +87,6 @@ public final class RouteManager {
             pointsSequence();
             line.setLayoutX(-mapParameters.get().xTopLeft());
             line.setLayoutY(-mapParameters.get().yTopLeft());
-
-            routeBean.setHighlightedPosition(HIGHLIGHTED_PROPERTY);
 
             PointWebMercator point = PointWebMercator.
                     ofPointCh(routeBean.routeProperty().get().pointAt(routeBean.highlightedPosition()));
@@ -129,12 +128,16 @@ public final class RouteManager {
     }
 
     private void setCircle() {
-        PointWebMercator point = PointWebMercator.
-                ofPointCh(routeBean.routeProperty().get()
-                        .pointAt(routeBean.highlightedPosition()));
+        if(routeBean.routeProperty().get() != null) {
+            PointWebMercator point = PointWebMercator.
+                    ofPointCh(routeBean.routeProperty().get()
+                            .pointAt(routeBean.highlightedPosition()));
 
-        circle.setCenterX(mapParameters.get().viewX(point));
-        circle.setCenterY(mapParameters.get().viewY(point));
+            circle.setCenterX(mapParameters.get().viewX(point));
+            circle.setCenterY(mapParameters.get().viewY(point));
+        }
+
+
     }
 
     /**
@@ -147,7 +150,15 @@ public final class RouteManager {
         if ((routeBean.routeProperty().get() == null)) {
             line.setVisible(false);
             circle.setVisible(false);
-        } else {
+
+        } else if(routeBean.highlightedPositionProperty().get() == 0){
+            System.out.println("coucou");
+                circle.setVisible(false);
+                line.setVisible(true);
+            }
+
+        else {
+            System.out.println("coucou2");
             line.setVisible(true);
             circle.setVisible(true);
         }

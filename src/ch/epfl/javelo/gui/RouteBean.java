@@ -137,6 +137,7 @@ public final class RouteBean {
      * @return a double property which contains the highlighted position
      */
     public DoubleProperty highlightedPositionProperty() {
+        System.out.println(highlightedPosition.get());
         return highlightedPosition;
     }
 
@@ -146,7 +147,7 @@ public final class RouteBean {
      * @return the highlighted position
      */
     public double highlightedPosition() {
-        return highlightedPosition.getValue();
+        return highlightedPosition.get();
     }
 
     /**
