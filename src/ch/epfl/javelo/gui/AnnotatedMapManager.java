@@ -71,9 +71,7 @@ public final class AnnotatedMapManager {
                         double y = mapViewParametersP.get().viewY(PointWebMercator.ofPointCh(point.point()));
                         Point2D point2D1 = new Point2D(x, y);
 
-                        System.out.println(Math2.norm(point2DMouse.getX() - point2D1.getX(), point2DMouse.getY() - point2D1.getY()));
                         if (Math2.norm(point2DMouse.getX() - point2D1.getX(), point2DMouse.getY() - point2D1.getY()) <= 15) {
-                            System.out.println(x);
                             return point.position();
                         } else return Double.NaN;
                     }else return Double.NaN;
@@ -95,7 +93,6 @@ public final class AnnotatedMapManager {
 
     ///retourne en lecture seule ou pas?
     public ReadOnlyDoubleProperty mousePositionOnRouteProperty() {
-        System.out.println(mouseProperty.get());
         return mouseProperty;
     }
 }
