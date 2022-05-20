@@ -131,10 +131,10 @@ public final class ElevationProfileManager {
         transformation.prependScale(elevationProfileProperty.get().length() / rectangle2DProperty.get().getWidth(),
                 -(elevationProfileProperty.get().maxElevation() - elevationProfileProperty.get().minElevation()) / rectangle2DProperty.get().getHeight());
         transformation.prependTranslation(0, elevationProfileProperty.get().maxElevation());
-        screenToWorld.setValue(transformation);
+        screenToWorld.set(transformation);
 
         try {
-            worldToScreen.setValue(screenToWorld.get().createInverse());
+            worldToScreen.set(screenToWorld.get().createInverse());
         } catch (NonInvertibleTransformException e) {
             e.printStackTrace();
         }

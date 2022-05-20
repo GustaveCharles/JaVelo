@@ -45,12 +45,16 @@ public final class WaypointsManager {
     }
 
     private Waypoint isWaypointClosest(double x, double y) {
-        PointCh point = mapParameters.getValue().pointAt(x, y).toPointCh();
-        int closestPointId = graph.nodeClosestTo(point, RADIUS);
-        if (closestPointId != -1) {
-            return new Waypoint(point, closestPointId);
-        } else {
+        PointCh point = mapParameters.get().pointAt(x, y).toPointCh();
+        if (point == null) {
             stringConsumer.accept("No road nearby!");
+        } else {
+            int closestPointId = graph.nodeClosestTo(point, RADIUS);
+            if (closestPointId != -1) {
+                return new Waypoint(point, closestPointId);
+            } else {
+                stringConsumer.accept("No road nearby!");
+            }
         }
         return null;
     }
@@ -83,7 +87,7 @@ public final class WaypointsManager {
     private void handler(int i, Group wayPointGroup) {
         ObjectProperty<Point2D> initialPoint = new SimpleObjectProperty<>();
 
-        wayPointGroup.setOnMousePressed(e -> initialPoint.setValue(new Point2D(e.getX(), e.getY())));
+        wayPointGroup.setOnMousePressed(e -> initialPoint.set(new Point2D(e.getX(), e.getY())));
 
         wayPointGroup.setOnMouseReleased(e1 -> {
             if (e1.isStillSincePress()) {

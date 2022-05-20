@@ -61,7 +61,7 @@ public final class JaVelo extends Application {
         menuBar.setUseSystemMenuBar(true);
 
         routeBean.routeProperty().addListener((e, oV, nV) -> {
-            menuItemExport.disableProperty().setValue(e.getValue() == null);
+            menuItemExport.disableProperty().set(e.getValue() == null);
         });
 
         menuItemExport.setOnAction(e -> {
