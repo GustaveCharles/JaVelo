@@ -77,11 +77,15 @@ public final class ElevationProfileManager {
         createRectangle();
 
         pane.widthProperty().addListener(e -> {
-            displayElevation();
-            System.out.println(screenToWorld.get().transform(0,663));
+            if (elevationProfileProperty.get() != null)
+                displayElevation();
         });
 
-        pane.heightProperty().addListener(e -> displayElevation());
+        pane.heightProperty().addListener(e -> {
+            if (elevationProfileProperty.get() != null)
+                displayElevation();
+
+        });
 
         pane.setOnMouseMoved(e -> {
             if (rectangle2DProperty.get().contains(new Point2D(e.getX(), e.getY()))) {
