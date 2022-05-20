@@ -3,10 +3,7 @@ package ch.epfl.javelo.gui;
 import ch.epfl.javelo.Math2;
 import ch.epfl.javelo.routing.ElevationProfile;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyDoubleProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
@@ -43,7 +40,7 @@ public final class ElevationProfileManager {
     private final ReadOnlyObjectProperty<ElevationProfile> elevationProfileProperty;
     private final ReadOnlyDoubleProperty highlightedProperty;
     private final ObjectProperty<Rectangle2D> rectangle2DProperty;
-    private final ObjectProperty<Double> mousePosition;
+    private final DoubleProperty mousePosition;
 
     /**
      * Manages the display and interaction with the profile of the route
@@ -58,7 +55,7 @@ public final class ElevationProfileManager {
         this.worldToScreen = new SimpleObjectProperty<>();
         this.elevationProfileProperty = elevationProfileProperty;
         this.highlightedProperty = highlightedProperty;
-        this.mousePosition = new SimpleObjectProperty<>();
+        this.mousePosition = new SimpleDoubleProperty();
         this.path = new Path();
         this.polygon = new Polygon();
         this.line = new Line();
@@ -119,11 +116,11 @@ public final class ElevationProfileManager {
      *
      * @return a read-only property which contains the mouse position
      */
-    public ReadOnlyObjectProperty<Double> mousePositionOnProfileProperty() {
+    public ReadOnlyDoubleProperty mousePositionOnProfileProperty() {
         return mousePosition;
     }
 
-    //creer des variables pour eveiter de faire des get tout le temps
+    //creer des variables pour eveiter de faire des get tout le temp
 
     /**
      * Represents the conversion between the two coordinate systems, namely from real coordinates to screen coordinates and vice versa.

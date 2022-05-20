@@ -63,16 +63,19 @@ public final class AnnotatedMapManager {
                 () -> {
                     if(routeBean.routeProperty().get() != null && point2DProperty.get() != null){
                         Point2D point2DMouse = point2DProperty.get();
-                        PointWebMercator pointWebMercator = mapViewParametersP.get().pointAt(point2DMouse.getX(),point2DMouse.getY());
-                        PointCh pointCh =  pointWebMercator.toPointCh();
+                        PointWebMercator pointWebMercator = mapViewParametersP.get().pointAt(point2DMouse.getX(), point2DMouse.getY());
+                        PointCh pointCh = pointWebMercator.toPointCh();
                         RoutePoint point = routeBean.routeProperty().get().pointClosestTo(pointCh);
 
                         double x = mapViewParametersP.get().viewX(PointWebMercator.ofPointCh(point.point()));
                         double y = mapViewParametersP.get().viewY(PointWebMercator.ofPointCh(point.point()));
-                        Point2D point2D1 = new Point2D(x,y);
-                        if(Math2.norm(point2D.getX()-point2D1.getX(),point2D.getY()-point2D1.getY()) <= 15){
-                            return x;
-                        }else return Double.NaN;
+                        Point2D point2D1 = new Point2D(x, y);
+
+                        System.out.println(Math2.norm(point2DMouse.getX() - point2D1.getX(), point2DMouse.getY() - point2D1.getY()));
+                        if (Math2.norm(point2DMouse.getX() - point2D1.getX(), point2DMouse.getY() - point2D1.getY()) <= 15) {
+                            System.out.println(x);
+                            return point.position();
+                        } else return Double.NaN;
                     }else return Double.NaN;
                 },
                  point2DProperty,routeBean.routeProperty(),mapViewParametersP
@@ -90,8 +93,9 @@ public final class AnnotatedMapManager {
         return mainPane;
     }
 
-    //retourne en lecture seule ou pas?
+    ///retourne en lecture seule ou pas?
     public ReadOnlyDoubleProperty mousePositionOnRouteProperty() {
+        System.out.println(mouseProperty.get());
         return mouseProperty;
     }
 }

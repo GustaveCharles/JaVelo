@@ -29,7 +29,7 @@ public final class JaVelo extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-
+//
         Graph graph = Graph.loadFrom(Path.of("lausanne"));
         Path cacheBasePath = Path.of("osm-cache");
         String tileServerHost = "tile.openstreetmap.org";
@@ -54,7 +54,6 @@ public final class JaVelo extends Application {
         splitPane.setOrientation(Orientation.VERTICAL);
 
         routeBean.elevationProfileProperty().addListener((e, oV, nV) -> {
-            System.out.println("cc");
             if (oV == null & nV != null) {
                 splitPane.getItems().add(1, profilePane);
             }
@@ -94,17 +93,16 @@ public final class JaVelo extends Application {
         primaryStage.setScene(new Scene(stackPane));
         primaryStage.show();
 
-        routeBean.routeProperty().addListener(e -> {
-            if(e != null) {
-                routeBean.highlightedPositionProperty().bind(
-                        Bindings
-                                .when(annotatedMapManager.mousePositionOnRouteProperty().greaterThanOrEqualTo(0))
-                                .then(annotatedMapManager.mousePositionOnRouteProperty().get())
-                                .otherwise(elevationProfileManager.mousePositionOnProfileProperty().get())
-                );
-            }
-        });
-        
+
+        System.out.println(annotatedMapManager.mousePositionOnRouteProperty().greaterThanOrEqualTo(0).get());
+        routeBean.highlightedPositionProperty().bind(
+                Bindings
+                        .when(annotatedMapManager.mousePositionOnRouteProperty().greaterThanOrEqualTo(0))
+                        .then(annotatedMapManager.mousePositionOnRouteProperty())
+                        .otherwise(elevationProfileManager.mousePositionOnProfileProperty())
+        );
+
+
     }
 
 
