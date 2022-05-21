@@ -151,12 +151,10 @@ public final class RouteManager {
             line.setVisible(false);
             circle.setVisible(false);
 
-        } else if(routeBean.highlightedPositionProperty().get() == 0){
+        } else if(routeBean.highlightedPositionProperty().get() == 0 || Double.isNaN(routeBean.highlightedPosition())){
                 circle.setVisible(false);
                 line.setVisible(true);
-            }
-
-        else {
+        }else {
             line.setVisible(true);
             circle.setVisible(true);
         }
