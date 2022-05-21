@@ -56,13 +56,13 @@ public final class RouteManager {
         line.setVisible(false);
         circle.setVisible(false);
 
-        routeBean.highlightedPositionProperty().addListener(e -> {
-            setCircle();
-            visibleProperty();
+        routeBean.highlightedPositionProperty().addListener((p, o, n) -> {
+                    setCircle();
+                    visibleProperty();
                 }
         );
 
-        routeBean.routeProperty().addListener(e ->
+        routeBean.routeProperty().addListener((p, o, n) ->
                 visibleProperty());
 
         routeBean.routeProperty().addListener((e, oV, nV) ->
@@ -180,10 +180,10 @@ public final class RouteManager {
     private void handler() {
 
         circle.setOnMouseClicked(e -> {
-                    Point2D point2D = circle.localToParent(e.getX(), e.getY());
-                    PointCh point = mapParameters.getValue().pointAt(point2D.getX(), point2D.getY()).toPointCh();
-                    int closestPointId = routeBean.routeProperty().get()
-                            .nodeClosestTo(routeBean.highlightedPosition());
+            Point2D point2D = circle.localToParent(e.getX(), e.getY());
+            PointCh point = mapParameters.get().pointAt(point2D.getX(), point2D.getY()).toPointCh();
+            int closestPointId = routeBean.routeProperty().get()
+                    .nodeClosestTo(routeBean.highlightedPosition());
 
                     int index = routeBean.indexOfNonEmptySegmentAt(routeBean.highlightedPosition()) + 1;
                     Waypoint waypoint = new Waypoint(point, closestPointId);

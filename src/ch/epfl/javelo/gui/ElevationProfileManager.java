@@ -73,12 +73,12 @@ public final class ElevationProfileManager {
         borderPane.getStylesheets().setAll("elevation_profile.css");
         createRectangle();
 
-        pane.widthProperty().addListener(e -> {
+        pane.widthProperty().addListener((p, o, n) -> {
             if (elevationProfileProperty.get() != null)
                 displayElevation();
         });
 
-        pane.heightProperty().addListener(e -> {
+        pane.heightProperty().addListener((p, o, n) -> {
             if (elevationProfileProperty.get() != null)
                 displayElevation();
 
@@ -99,7 +99,7 @@ public final class ElevationProfileManager {
             }
         });
 
-        elevationProfileProperty.addListener(e -> displayElevation());
+        elevationProfileProperty.addListener((p, o, n) -> displayElevation());
     }
 
     /**
@@ -131,10 +131,10 @@ public final class ElevationProfileManager {
         transformation.prependScale(elevationProfileProperty.get().length() / rectangle2DProperty.get().getWidth(),
                 -(elevationProfileProperty.get().maxElevation() - elevationProfileProperty.get().minElevation()) / rectangle2DProperty.get().getHeight());
         transformation.prependTranslation(0, elevationProfileProperty.get().maxElevation());
-        screenToWorld.setValue(transformation);
+        screenToWorld.set(transformation);
 
         try {
-            worldToScreen.setValue(screenToWorld.get().createInverse());
+            worldToScreen.set(screenToWorld.get().createInverse());
         } catch (NonInvertibleTransformException e) {
             e.printStackTrace();
         }

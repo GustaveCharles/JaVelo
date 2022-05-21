@@ -31,7 +31,7 @@ public final class WaypointsManager {
         pane.setPickOnBounds(false);
         updatePane();
         listOfWayPoint.addListener((Observable o) -> updatePane());
-        mapParameters.addListener((Observable o) -> updatePane());
+        mapParameters.addListener((p, o, n) -> updatePane());
     }
 
     public Pane pane() {

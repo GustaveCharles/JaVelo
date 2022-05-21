@@ -54,8 +54,8 @@ public final class BaseMapManager {
         });
 
         redrawOnNextPulse();
-        canvas.heightProperty().addListener(o -> redrawOnNextPulse());
-        canvas.widthProperty().addListener(o -> redrawOnNextPulse());
+        canvas.heightProperty().addListener((p, o, n) -> redrawOnNextPulse());
+        canvas.widthProperty().addListener((p, o, n) -> redrawOnNextPulse());
         handler();
     }
 
@@ -99,9 +99,9 @@ public final class BaseMapManager {
                     Point2D pd = new Point2D(property1.get().getX(), property1.get().getY());
                     Point2D pd1 = pd.subtract(e.getX(), e.getY());
 
-                    property.setValue(property.get().
-                            withMinXY(property.get().xTopLeft() + pd1.getX(),
-                                    property.get().yTopLeft() + pd1.getY()));
+            property.set(property.get().
+                    withMinXY(property.get().xTopLeft() + pd1.getX(),
+                            property.get().yTopLeft() + pd1.getY()));
 
                     //     property.set(
                     //   new MapViewParameters(property.get().zoomLevel(),

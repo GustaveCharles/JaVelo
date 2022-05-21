@@ -57,12 +57,12 @@ public final class JaVelo extends Application {
         Menu menu = new Menu("Fichier");
         MenuItem menuItemExport = new MenuItem("Exporter GPX");
         menu.getItems().add(menuItemExport);
-        menuItemExport.disableProperty().setValue(true);
+        menuItemExport.disableProperty().set(true);
         MenuBar menuBar = new MenuBar(menu);
         menuBar.setUseSystemMenuBar(true);
 
-        routeBean.routeProperty().addListener((e, oV, nV) -> {
-            menuItemExport.disableProperty().setValue(e.getValue() == null);
+        routeBean.routeProperty().addListener((p, o, n) -> {
+            menuItemExport.disableProperty().set(p.getValue() == null);
         });
 
         menuItemExport.setOnAction(e -> {
