@@ -88,11 +88,16 @@ public final class RouteManager {
             line.setLayoutX(-mapParameters.get().xTopLeft());
             line.setLayoutY(-mapParameters.get().yTopLeft());
 
-            PointWebMercator point = PointWebMercator.
-                    ofPointCh(routeBean.routeProperty().get().pointAt(routeBean.highlightedPosition()));
 
-            circle.setCenterX(mapParameters.get().viewX(point));
-            circle.setCenterY(mapParameters.get().viewY(point));
+            if(Double.isNaN(routeBean.highlightedPosition())){
+                circle.setVisible(false);
+            }else {
+                PointWebMercator point = PointWebMercator.
+                        ofPointCh(routeBean.routeProperty().get().pointAt(routeBean.highlightedPosition()));
+
+                circle.setCenterX(mapParameters.get().viewX(point));
+                circle.setCenterY(mapParameters.get().viewY(point));
+            }
         }
     }
 
@@ -106,16 +111,21 @@ public final class RouteManager {
     private void rebuildWhenZoom(MapViewParameters oV, MapViewParameters nV) {
         if (oV.zoomLevel() != nV.zoomLevel() && routeBean.routeProperty().get() != null) {
 
+
             pointsSequence();
             line.setLayoutX(-nV.xTopLeft());
             line.setLayoutY(-nV.yTopLeft());
 
-            PointWebMercator point = PointWebMercator.
-                    ofPointCh(routeBean.routeProperty().get().pointAt(routeBean.highlightedPosition()));
+            if(Double.isNaN(routeBean.highlightedPosition())){
+                circle.setVisible(false);
+            }else {
+                PointWebMercator point = PointWebMercator.
+                        ofPointCh(routeBean.routeProperty().get().pointAt(routeBean.highlightedPosition()));
 
-            circle.setCenterX(point.xAtZoomLevel(nV.zoomLevel()) - nV.xTopLeft());
-            circle.setCenterY(point.yAtZoomLevel(nV.zoomLevel()) - nV.yTopLeft());
+                circle.setCenterX(point.xAtZoomLevel(nV.zoomLevel()) - nV.xTopLeft());
+                circle.setCenterY(point.yAtZoomLevel(nV.zoomLevel()) - nV.yTopLeft());
 
+            }
         }
         if (oV.zoomLevel() == nV.zoomLevel()) {
 
