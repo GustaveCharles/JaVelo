@@ -272,10 +272,12 @@ public final class ElevationProfileManager {
     }
 
     private void displayElevation() {
-        createTransformation();
-        createPolygon();
-        createLine();
-        createGrid();
-        createBox();
+        if (elevationProfileProperty.get() != null) {
+            createTransformation();
+            createPolygon();
+            createLine();
+            createGrid();
+            createBox();
+        }
     }
 }
