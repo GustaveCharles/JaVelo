@@ -42,7 +42,7 @@ public final class WaypointsManager {
         if (isWaypointClosest(x, y) != null) {
             listOfWayPoint.add(isWaypointClosest(x, y));
         } else {
-            stringConsumer.accept("No road nearby!");
+            stringConsumer.accept("Aucune route à proximité !");
         }
     }
 
@@ -101,7 +101,7 @@ public final class WaypointsManager {
                     positionGroup(w, wayPointGroup);
                     listOfWayPoint.set(i, w);
                 } else {
-                    stringConsumer.accept("No road nearby!");
+                    stringConsumer.accept("Aucune route à proximité !");
                     wayPointGroup.setLayoutX(initialPoint.get().getX());
                     wayPointGroup.setLayoutY(initialPoint.get().getY());
                     updatePane();
