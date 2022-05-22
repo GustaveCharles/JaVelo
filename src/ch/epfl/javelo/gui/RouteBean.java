@@ -80,8 +80,12 @@ public final class RouteBean {
                     }
                 }
             }
-            MultiRoute multiRoute = new MultiRoute(listRoute);
-            setRouteAndElevation(multiRoute, ElevationProfileComputer.elevationProfile(multiRoute, MAX_LENGTH));
+            if (!listRoute.isEmpty()) {
+                MultiRoute multiRoute = new MultiRoute(listRoute);
+                setRouteAndElevation(multiRoute, ElevationProfileComputer.elevationProfile(multiRoute, MAX_LENGTH));
+            } else {
+                setRouteAndElevation(null, null);
+            }
         } else {
             setRouteAndElevation(null, null);
         }

@@ -49,7 +49,8 @@ public final class Functions {
             double interval = xMax / (immutableSamples.size() - 1);
             int position = (int) (x / interval);
             double y0 = immutableSamples.get(position);
-            double y1 = immutableSamples.get(position + 1);
+            int nextPosition = Math2.clamp(0, position + 1, immutableSamples.size() - 1);
+            double y1 = immutableSamples.get(nextPosition);
             double xProportional = (x % interval) / interval;
             return Math2.interpolate(y0, y1, xProportional);
         };
