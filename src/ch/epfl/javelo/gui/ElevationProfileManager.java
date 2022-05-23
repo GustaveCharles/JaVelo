@@ -123,7 +123,8 @@ public final class ElevationProfileManager {
     //creer des variables pour eveiter de faire des get tout le temp
 
     /**
-     * Represents the conversion between the two coordinate systems, namely from real coordinates to screen coordinates and vice versa.
+     * Represents the conversion between the two coordinate systems,
+     * namely from real coordinates to screen coordinates and vice versa.
      */
     private void createTransformation() {
         Affine transformation = new Affine();
@@ -141,7 +142,8 @@ public final class ElevationProfileManager {
     }
 
     /**
-     * Builds a grid with an adapted scale for the x-axis and y-axis regarding the value of the height and the length of the profile
+     * Builds a grid with an adapted scale for the x-axis and y-axis regarding
+     * the value of the height and the length of the profile
      */
     private void createGrid() {
         group.getChildren().clear();
@@ -222,6 +224,9 @@ public final class ElevationProfileManager {
         }
     }
 
+    /**
+     *displays the route statistics presented at the bottom of the panel
+     */
     private void createBox() {
         //mettre une constante pour 0.001
         textVbox.setText("Longueur : %.1f km".formatted(elevationProfileProperty.get().length() * 0.001) +
@@ -232,6 +237,7 @@ public final class ElevationProfileManager {
                         elevationProfileProperty.get().maxElevation()
                 ));
     }
+
 
     private void createPolygon() {
         polygon.getPoints().clear();

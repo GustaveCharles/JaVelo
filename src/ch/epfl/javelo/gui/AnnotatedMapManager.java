@@ -15,7 +15,13 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 
 import java.util.function.Consumer;
-
+/**
+ * manages the display of the “annotated” map,
+ * i.e. the base map above which the route and waypoints are superimposed
+ *
+ * @author Gustave Charles -- Saigne (345945)
+ * @author Baudoin Coispeau (339364)
+ */
 public final class AnnotatedMapManager {
 
     private final RouteBean routeBean;
@@ -28,6 +34,15 @@ public final class AnnotatedMapManager {
     public final static MapViewParameters MAP_VIEW_PARAMETERS =
             new MapViewParameters(12, 543200, 370650);
 
+    /**
+     * creates a basemap manager (BaseMapManager),
+     * a waypoints manager (WaypointsManager) and a route manager (RouteManager)
+     *
+     * @param graph the road network graph
+     * @param tileManager the OpenStreetMap tile manager
+     * @param routeBean the route bean
+     * @param stringConsumer an “error consumer” to report an error
+     */
     public AnnotatedMapManager(Graph graph, TileManager tileManager, RouteBean routeBean, Consumer<String> stringConsumer) {
 
         this.routeBean = routeBean;
@@ -45,14 +60,26 @@ public final class AnnotatedMapManager {
         handler();
     }
 
+    /**
+     *
+     * @return returns the the panel containing the annotated map
+     */
     public Pane pane() {
         return mainPane;
     }
 
+    /**
+     *
+     * @return returning the property containing the position of
+     * the mouse pointer along the route
+     */
     public ReadOnlyDoubleProperty mousePositionOnRouteProperty() {
         return mouseProperty;
     }
 
+    /**
+     * manages the property containing the position of the mouse pointer along the route
+     */
     private void handler() {
         mouseProperty.bind(Bindings.createDoubleBinding(
                 () -> {
