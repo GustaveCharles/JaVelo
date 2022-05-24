@@ -47,7 +47,7 @@ public final class JaVelo extends Application {
         AnnotatedMapManager annotatedMapManager = new AnnotatedMapManager(graph, tileManager, routeBean, errorManager::displayError);
 
         ElevationProfileManager elevationProfileManager = new ElevationProfileManager(routeBean.elevationProfileProperty(), routeBean.highlightedPositionProperty());
-        BorderPane profilePane = elevationProfileManager.pane();
+        Pane profilePane = elevationProfileManager.pane();
 
         SplitPane splitPane = new SplitPane(annotatedMapManager.pane());
         splitPane.setOrientation(Orientation.VERTICAL);
@@ -68,7 +68,7 @@ public final class JaVelo extends Application {
         menuItemExport.setOnAction(e -> {
             if (!menuItemExport.isDisable()) {
                 try {
-                    GpxGenerator.writeGpx("javelo.gpx", routeBean.routeProperty().get(), routeBean.elevationProfileProperty().get());
+                    GpxGenerator.writeGpx("javelo.gpx", routeBean.route(), routeBean.elevationProfileProperty().get());
                 } catch (IOException ex) {
                     throw new UncheckedIOException(ex);
                 }

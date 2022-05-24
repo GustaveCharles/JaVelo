@@ -20,6 +20,7 @@ public final class WaypointsManager {
     private final Graph graph;
     private final ObservableList<Waypoint> listOfWayPoint;
     private final static int RADIUS = 500;
+    private final String errorMessage = "Aucune route à proximité !";
     private final Pane pane;
 
     public WaypointsManager(Graph graph, ObjectProperty<MapViewParameters> mapParameters, ObservableList<Waypoint> listOfWayPoint, Consumer<String> stringConsumer) {
@@ -42,7 +43,7 @@ public final class WaypointsManager {
         if (isWaypointClosest(x, y) != null) {
             listOfWayPoint.add(isWaypointClosest(x, y));
         } else {
-            stringConsumer.accept("Aucune route à proximité !");
+            stringConsumer.accept(errorMessage);
         }
     }
 
@@ -101,7 +102,7 @@ public final class WaypointsManager {
                     positionGroup(w, wayPointGroup);
                     listOfWayPoint.set(i, w);
                 } else {
-                    stringConsumer.accept("Aucune route à proximité !");
+                    stringConsumer.accept(errorMessage);
                     wayPointGroup.setLayoutX(initialPoint.get().getX());
                     wayPointGroup.setLayoutY(initialPoint.get().getY());
                     updatePane();

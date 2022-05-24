@@ -11,13 +11,28 @@ import javafx.util.Duration;
 
 public final class ErrorManager {
 
+    private static final double FROM_OPACITY = 0;
+    private static final double TO_OPACITY = 0.8;
+    private static final double DURATION_TIME_1 = 0.2;
+    private static final double DURATION_TIME_2 = 0.5;
+    private final VBox vBoxError;
+    private final SequentialTransition sequentialTransition;
+
     public ErrorManager() {
+        vBoxError = new VBox();
         vBoxError.setMouseTransparent(true);
         vBoxError.getStylesheets().setAll("error.css");
-    }
 
-    private static final VBox vBoxError = new VBox();
-    //
+        FadeTransition fadeTransition1 = new FadeTransition(Duration.seconds(DURATION_TIME_1), vBoxError);
+        fadeTransition1.setFromValue(FROM_OPACITY);
+        fadeTransition1.setToValue(TO_OPACITY);
+        PauseTransition pauseTransition = new PauseTransition(Duration.seconds(2));
+        FadeTransition fadeTransition2 = new FadeTransition(Duration.seconds(DURATION_TIME_2), vBoxError);
+        fadeTransition2.setFromValue(TO_OPACITY);
+        fadeTransition2.setToValue(FROM_OPACITY);
+
+        sequentialTransition = new SequentialTransition(fadeTransition1, pauseTransition, fadeTransition2);
+    }
 
     public Pane pane() {
         return vBoxError;
@@ -27,20 +42,10 @@ public final class ErrorManager {
         vBoxError.getChildren().clear();
         java.awt.Toolkit.getDefaultToolkit().beep();
         vBoxError.getChildren().add(new Text(errorMessage));
-        FadeTransition fadeTransition1 = new FadeTransition(Duration.seconds(0.2), vBoxError);
-        fadeTransition1.setFromValue(0);
-        fadeTransition1.setToValue(0.8);
-        PauseTransition pauseTransition = new PauseTransition(Duration.seconds(2));
-        FadeTransition fadeTransition2 = new FadeTransition(Duration.seconds(0.5), vBoxError);
-        fadeTransition2.setFromValue(0.8);
-        fadeTransition2.setToValue(0);
-
-        SequentialTransition sequentialTransition = new SequentialTransition(fadeTransition1, pauseTransition, fadeTransition2);
 
         if (sequentialTransition.getStatus() == Animation.Status.RUNNING) {
             sequentialTransition.stop();
         }
-
         sequentialTransition.play();
     }
 }

@@ -9,11 +9,6 @@ import javafx.util.Pair;
 
 import java.util.*;
 
-import static java.lang.Double.NaN;
-
-//TODO vérifier si la correction à la ligne 68 est correcte
-// quand on ajoute 3 waypoints alors le dernier quand on le déplace ne recalcule pas l'itinéraire
-
 /**
  * Represents a JavaFX bean for a route
  *
@@ -123,16 +118,8 @@ public final class RouteBean {
      *
      * @return a route
      */
-    private Route route() {
+    public Route route() {
         return route.get();
-    }
-
-    /**
-     * A setter for the highlighted position
-     */
-    public void setHighlightedPosition(double newHighlightedPosition) {
-        highlightedPosition.set((newHighlightedPosition <= route.get().length()) && (newHighlightedPosition >= 0) ?
-                newHighlightedPosition : NaN);
     }
 
     /**

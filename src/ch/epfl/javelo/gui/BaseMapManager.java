@@ -14,6 +14,7 @@ import javafx.scene.canvas.Canvas;
 
 import java.io.IOException;
 //TODO regler problème de la mouse avec /26
+//chnager les noms de varioables pour property et property1
 
 /**
  * manages the display and interaction with the basemap
@@ -96,22 +97,16 @@ public final class BaseMapManager {
                 property1.set(new Point2D(e.getX(), e.getY())));
 
         pane.setOnMouseDragged(e -> {
-                    Point2D pd = new Point2D(property1.get().getX(), property1.get().getY());
-                    Point2D pd1 = pd.subtract(e.getX(), e.getY());
+            Point2D pd = new Point2D(property1.get().getX(), property1.get().getY());
+            Point2D pd1 = pd.subtract(e.getX(), e.getY());
 
-            property.set(property.get().
-                    withMinXY(property.get().xTopLeft() + pd1.getX(),
-                            property.get().yTopLeft() + pd1.getY()));
-
-                    //     property.set(
-                    //   new MapViewParameters(property.get().zoomLevel(),
-                    // property.get().xTopLeft() + pd1.getX(),
-                    //property.get().yTopLeft() + pd1.getY()));
-
-                    property1.set(new Point2D(e.getX(), e.getY()));
-                    redrawOnNextPulse();
-                }
-        );
+            //TODO  renommer constante en dessous
+            Point2D point2D = property.get().topLeft().add(pd1);
+            property.set(property.get().withMinXY(point2D.getX(),
+                    point2D.getY()));
+            property1.set(new Point2D(e.getX(), e.getY()));
+            redrawOnNextPulse();
+        });
 
         SimpleLongProperty minScrollTime = new SimpleLongProperty();
         pane.setOnScroll(e -> {

@@ -51,8 +51,6 @@ public final class RouteManager {
         line.setId("route");
         circle.setId("highlight");
 
-        //si la propriété route de routeBean contient null
-
         line.setVisible(false);
         circle.setVisible(false);
 
@@ -72,7 +70,6 @@ public final class RouteManager {
                 rebuildWhenZoom(oV, nV));
 
         handler();
-
     }
 
     /**
@@ -93,7 +90,7 @@ public final class RouteManager {
                 circle.setVisible(false);
             }else {
                 PointWebMercator point = PointWebMercator.
-                        ofPointCh(routeBean.routeProperty().get().pointAt(routeBean.highlightedPosition()));
+                        ofPointCh(routeBean.route().pointAt(routeBean.highlightedPosition()));
 
                 circle.setCenterX(mapParameters.get().viewX(point));
                 circle.setCenterY(mapParameters.get().viewY(point));
@@ -109,18 +106,18 @@ public final class RouteManager {
      * @param nV new route
      */
     private void rebuildWhenZoom(MapViewParameters oV, MapViewParameters nV) {
-        if (oV.zoomLevel() != nV.zoomLevel() && routeBean.routeProperty().get() != null) {
+        if (oV.zoomLevel() != nV.zoomLevel() && routeBean.route() != null) {
 
 
             pointsSequence();
             line.setLayoutX(-nV.xTopLeft());
             line.setLayoutY(-nV.yTopLeft());
 
-            if(Double.isNaN(routeBean.highlightedPosition())){
+            if (Double.isNaN(routeBean.highlightedPosition())) {
                 circle.setVisible(false);
-            }else {
+            } else {
                 PointWebMercator point = PointWebMercator.
-                        ofPointCh(routeBean.routeProperty().get().pointAt(routeBean.highlightedPosition()));
+                        ofPointCh(routeBean.route().pointAt(routeBean.highlightedPosition()));
 
                 circle.setCenterX(point.xAtZoomLevel(nV.zoomLevel()) - nV.xTopLeft());
                 circle.setCenterY(point.yAtZoomLevel(nV.zoomLevel()) - nV.yTopLeft());
@@ -138,9 +135,9 @@ public final class RouteManager {
     }
 
     private void setCircle() {
-        if(routeBean.routeProperty().get() != null && !Double.isNaN(routeBean.highlightedPosition())) {
+        if (routeBean.route() != null && !Double.isNaN(routeBean.highlightedPosition())) {
             PointWebMercator point = PointWebMercator.
-                    ofPointCh(routeBean.routeProperty().get()
+                    ofPointCh(routeBean.route()
                             .pointAt(routeBean.highlightedPosition()));
 
             circle.setCenterX(mapParameters.get().viewX(point));
@@ -157,14 +154,14 @@ public final class RouteManager {
      * make the disk visible when route is non-zero
      */
     private void visibleProperty() {
-        if ((routeBean.routeProperty().get() == null)) {
+        if ((routeBean.route() == null)) {
             line.setVisible(false);
             circle.setVisible(false);
 
-        } else if(routeBean.highlightedPositionProperty().get() == 0 || Double.isNaN(routeBean.highlightedPosition())){
-                circle.setVisible(false);
-                line.setVisible(true);
-        }else {
+        } else if (routeBean.highlightedPositionProperty().get() == 0 || Double.isNaN(routeBean.highlightedPosition())) {
+            circle.setVisible(false);
+            line.setVisible(true);
+        } else {
             line.setVisible(true);
             circle.setVisible(true);
         }
@@ -182,7 +179,7 @@ public final class RouteManager {
         circle.setOnMouseClicked(e -> {
             Point2D point2D = circle.localToParent(e.getX(), e.getY());
             PointCh point = mapParameters.get().pointAt(point2D.getX(), point2D.getY()).toPointCh();
-            int closestPointId = routeBean.routeProperty().get()
+            int closestPointId = routeBean.route()
                     .nodeClosestTo(routeBean.highlightedPosition());
 
                     int index = routeBean.indexOfNonEmptySegmentAt(routeBean.highlightedPosition()) + 1;
@@ -203,7 +200,7 @@ public final class RouteManager {
         routeNodesDouble.clear();
         line.getPoints().clear();
 
-        routeNodes = new ArrayList<>(routeBean.routeProperty().get().points());
+        routeNodes = new ArrayList<>(routeBean.route().points());
         routeNodes.forEach(o -> {
             PointWebMercator pointWebMercator = PointWebMercator.ofPointCh(o);
             routeNodesDouble.add(pointWebMercator.xAtZoomLevel(mapParameters.get().zoomLevel()));

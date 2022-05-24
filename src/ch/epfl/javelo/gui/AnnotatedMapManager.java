@@ -83,7 +83,7 @@ public final class AnnotatedMapManager {
     private void handler() {
         mouseProperty.bind(Bindings.createDoubleBinding(
                 () -> {
-                    if (routeBean.routeProperty().get() != null && point2DProperty.get() != null) {
+                    if (routeBean.route() != null && point2DProperty.get() != null) {
                         Point2D point2DMouse = point2DProperty.get();
                         PointWebMercator pointWebMercator = mapViewParametersP.get().pointAt(point2DMouse.getX(), point2DMouse.getY());
                         PointCh pointCh = pointWebMercator.toPointCh();
@@ -91,7 +91,7 @@ public final class AnnotatedMapManager {
                             return Double.NaN;
                         }
 
-                        RoutePoint point = routeBean.routeProperty().get().pointClosestTo(pointCh);
+                        RoutePoint point = routeBean.route().pointClosestTo(pointCh);
 
                         double x = mapViewParametersP.get().viewX(PointWebMercator.ofPointCh(point.point()));
                         double y = mapViewParametersP.get().viewY(PointWebMercator.ofPointCh(point.point()));
