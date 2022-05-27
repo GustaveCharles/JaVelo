@@ -266,7 +266,7 @@ public final class ElevationProfileManager {
         }
         polygon.getPoints().addAll(rectangle2DProperty.get().getMaxX(),rectangle2DProperty.get().getMaxY(),
                 rectangle2DProperty.get().getMinX(),rectangle2DProperty.get().getMaxY());
-        
+
     }
 
     private void createRectangle() {
