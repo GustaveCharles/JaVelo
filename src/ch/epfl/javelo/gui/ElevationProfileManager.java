@@ -16,6 +16,8 @@ import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Transform;
 import javafx.scene.Group;
 import javafx.scene.text.Text;
+
+import java.io.InputStream;
 //TODO formatted
 /**
  * Represents a manager for the elevation profile
@@ -264,6 +266,7 @@ public final class ElevationProfileManager {
         }
         polygon.getPoints().addAll(rectangle2DProperty.get().getMaxX(),rectangle2DProperty.get().getMaxY(),
                 rectangle2DProperty.get().getMinX(),rectangle2DProperty.get().getMaxY());
+        
     }
 
     private void createRectangle() {

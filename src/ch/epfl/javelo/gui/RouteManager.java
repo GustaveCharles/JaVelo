@@ -12,7 +12,7 @@ import javafx.scene.shape.Polyline;
 
 import java.util.ArrayList;
 import java.util.List;
-//todo bien de faire foreach? faire un stream?
+import java.util.stream.Collectors;
 
 /**
  * manages the display of the route and part of the interaction with it
@@ -191,8 +191,16 @@ public final class RouteManager {
             routeNodesDouble.add(pointWebMercator.yAtZoomLevel(mvpProperty.get().zoomLevel()));
 
         });
-
         line.getPoints().addAll(routeNodesDouble);
+
+//        routeBean.route().points()
+//                .stream()
+//                .map(PointWebMercator::ofPointCh)
+//                .forEach(o -> {
+//                    routeNodesDouble.add(o.xAtZoomLevel(mvpProperty.get().zoomLevel()));
+//                    routeNodesDouble.add(o.yAtZoomLevel(mvpProperty.get().zoomLevel()));
+//                });
+//        line.getPoints().addAll(routeNodesDouble);
 
     }
 

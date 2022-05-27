@@ -10,7 +10,7 @@ import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
-//todo constante pour le isValid
+
 /**
  * represents an OSM tile manager *
  *
@@ -28,7 +28,7 @@ public final class TileManager {
      */
     private static final int MAX_CAPACITY = 100;
     private final static float LOAD_FACTOR = 0.75F;
-    private final static int MINIMAL_VALUE_FOR_TILE_INDEX =0;
+    private final static int MINIMAL_VALUE_FOR_TILE_INDEX = 0;
 
     /**
      * represents the identity of an OSM tile
@@ -55,7 +55,8 @@ public final class TileManager {
 
             int max = 1 << zoomLevel;
 
-            return (xIndex >= 0 && yIndex >= 0 && xIndex <= max && yIndex <= max);
+            return (xIndex >= MINIMAL_VALUE_FOR_TILE_INDEX && yIndex >= MINIMAL_VALUE_FOR_TILE_INDEX
+                    && xIndex <= max && yIndex <= max);
         }
     }
 
