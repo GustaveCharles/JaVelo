@@ -16,12 +16,25 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.io.PipedReader;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
 
 //TODO est-ce qu'il faut nommer des variables pour la height et la width (800 et 600)
 
 public final class JaVelo extends Application {
+    private final static String PATH_GRAPH = "javelo-data";
+    private final static String PATH_CACHE = "osm-cache";
+    private final static String SERVER_NAME = "tile.openstreetmap.org";
+    private final static String MENU_NAME = "Fichier";
+    private final static String EXPORT_NAME = "Exporter GPX";
+    private final static String GPX_FILE_NAME = "javelo.gpx";
+    private final static String MAP_STYLE = "map.css";
+    private final static String PANE_NAME = "JaVelo";
+    private final static int PANE_WIDTH = 800;
+    private final static int PANE_HEIGHT = 600;
+
+
     public static void main(String[] args) {
         launch(args);
     }
@@ -29,12 +42,11 @@ public final class JaVelo extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        Graph graph = Graph.loadFrom(Path.of("javelo-data"));
-        Path cacheBasePath = Path.of("osm-cache");
-        String tileServerHost = "tile.openstreetmap.org";
+        Graph graph = Graph.loadFrom(Path.of(PATH_GRAPH));
+        Path cacheBasePath = Path.of(PATH_CACHE);
 
         TileManager tileManager =
-                new TileManager(cacheBasePath, tileServerHost);
+                new TileManager(cacheBasePath, SERVER_NAME);
 
         CityBikeCF costFunction = new CityBikeCF(graph);
 
@@ -44,31 +56,31 @@ public final class JaVelo extends Application {
 
         ErrorManager errorManager = new ErrorManager();
 
-        AnnotatedMapManager annotatedMapManager = new AnnotatedMapManager(graph, tileManager, routeBean, errorManager::displayError);
+        AnnotatedMapManager annotatedMapManager = new AnnotatedMapManager(graph, tileManager, routeBean,
+                errorManager::displayError);
 
-        ElevationProfileManager elevationProfileManager = new ElevationProfileManager(routeBean.elevationProfileProperty(), routeBean.highlightedPositionProperty());
+        ElevationProfileManager elevationProfileManager = new ElevationProfileManager(routeBean.elevationProfileProperty(),
+                routeBean.highlightedPositionProperty());
         Pane profilePane = elevationProfileManager.pane();
 
         SplitPane splitPane = new SplitPane(annotatedMapManager.pane());
         splitPane.setOrientation(Orientation.VERTICAL);
 
-        //vérifier ligne en dessous
         SplitPane.setResizableWithParent(profilePane, false);
-        Menu menu = new Menu("Fichier");
-        MenuItem menuItemExport = new MenuItem("Exporter GPX");
-        menu.getItems().add(menuItemExport);
-        menuItemExport.disableProperty().set(true);
+        Menu menu = new Menu(MENU_NAME);
+        MenuItem exportGPXItem = new MenuItem(EXPORT_NAME);
+        menu.getItems().add(exportGPXItem);
+        exportGPXItem.disableProperty().set(true);
         MenuBar menuBar = new MenuBar(menu);
-        menuBar.setUseSystemMenuBar(true);
 
         routeBean.routeProperty().addListener((p, o, n) -> {
-            menuItemExport.disableProperty().set(p.getValue() == null);
+            exportGPXItem.disableProperty().set(p.getValue() == null);
         });
 
-        menuItemExport.setOnAction(e -> {
-            if (!menuItemExport.isDisable()) {
+        exportGPXItem.setOnAction(e -> {
+            if (!exportGPXItem.isDisable()) {
                 try {
-                    GpxGenerator.writeGpx("javelo.gpx", routeBean.route(), routeBean.elevationProfileProperty().get());
+                    GpxGenerator.writeGpx(GPX_FILE_NAME, routeBean.route(), routeBean.elevationProfileProperty().get());
                 } catch (IOException ex) {
                     throw new UncheckedIOException(ex);
                 }
@@ -92,10 +104,10 @@ public final class JaVelo extends Application {
         borderPane.setCenter(stackPane);
         borderPane.setTop(menuBar);
 
-        borderPane.getStylesheets().add("map.css");
-        primaryStage.setMinWidth(800);
-        primaryStage.setMinHeight(600);
-        primaryStage.setTitle("JaVelo");
+        borderPane.getStylesheets().add(MAP_STYLE);
+        primaryStage.setMinWidth(PANE_WIDTH);
+        primaryStage.setMinHeight(PANE_HEIGHT);
+        primaryStage.setTitle(PANE_NAME);
         primaryStage.setScene(new Scene(borderPane));
         primaryStage.show();
 
