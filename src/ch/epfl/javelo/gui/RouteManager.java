@@ -27,8 +27,7 @@ public final class RouteManager {
     private final Circle circle;
     private final RouteBean routeBean;
     private final ObjectProperty<MapViewParameters> mvpProperty;
-    private List<PointCh> routeNodes;
-    private final List<Double> routeNodesDouble;
+    private final List<Double> routeNodes;
 
     private final static int CIRCLE_RADIUS = 5;
 
@@ -43,7 +42,6 @@ public final class RouteManager {
         this.mvpProperty = mvpProperty;
 
         this.routeNodes = new ArrayList<>();
-        this.routeNodesDouble = new ArrayList<>();
 
         pane = new Pane(line, circle);
         pane.setPickOnBounds(false);
@@ -177,30 +175,19 @@ public final class RouteManager {
     /**
      * adds all the points to the polyline
      */
-    //TODO stream
     private void pointsSequence() {
 
         routeNodes.clear();
-        routeNodesDouble.clear();
         line.getPoints().clear();
 
-        routeNodes = new ArrayList<>(routeBean.route().points());
-        routeNodes.forEach(o -> {
-            PointWebMercator pointWebMercator = PointWebMercator.ofPointCh(o);
-            routeNodesDouble.add(pointWebMercator.xAtZoomLevel(mvpProperty.get().zoomLevel()));
-            routeNodesDouble.add(pointWebMercator.yAtZoomLevel(mvpProperty.get().zoomLevel()));
-
-        });
-        line.getPoints().addAll(routeNodesDouble);
-
-//        routeBean.route().points()
-//                .stream()
-//                .map(PointWebMercator::ofPointCh)
-//                .forEach(o -> {
-//                    routeNodesDouble.add(o.xAtZoomLevel(mvpProperty.get().zoomLevel()));
-//                    routeNodesDouble.add(o.yAtZoomLevel(mvpProperty.get().zoomLevel()));
-//                });
-//        line.getPoints().addAll(routeNodesDouble);
+        routeBean.route().points()
+                .stream()
+                .map(PointWebMercator::ofPointCh)
+                .forEach(o -> {
+                    routeNodes.add(o.xAtZoomLevel(mvpProperty.get().zoomLevel()));
+                    routeNodes.add(o.yAtZoomLevel(mvpProperty.get().zoomLevel()));
+                });
+        line.getPoints().addAll(routeNodes);
 
     }
 

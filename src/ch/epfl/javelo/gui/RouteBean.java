@@ -30,7 +30,8 @@ public final class RouteBean {
     /**
      * Builds a JavaFX bean grouping properties related to waypoints and the corresponding route
      *
-     * @param routeComputer a route calculator, of RouteComputer type, used to determine the best route connecting two waypoints.
+     * @param routeComputer a route calculator, of RouteComputer type,
+     *                     used to determine the best route connecting two waypoints.
      */
     public RouteBean(RouteComputer routeComputer) {
         this.routeComputer = routeComputer;
@@ -53,7 +54,8 @@ public final class RouteBean {
     }
 
     /**
-     * Creates a route connecting waypoints, returns null if there is no road between two waypoints or there are less than 2 waypoints
+     * Creates a route connecting waypoints, returns null if there is no
+     * road between two waypoints or there are less than 2 waypoints
      */
     private void createRoute() {
         if (waypoints.size() >= MIN_GROUP_SIZE) {

@@ -26,8 +26,14 @@ public final class TileManager {
     /**
      * Maximum capacity of the LinkedHashMap
      */
-    private static final int MAX_CAPACITY = 100;
+    private final static int MAX_CAPACITY = 100;
+    /**
+     * Ideal load Factor
+     */
     private final static float LOAD_FACTOR = 0.75F;
+    /**
+     * Minimal value for the x and y index of the tile
+     */
     private final static int MINIMAL_VALUE_FOR_TILE_INDEX = 0;
 
     /**

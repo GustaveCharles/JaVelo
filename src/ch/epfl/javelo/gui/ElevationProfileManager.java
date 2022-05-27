@@ -16,6 +16,10 @@ import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Transform;
 import javafx.scene.Group;
 import javafx.scene.text.Text;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.IntStream;
 //TODO formatted
 /**
  * Represents a manager for the elevation profile
@@ -39,6 +43,7 @@ public final class ElevationProfileManager {
     private final DoubleProperty mousePosition;
     private final Pane elevationPane;
     private final Pane statisticsPane;
+    private final List<Double> elevationNodes;
 
     private final static Insets insets = new Insets(10, 10, 20, 40);
     private static final int[] ELE_STEPS =
@@ -87,6 +92,7 @@ public final class ElevationProfileManager {
         polygon.setId(PROFILE_ID);
         vBox.setId(V_BOX_ID);
         statisticsPane.getStylesheets().setAll(MAP_STYLE);
+        elevationNodes = new ArrayList<>();
         createRectangle();
 
         elevationPane.widthProperty().addListener((p, o, n) ->
@@ -139,7 +145,8 @@ public final class ElevationProfileManager {
      * namely from real coordinates to screen coordinates and vice versa.
      */
     private void createTransformation() {
-        double elevationDifference = elevationProfileProperty.get().maxElevation() - elevationProfileProperty.get().minElevation();
+        double elevationDifference =
+                elevationProfileProperty.get().maxElevation() - elevationProfileProperty.get().minElevation();
         double rectangleHeight = rectangle2DProperty.get().getHeight();
         double rectangleWidth = rectangle2DProperty.get().getWidth();
         double length = elevationProfileProperty.get().length();
@@ -185,7 +192,8 @@ public final class ElevationProfileManager {
                 xStep = i;
                 break;
             }
-            if (worldToScreen.get().deltaTransform(POS_STEPS[POS_STEPS.length - 1], 0).getX() < MIN_VERTICAL_SPACING) {
+            if (worldToScreen.get().deltaTransform(POS_STEPS[POS_STEPS.length - 1],
+                    0).getX() < MIN_VERTICAL_SPACING) {
                 xStep = POS_STEPS[POS_STEPS.length - 1];
             }
         }
@@ -198,7 +206,8 @@ public final class ElevationProfileManager {
                 yStep = i;
                 break;
             }
-            if (worldToScreen.get().deltaTransform(0, ELE_STEPS[ELE_STEPS.length - 1]).getY() < MIN_HORIZONTAL_SPACING) {
+            if (worldToScreen.get().deltaTransform(0,
+                    ELE_STEPS[ELE_STEPS.length - 1]).getY() < MIN_HORIZONTAL_SPACING) {
                 yStep = ELE_STEPS[ELE_STEPS.length - 1];
             }
         }
@@ -223,7 +232,8 @@ public final class ElevationProfileManager {
             path.getElements().addAll(new MoveTo(startVertical.getX(), startVertical.getY()),
                     new LineTo(endVertical.getX(), endVertical.getY()));
 
-            createLabels(VERTICAL_ORIENTATION, VPos.TOP, Integer.toString((int) (i / TO_KILOMETERS)), rectangle2DProperty.get().getMaxY(),
+            createLabels(VERTICAL_ORIENTATION, VPos.TOP,
+                    Integer.toString((int) (i / TO_KILOMETERS)), rectangle2DProperty.get().getMaxY(),
                     startVertical);
         }
     }
@@ -261,14 +271,17 @@ public final class ElevationProfileManager {
 
     private void createPolygon() {
         polygon.getPoints().clear();
+        elevationNodes.clear();
 
-        for (int i = (int) rectangle2DProperty.get().getMinX(); i <= rectangle2DProperty.get().getMaxX(); ++i) {
-            Point2D point2Dd = screenToWorld.get().transform(i, 0);
-            double point = elevationProfileProperty.get().elevationAt(point2Dd.getX());
-            Point2D pd2 = worldToScreen.get().transform(0, point);
-            polygon.getPoints().add((double) i);
-            polygon.getPoints().add(pd2.getY());
-        }
+        IntStream.range((int) rectangle2DProperty.get().getMinX(),(int)rectangle2DProperty.get().getMaxX()+1)
+                .forEach(e -> {
+                    Point2D point2Dd = screenToWorld.get().transform(e, 0);
+                    double point = elevationProfileProperty.get().elevationAt(point2Dd.getX());
+                    elevationNodes.add((double) e);
+                    elevationNodes.add(worldToScreen.get().transform(0, point).getY());
+                });
+
+        polygon.getPoints().addAll(elevationNodes);
         polygon.getPoints().addAll(rectangle2DProperty.get().getMaxX(),rectangle2DProperty.get().getMaxY(),
                 rectangle2DProperty.get().getMinX(),rectangle2DProperty.get().getMaxY());
     }
