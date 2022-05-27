@@ -149,6 +149,7 @@ public final class RouteBean {
         return waypoints;
     }
 
+    //todo commenter
     public ReadOnlyObjectProperty<ElevationProfile> elevationProfileProperty() {
         return elevationProfile;
     }

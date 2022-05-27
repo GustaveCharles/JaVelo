@@ -12,6 +12,10 @@ import ch.epfl.javelo.Preconditions;
 public record PointWebMercator(double x, double y) {
 
     /**
+     * At zoom level 0, the map of the entire Earth is a square image with sides 256 pixels, 2^8
+     */
+    public static int ZOOM_LEVEL_ZERO = 8;
+    /**
      * @throws IllegalArgumentException if the coordinates x and y are not in the interval [0,1]
      */
 
@@ -29,8 +33,8 @@ public record PointWebMercator(double x, double y) {
      * @return returns the coordinates in the WebMercator system in the interval [0,1]
      */
     public static PointWebMercator of(int zoomLevel, double x, double y) {
-        double X = Math.scalb(x, -8 - zoomLevel);
-        double Y = Math.scalb(y, -8 - zoomLevel);
+        double X = Math.scalb(x, -ZOOM_LEVEL_ZERO - zoomLevel);
+        double Y = Math.scalb(y, -ZOOM_LEVEL_ZERO - zoomLevel);
         return new PointWebMercator(X, Y);
     }
 
@@ -56,7 +60,7 @@ public record PointWebMercator(double x, double y) {
      * @return returns the x coordinate at the given zoom level
      */
     public double xAtZoomLevel(int zoomLevel) {
-        return Math.scalb(this.x, 8 + zoomLevel);
+        return Math.scalb(this.x, ZOOM_LEVEL_ZERO + zoomLevel);
     }
 
     /**
@@ -66,7 +70,7 @@ public record PointWebMercator(double x, double y) {
      * @return returns the y coordinate at the given zoom level
      */
     public double yAtZoomLevel(int zoomLevel) {
-        return Math.scalb(this.y, 8 + zoomLevel);
+        return Math.scalb(this.y, ZOOM_LEVEL_ZERO + zoomLevel);
     }
 
     /**

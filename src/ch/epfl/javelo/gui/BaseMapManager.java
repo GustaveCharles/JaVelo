@@ -13,8 +13,7 @@ import javafx.scene.canvas.Canvas;
 
 
 import java.io.IOException;
-//TODO regler problème de la mouse avec /26
-//chnager les noms de varioables pour property et property1
+// TODO chnager les noms de varioables pour property et property1
 
 /**
  * manages the display and interaction with the basemap
@@ -25,14 +24,25 @@ import java.io.IOException;
 public final class BaseMapManager {
 
     private final TileManager tileManager;
-    private final ObjectProperty<MapViewParameters> property;
+    private final ObjectProperty<MapViewParameters> mapViewParametersObjectProperty;
     private final WaypointsManager waypointsManager;
     private boolean redrawNeeded;
     private final Canvas canvas;
     private final Pane pane;
+    private final GraphicsContext gc;
 
+    /**
+     * height of a tile
+     */
+    //todo public ou private la constante?
     public final static int TILE_HEIGHT = 256;
+    /**
+     * minimal zoom of JaVelo
+     */
     public final static int MIN_ZOOM = 8;
+    /**
+     * maximal zoom of JaVelo
+     */
     public final static int MAX_ZOOM = 19;
 
     /**
@@ -40,14 +50,14 @@ public final class BaseMapManager {
      * @param waypointsManager waypoint manager
      * @param property         a JavaFX property containing the parameters of the map displayed
      */
-    public BaseMapManager(TileManager tileManager, WaypointsManager waypointsManager, ObjectProperty<MapViewParameters> property) {
-        this.tileManager = tileManager;
-        this.property = property;
-        this.waypointsManager = waypointsManager;
-        canvas = new Canvas();
-        pane = new Pane(canvas);
+    public BaseMapManager(TileManager tileManager, WaypointsManager waypointsManager,
+                          ObjectProperty<MapViewParameters> property) {
 
-        redrawNeeded = false;
+        this.tileManager = tileManager;
+        this.mapViewParametersObjectProperty = property;
+        this.waypointsManager = waypointsManager;
+        this.canvas = new Canvas();
+        this.pane = new Pane(canvas);
 
         canvas.sceneProperty().addListener((p, oldS, newS) -> {
             assert oldS == null;
@@ -58,6 +68,11 @@ public final class BaseMapManager {
         canvas.heightProperty().addListener((p, o, n) -> redrawOnNextPulse());
         canvas.widthProperty().addListener((p, o, n) -> redrawOnNextPulse());
         handler();
+
+        canvas.widthProperty().bind(pane.widthProperty());
+        canvas.heightProperty().bind(pane.heightProperty());
+
+        this.gc = canvas.getGraphicsContext2D();
     }
 
     /**
@@ -69,20 +84,20 @@ public final class BaseMapManager {
 
     private void paneDraw() {
 
-        canvas.widthProperty().bind(pane.widthProperty());
-        canvas.heightProperty().bind(pane.heightProperty());
-
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-
-        double x = property.get().xTopLeft();
-        double y = property.get().yTopLeft();
+        double x = mapViewParametersObjectProperty.get().xTopLeft();
+        double y = mapViewParametersObjectProperty.get().yTopLeft();
 
         for (int i = 0; i < canvas.getWidth() + TILE_HEIGHT; i += TILE_HEIGHT) {
             for (int j = 0; j < canvas.getHeight() + TILE_HEIGHT; j += TILE_HEIGHT) {
                 try {
                     TileManager.TileId tileID =
-                            new TileManager.TileId(property.get().zoomLevel(), Math.floorDiv((int) (i + x), TILE_HEIGHT), Math.floorDiv((int) (j + y), 256));
-                    gc.drawImage(tileManager.imageForTileAt(tileID), i - x % TILE_HEIGHT, j - y % TILE_HEIGHT);
+                            new TileManager.TileId(mapViewParametersObjectProperty.get().zoomLevel(),
+                                    Math.floorDiv((int) (i + x), TILE_HEIGHT),
+                                    Math.floorDiv((int) (j + y), 256));
+                    gc.drawImage(tileManager.imageForTileAt(tileID),
+                            i - x % TILE_HEIGHT,
+                            j - y % TILE_HEIGHT);
+                    //todo illegalargumentexception?
                 } catch (IOException ignored) {
                 }
             }
@@ -92,19 +107,23 @@ public final class BaseMapManager {
 
     private void handler() {
 
-        ObjectProperty<Point2D> property1 = new SimpleObjectProperty<>();
+        ObjectProperty<Point2D> oldMousePositionProperty = new SimpleObjectProperty<>();
+
         pane.setOnMousePressed(e ->
-                property1.set(new Point2D(e.getX(), e.getY())));
+                oldMousePositionProperty.set(new Point2D(e.getX(), e.getY()))
+        );
 
         pane.setOnMouseDragged(e -> {
-            Point2D pd = new Point2D(property1.get().getX(), property1.get().getY());
-            Point2D pd1 = pd.subtract(e.getX(), e.getY());
+            Point2D scrolledDistance = oldMousePositionProperty.get().subtract(e.getX(), e.getY());
 
-            //TODO  renommer constante en dessous
-            Point2D point2D = property.get().topLeft().add(pd1);
-            property.set(property.get().withMinXY(point2D.getX(),
-                    point2D.getY()));
-            property1.set(new Point2D(e.getX(), e.getY()));
+            Point2D newMousePosition = mapViewParametersObjectProperty
+                    .get().topLeft().add(scrolledDistance);
+
+            mapViewParametersObjectProperty
+                    .set(mapViewParametersObjectProperty
+                            .get().withMinXY(newMousePosition.getX(), newMousePosition.getY()));
+
+            oldMousePositionProperty.set(new Point2D(e.getX(), e.getY()));
             redrawOnNextPulse();
         });
 
@@ -117,18 +136,17 @@ public final class BaseMapManager {
             minScrollTime.set(currentTime + 200);
             int zoomDelta = (int) Math.signum(e.getDeltaY());
 
-            int newZoom = Math2.clamp(MIN_ZOOM, property.get().zoomLevel() + zoomDelta, MAX_ZOOM);
+            int newZoom = Math2.clamp(MIN_ZOOM,
+                    mapViewParametersObjectProperty.get().zoomLevel() + zoomDelta,
+                    MAX_ZOOM);
 
-            PointWebMercator newCoordinates = property.get().pointAt(e.getX(), e.getY());
-
-            // PointWebMercator newCoordinates = PointWebMercator.of(property.get().zoomLevel(),
-            //       property.get().xTopLeft() + e.getX(),
-            //     property.get().yTopLeft() + e.getY());
+            PointWebMercator newCoordinates
+                    = mapViewParametersObjectProperty.get().pointAt(e.getX(), e.getY());
 
             double newX = newCoordinates.xAtZoomLevel(newZoom);
             double newY = newCoordinates.yAtZoomLevel(newZoom);
 
-            property.set(new MapViewParameters(newZoom,
+            mapViewParametersObjectProperty.set(new MapViewParameters(newZoom,
                     newX - e.getX(),
                     newY - e.getY()));
 

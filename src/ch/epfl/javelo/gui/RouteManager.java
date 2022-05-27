@@ -28,8 +28,12 @@ public final class RouteManager {
     private final ObjectProperty<MapViewParameters> mapParameters;
     private List<PointCh> routeNodes;
     private final List<Double> routeNodesDouble;
+
+    private final int CIRCLE_RADIUS = 5;
+    //todo est-ce qu'il faut mettre les string en constante aussi?
     //TODO public ou private la constante?
-    //TODO problème lorsque la distance entre les points verts et rouge sont plus petits que highlited property
+    //TODO problème lorsque la distance entre les points verts et rouge
+    // sont plus petits que highlited property
 
     /**
      * @param routeBean     the route bean
@@ -38,7 +42,7 @@ public final class RouteManager {
     public RouteManager(RouteBean routeBean, SimpleObjectProperty<MapViewParameters> mapParameters) {
         this.line = new Polyline();
         this.routeBean = routeBean;
-        this.circle = new Circle(5);
+        this.circle = new Circle(CIRCLE_RADIUS);
         this.mapParameters = mapParameters;
 
         this.routeNodes = new ArrayList<>();

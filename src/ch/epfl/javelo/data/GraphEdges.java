@@ -183,17 +183,14 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
     private float[] inverter(float[] invert, int edgeID) {
 
         if (isInverted(edgeID)) {
-            int j = invert.length;
-            float[] inverted = new float[j];
-
-            for (int i = 0; i < invert.length; ++i) {
-                inverted[i] = invert[j - 1];
-                j -= 1;
+            float temp;
+            for (int i = 0; i < invert.length/2; ++i) {
+                temp = invert[i];
+                invert[i] = invert[invert.length -i - 1];
+                invert[invert.length - i - 1] = temp;
             }
-            return inverted;
-        } else {
-            return invert;
         }
+        return invert;
 
     }
 

@@ -11,6 +11,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
 
+//TODO utiliser toString ou toFile??
+
 /**
  * represents an OSM tile manager *
  *
@@ -39,6 +41,7 @@ public final class TileManager {
          * @param yIndex    the Y index of the tile
          * @throws IllegalArgumentException if the tile is not within the limits
          */
+        //todo laisser le constructeur??
         public TileId {
             Preconditions.checkArgument(isValid(zoomLevel, xIndex, yIndex));
         }
@@ -86,12 +89,10 @@ public final class TileManager {
 
         Preconditions.checkArgument(TileId.isValid(tile.zoomLevel, tile.xIndex, tile.yIndex));
 
-        Path fullPath = basePath.resolve("%d".formatted(tile.zoomLevel)).
-                resolve("%d".formatted(tile.xIndex))
+        Path fullPath = basePath
+                .resolve("%d".formatted(tile.zoomLevel))
+                .resolve("%d".formatted(tile.xIndex))
                 .resolve("%d.png".formatted(tile.yIndex));
-
-        Path toxPath = basePath.resolve("%d".formatted(tile.zoomLevel)).
-                resolve("%d".formatted(tile.xIndex));
 
         if (cacheMemory.containsKey(tile)) {
             return cacheMemory.get(tile);
@@ -99,37 +100,39 @@ public final class TileManager {
 
         if (Files.exists(fullPath)) {
             Image imageFromDisk;
-            try (FileInputStream channel = new FileInputStream(fullPath.toFile())) { //toString ou toFile?
+            try (FileInputStream channel = new FileInputStream(fullPath.toFile())) {
                 imageFromDisk = new Image(channel);
             }
-            checkCacheSize(cacheMemory);
+            checkCacheSize();
             cacheMemory.put(tile, imageFromDisk);
             return cacheMemory.get(tile);
         }
 
         if (!cacheMemory.containsKey(tile) && !Files.exists(fullPath)) {
-            Files.createDirectories(Path.of(String.valueOf(toxPath)));
+            //TODO Files.createDirectories(Path.of(String.valueOf(toxPath)));
+            Files.createDirectories(fullPath.getParent());
             URL u = new URL(
                     "https://" + servername + "/%d/%d/%d.png"
                             .formatted(tile.zoomLevel, tile.xIndex, tile.yIndex));
             URLConnection c = u.openConnection();
             c.setRequestProperty("User-Agent", "JaVelo");
 
-            try (InputStream i = c.getInputStream(); OutputStream o = new FileOutputStream(fullPath.toFile())) {
+            try (InputStream i = c.getInputStream();
+                 OutputStream o = new FileOutputStream(fullPath.toFile())) {
                 i.transferTo(o);
             }
             Image imageFromDisk;
             try (FileInputStream channel = new FileInputStream(fullPath.toFile())) {
                 imageFromDisk = new Image(channel);
             }
-            checkCacheSize(cacheMemory);
+            checkCacheSize();
             cacheMemory.put(tile, imageFromDisk);
             return cacheMemory.get(tile);
         }
         return null;
     }
 
-    private void checkCacheSize(LinkedHashMap<TileId, Image> cacheMemory) {
+    private void checkCacheSize() {
         if (cacheMemory.size() == MAX_CAPACITY) {
             cacheMemory.remove(cacheMemory.keySet().iterator().next());
         }

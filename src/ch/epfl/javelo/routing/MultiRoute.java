@@ -18,6 +18,8 @@ import java.util.List;
 public final class MultiRoute implements Route {
 
     private final List<Route> segments;
+    private final List<Edge> edges ;
+
 
     /**
      * builds a multiple route made up of the given segments
@@ -27,6 +29,7 @@ public final class MultiRoute implements Route {
      */
     public MultiRoute(List<Route> segments) {
         Preconditions.checkArgument(segments.size() != 0);
+        this.edges = new ArrayList<>();
         this.segments = List.copyOf(segments);
     }
 
@@ -69,7 +72,6 @@ public final class MultiRoute implements Route {
      * {@inheritDoc}
      */
     public List<Edge> edges() {
-        List<Edge> edges = new ArrayList<>();
 
         for (Route segment : segments) {
             edges.addAll(segment.edges());
