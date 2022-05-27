@@ -16,20 +16,21 @@ import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Transform;
 import javafx.scene.Group;
 import javafx.scene.text.Text;
-
+//TODO formatted
 /**
  * Represents a manager for the elevation profile
  *
  * @author Baudoin Coispeau (339364)
- * @author Gustave Charles-Saigne (345945)
+ * @author Gustave Charles-Saigne (345945),9ujni0
  */
 
 public final class ElevationProfileManager {
-    public final static int MIN_HORIZONTAL_SPACING = 25;
-    public final static int MIN_VERTICAL_SPACING = 50;
+    private final static int MIN_HORIZONTAL_SPACING = 25;
+    private final static int MIN_VERTICAL_SPACING = 50;
     private static final int TO_KILOMETERS = 1000;
     private static final int[] POS_STEPS =
             {1000, 2000, 5000, 10_000, 25_000, 50_000, 100_000};
+    private final int MINIMAL_VALUE_FOR_RECTANGLE = 0;
     private final Path path;
     private final Polygon polygon;
     private final Line line;
@@ -51,12 +52,15 @@ public final class ElevationProfileManager {
     private final Pane elevationPane;
     private final Pane statisticsPane;
 
+    private final Insets INSET = new Insets(10, 10, 20, 40);
 
     /**
      * Manages the display and interaction with the profile of the route
      *
-     * @param elevationProfileProperty a read-only property containing the profile to display, it contains null if there is no such profile
-     * @param highlightedProperty      a read-only property containing the position along the profile to be highlighted,
+     * @param elevationProfileProperty a read-only property containing the profile to display,
+     *                                it contains null if there is no such profile
+     * @param highlightedProperty      a read-only property containing the position along
+     *                                 the profile to be highlighted,
      *                                 it contains Nan if there is no such position
      */
     public ElevationProfileManager(ReadOnlyObjectProperty<ElevationProfile> elevationProfileProperty,
@@ -65,7 +69,7 @@ public final class ElevationProfileManager {
         this.worldToScreen = new SimpleObjectProperty<>();
         this.elevationProfileProperty = elevationProfileProperty;
         this.highlightedProperty = highlightedProperty;
-        this.mousePosition = new SimpleDoubleProperty();
+        this.mousePosition = new SimpleDoubleProperty(Double.NaN);
         this.path = new Path();
         this.polygon = new Polygon();
         this.line = new Line();
@@ -75,23 +79,21 @@ public final class ElevationProfileManager {
         VBox vBox = new VBox(textVbox);
         elevationPane = new Pane(path, polygon, line, group);
         statisticsPane = new BorderPane(elevationPane, null, null, vBox, null);
-        insets = new Insets(10, 10, 20, 40);
+        insets = INSET;
         path.setId("grid");
         polygon.setId("profile");
         vBox.setId("profile_data");
         statisticsPane.getStylesheets().setAll("elevation_profile.css");
         createRectangle();
 
-        elevationPane.widthProperty().addListener((p, o, n) -> {
-            if (elevationProfileProperty.get() != null)
-                displayElevation();
-        });
+        elevationPane.widthProperty().addListener((p, o, n) ->
+                displayElevation()
+        );
 
-        elevationPane.heightProperty().addListener((p, o, n) -> {
-            if (elevationProfileProperty.get() != null)
-                displayElevation();
+        elevationPane.heightProperty().addListener((p, o, n) ->
+                displayElevation()
 
-        });
+        );
 
         elevationPane.setOnMouseMoved(e -> {
             if (rectangle2DProperty.get().contains(new Point2D(e.getX(), e.getY()))) {
@@ -174,6 +176,7 @@ public final class ElevationProfileManager {
         //Searches for the smallest value guaranteeing that, on the screen, the horizontal lines are separated by
         //at least 25 JavaFX units (pixels). If no value guarantees this, the largest of all is used.
 
+        //TODO FAIRE UN STREAM
         for (int i : POS_STEPS) {
             if (worldToScreen.get().deltaTransform(i, 0).getX() >= MIN_VERTICAL_SPACING) {
                 xStep = i;
@@ -199,7 +202,7 @@ public final class ElevationProfileManager {
 
         //Creates horizontal lines
 
-        double closestStepBound = Math2.ceilDiv((int) minElevation, yStep) * yStep;
+        double closestStepBound = Math2.ceilDiv((int) Math.round(minElevation), yStep) * yStep;
         for (double i = closestStepBound; i < maxElevation; i += yStep) {
             Point2D startHorizontal = worldToScreen.get().transform(0, i);
             Point2D endHorizontal = worldToScreen.get().transform(length, i);
@@ -240,7 +243,6 @@ public final class ElevationProfileManager {
      *displays the route statistics presented at the bottom of the panel
      */
     private void createBox() {
-        //mettre une constante pour 0.001
         textVbox.setText("Longueur : %.1f km".formatted(elevationProfileProperty.get().length() / TO_KILOMETERS) +
                 "     Montée : %.0f m".formatted(elevationProfileProperty.get().totalAscent()) +
                 "     Descente : %.0f m".formatted(elevationProfileProperty.get().totalDescent()) +
@@ -250,7 +252,6 @@ public final class ElevationProfileManager {
                 ));
     }
 
-
     private void createPolygon() {
         polygon.getPoints().clear();
 
@@ -258,21 +259,22 @@ public final class ElevationProfileManager {
             Point2D point2Dd = screenToWorld.get().transform(i, 0);
             double point = elevationProfileProperty.get().elevationAt(point2Dd.getX());
             Point2D pd2 = worldToScreen.get().transform(0, point);
-            //Math2.clamp(); --post 1551
             polygon.getPoints().add((double) i);
             polygon.getPoints().add(pd2.getY());
         }
-        polygon.getPoints().add(rectangle2DProperty.get().getMaxX());
-        polygon.getPoints().add(rectangle2DProperty.get().getMaxY());
-        polygon.getPoints().add(rectangle2DProperty.get().getMinX());
-        polygon.getPoints().add(rectangle2DProperty.get().getMaxY());
+        polygon.getPoints().addAll(rectangle2DProperty.get().getMaxX(),rectangle2DProperty.get().getMaxY(),
+                rectangle2DProperty.get().getMinX(),rectangle2DProperty.get().getMaxY());
     }
 
     private void createRectangle() {
-        rectangle2DProperty.bind(Bindings.createObjectBinding(() -> new Rectangle2D(insets.getLeft(), insets.getTop(),
-                Math.max(0, elevationPane.getWidth() - insets.getLeft() - insets.getRight()),
-                Math.max(0, elevationPane.getHeight() - insets.getBottom() - insets.getTop())), elevationPane.widthProperty(), elevationPane.heightProperty()
-        ));
+        rectangle2DProperty.bind(Bindings.createObjectBinding(
+                () -> new Rectangle2D(insets.getLeft(), insets.getTop(),
+                Math.max(MINIMAL_VALUE_FOR_RECTANGLE,
+                        elevationPane.getWidth() - insets.getLeft() - insets.getRight()),
+                Math.max(MINIMAL_VALUE_FOR_RECTANGLE,
+                        elevationPane.getHeight() - insets.getBottom() - insets.getTop())),
+                elevationPane.widthProperty(), elevationPane.heightProperty()
+                ));
     }
 
     private void createLine() {

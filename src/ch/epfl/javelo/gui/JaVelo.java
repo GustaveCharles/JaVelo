@@ -15,12 +15,10 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+
 import java.io.IOException;
-import java.io.PipedReader;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
-
-//TODO est-ce qu'il faut nommer des variables pour la height et la width (800 et 600)
 
 public final class JaVelo extends Application {
     private final static String PATH_GRAPH = "javelo-data";
@@ -45,37 +43,34 @@ public final class JaVelo extends Application {
         Graph graph = Graph.loadFrom(Path.of(PATH_GRAPH));
         Path cacheBasePath = Path.of(PATH_CACHE);
 
-        TileManager tileManager =
-                new TileManager(cacheBasePath, SERVER_NAME);
-
+        TileManager tileManager = new TileManager(cacheBasePath, SERVER_NAME);
         CityBikeCF costFunction = new CityBikeCF(graph);
-
         RouteComputer routeComputer = new RouteComputer(graph, costFunction);
-
         RouteBean routeBean = new RouteBean(routeComputer);
-
         ErrorManager errorManager = new ErrorManager();
 
         AnnotatedMapManager annotatedMapManager = new AnnotatedMapManager(graph, tileManager, routeBean,
                 errorManager::displayError);
 
-        ElevationProfileManager elevationProfileManager = new ElevationProfileManager(routeBean.elevationProfileProperty(),
-                routeBean.highlightedPositionProperty());
+        ElevationProfileManager elevationProfileManager =
+                new ElevationProfileManager(routeBean.elevationProfileProperty(),
+                        routeBean.highlightedPositionProperty());
+
         Pane profilePane = elevationProfileManager.pane();
 
         SplitPane splitPane = new SplitPane(annotatedMapManager.pane());
         splitPane.setOrientation(Orientation.VERTICAL);
-
         SplitPane.setResizableWithParent(profilePane, false);
+
         Menu menu = new Menu(MENU_NAME);
         MenuItem exportGPXItem = new MenuItem(EXPORT_NAME);
         menu.getItems().add(exportGPXItem);
         exportGPXItem.disableProperty().set(true);
         MenuBar menuBar = new MenuBar(menu);
 
-        routeBean.routeProperty().addListener((p, o, n) -> {
-            exportGPXItem.disableProperty().set(p.getValue() == null);
-        });
+        routeBean.routeProperty().addListener((p, o, n) ->
+            exportGPXItem.disableProperty().set(p.getValue() == null)
+        );
 
         exportGPXItem.setOnAction(e -> {
             if (!exportGPXItem.isDisable()) {

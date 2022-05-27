@@ -10,9 +10,7 @@ import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
-
-//TODO utiliser toString ou toFile??
-
+//todo constante pour le isValid
 /**
  * represents an OSM tile manager *
  *
@@ -29,6 +27,8 @@ public final class TileManager {
      * Maximum capacity of the LinkedHashMap
      */
     private static final int MAX_CAPACITY = 100;
+    private final static float LOAD_FACTOR = 0.75F;
+    private final static int MINIMAL_VALUE_FOR_TILE_INDEX =0;
 
     /**
      * represents the identity of an OSM tile
@@ -41,7 +41,6 @@ public final class TileManager {
          * @param yIndex    the Y index of the tile
          * @throws IllegalArgumentException if the tile is not within the limits
          */
-        //todo laisser le constructeur??
         public TileId {
             Preconditions.checkArgument(isValid(zoomLevel, xIndex, yIndex));
         }
@@ -69,7 +68,7 @@ public final class TileManager {
      */
     public TileManager(Path basePath, String serverName) {
 
-        this.cacheMemory = new LinkedHashMap<>(MAX_CAPACITY, 0.75F, true);
+        this.cacheMemory = new LinkedHashMap<>(MAX_CAPACITY, LOAD_FACTOR, true);
         this.basePath = basePath;
         this.servername = serverName;
     }
@@ -109,7 +108,6 @@ public final class TileManager {
         }
 
         if (!cacheMemory.containsKey(tile) && !Files.exists(fullPath)) {
-            //TODO Files.createDirectories(Path.of(String.valueOf(toxPath)));
             Files.createDirectories(fullPath.getParent());
             URL u = new URL(
                     "https://" + servername + "/%d/%d/%d.png"

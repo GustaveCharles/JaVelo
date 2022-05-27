@@ -11,9 +11,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Pane;
 import javafx.scene.canvas.Canvas;
 
-
 import java.io.IOException;
-// TODO chnager les noms de varioables pour property et property1
 
 /**
  * manages the display and interaction with the basemap
@@ -24,7 +22,7 @@ import java.io.IOException;
 public final class BaseMapManager {
 
     private final TileManager tileManager;
-    private final ObjectProperty<MapViewParameters> mapViewParametersObjectProperty;
+    private final ObjectProperty<MapViewParameters> mvpProperty;
     private final WaypointsManager waypointsManager;
     private boolean redrawNeeded;
     private final Canvas canvas;
@@ -34,16 +32,15 @@ public final class BaseMapManager {
     /**
      * height of a tile
      */
-    //todo public ou private la constante?
-    public final static int TILE_HEIGHT = 256;
+    private final static int TILE_HEIGHT = 256;
     /**
      * minimal zoom of JaVelo
      */
-    public final static int MIN_ZOOM = 8;
+    private final static int MIN_ZOOM = 8;
     /**
      * maximal zoom of JaVelo
      */
-    public final static int MAX_ZOOM = 19;
+    private final static int MAX_ZOOM = 19;
 
     /**
      * @param tileManager      the tile manager to use to get the tiles from the map
@@ -54,14 +51,14 @@ public final class BaseMapManager {
                           ObjectProperty<MapViewParameters> property) {
 
         this.tileManager = tileManager;
-        this.mapViewParametersObjectProperty = property;
+        this.mvpProperty = property;
         this.waypointsManager = waypointsManager;
         this.canvas = new Canvas();
         this.pane = new Pane(canvas);
 
-        canvas.sceneProperty().addListener((p, oldS, newS) -> {
-            assert oldS == null;
-            newS.addPreLayoutPulseListener(this::redrawIfNeeded);
+        canvas.sceneProperty().addListener((p, o, n) -> {
+            assert o == null;
+            n.addPreLayoutPulseListener(this::redrawIfNeeded);
         });
 
         redrawOnNextPulse();
@@ -84,20 +81,19 @@ public final class BaseMapManager {
 
     private void paneDraw() {
 
-        double x = mapViewParametersObjectProperty.get().xTopLeft();
-        double y = mapViewParametersObjectProperty.get().yTopLeft();
+        double x = mvpProperty.get().xTopLeft();
+        double y = mvpProperty.get().yTopLeft();
 
         for (int i = 0; i < canvas.getWidth() + TILE_HEIGHT; i += TILE_HEIGHT) {
             for (int j = 0; j < canvas.getHeight() + TILE_HEIGHT; j += TILE_HEIGHT) {
                 try {
                     TileManager.TileId tileID =
-                            new TileManager.TileId(mapViewParametersObjectProperty.get().zoomLevel(),
+                            new TileManager.TileId(mvpProperty.get().zoomLevel(),
                                     Math.floorDiv((int) (i + x), TILE_HEIGHT),
-                                    Math.floorDiv((int) (j + y), 256));
+                                    Math.floorDiv((int) (j + y), TILE_HEIGHT));
                     gc.drawImage(tileManager.imageForTileAt(tileID),
                             i - x % TILE_HEIGHT,
                             j - y % TILE_HEIGHT);
-                    //todo illegalargumentexception?
                 } catch (IOException ignored) {
                 }
             }
@@ -116,11 +112,11 @@ public final class BaseMapManager {
         pane.setOnMouseDragged(e -> {
             Point2D scrolledDistance = oldMousePositionProperty.get().subtract(e.getX(), e.getY());
 
-            Point2D newMousePosition = mapViewParametersObjectProperty
+            Point2D newMousePosition = mvpProperty
                     .get().topLeft().add(scrolledDistance);
 
-            mapViewParametersObjectProperty
-                    .set(mapViewParametersObjectProperty
+            mvpProperty
+                    .set(mvpProperty
                             .get().withMinXY(newMousePosition.getX(), newMousePosition.getY()));
 
             oldMousePositionProperty.set(new Point2D(e.getX(), e.getY()));
@@ -137,16 +133,16 @@ public final class BaseMapManager {
             int zoomDelta = (int) Math.signum(e.getDeltaY());
 
             int newZoom = Math2.clamp(MIN_ZOOM,
-                    mapViewParametersObjectProperty.get().zoomLevel() + zoomDelta,
+                    mvpProperty.get().zoomLevel() + zoomDelta,
                     MAX_ZOOM);
 
             PointWebMercator newCoordinates
-                    = mapViewParametersObjectProperty.get().pointAt(e.getX(), e.getY());
+                    = mvpProperty.get().pointAt(e.getX(), e.getY());
 
             double newX = newCoordinates.xAtZoomLevel(newZoom);
             double newY = newCoordinates.yAtZoomLevel(newZoom);
 
-            mapViewParametersObjectProperty.set(new MapViewParameters(newZoom,
+            mvpProperty.set(new MapViewParameters(newZoom,
                     newX - e.getX(),
                     newY - e.getY()));
 

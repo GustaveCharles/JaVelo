@@ -30,8 +30,8 @@ public final class AnnotatedMapManager {
     private final DoubleProperty mouseProperty;
     private final SimpleObjectProperty<MapViewParameters> mapViewParametersP;
 
-    public final static int MAX_DISTANCE_PIXELS = 15;
-    public final static MapViewParameters MAP_VIEW_PARAMETERS =
+    private final static int MAX_DISTANCE_PIXELS = 15;
+    private final static MapViewParameters MAP_VIEW_PARAMETERS =
             new MapViewParameters(12, 543200, 370650);
 
     /**
@@ -43,7 +43,8 @@ public final class AnnotatedMapManager {
      * @param routeBean the route bean
      * @param stringConsumer an “error consumer” to report an error
      */
-    public AnnotatedMapManager(Graph graph, TileManager tileManager, RouteBean routeBean, Consumer<String> stringConsumer) {
+    public AnnotatedMapManager(Graph graph, TileManager tileManager, RouteBean routeBean,
+                               Consumer<String> stringConsumer) {
 
         this.routeBean = routeBean;
         this.mouseProperty = new SimpleDoubleProperty(Double.NaN);
@@ -51,7 +52,8 @@ public final class AnnotatedMapManager {
         this.mapViewParametersP = new SimpleObjectProperty<>(MAP_VIEW_PARAMETERS);
 
         RouteManager routeManager = new RouteManager(routeBean, mapViewParametersP);
-        WaypointsManager waypointsManager = new WaypointsManager(graph, mapViewParametersP, routeBean.waypointsProperty(), stringConsumer);
+        WaypointsManager waypointsManager =
+                new WaypointsManager(graph, mapViewParametersP, routeBean.waypointsProperty(), stringConsumer);
         BaseMapManager baseMapManager = new BaseMapManager(tileManager, waypointsManager, mapViewParametersP);
 
         this.mainPane = new StackPane(baseMapManager.pane(), routeManager.pane(), waypointsManager.pane());
@@ -85,7 +87,8 @@ public final class AnnotatedMapManager {
                 () -> {
                     if (routeBean.route() != null && point2DProperty.get() != null) {
                         Point2D point2DMouse = point2DProperty.get();
-                        PointWebMercator pointWebMercator = mapViewParametersP.get().pointAt(point2DMouse.getX(), point2DMouse.getY());
+                        PointWebMercator pointWebMercator =
+                                mapViewParametersP.get().pointAt(point2DMouse.getX(), point2DMouse.getY());
                         PointCh pointCh = pointWebMercator.toPointCh();
                         if (pointCh == null) {
                             return Double.NaN;
@@ -110,5 +113,7 @@ public final class AnnotatedMapManager {
         mainPane.setOnMouseMoved(e -> point2DProperty.set(new Point2D(e.getX(), e.getY())));
 
         mainPane.setOnMouseExited(e -> point2DProperty.set(null));
+
+        mainPane.setOnMouseDragged(e -> point2DProperty.set(null));
     }
 }

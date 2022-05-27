@@ -12,6 +12,7 @@ import javafx.scene.shape.Polyline;
 
 import java.util.ArrayList;
 import java.util.List;
+//todo bien de faire foreach? faire un stream?
 
 /**
  * manages the display of the route and part of the interaction with it
@@ -25,25 +26,21 @@ public final class RouteManager {
     private final Polyline line;
     private final Circle circle;
     private final RouteBean routeBean;
-    private final ObjectProperty<MapViewParameters> mapParameters;
+    private final ObjectProperty<MapViewParameters> mvpProperty;
     private List<PointCh> routeNodes;
     private final List<Double> routeNodesDouble;
 
-    private final int CIRCLE_RADIUS = 5;
-    //todo est-ce qu'il faut mettre les string en constante aussi?
-    //TODO public ou private la constante?
-    //TODO problème lorsque la distance entre les points verts et rouge
-    // sont plus petits que highlited property
+    private final static int CIRCLE_RADIUS = 5;
 
     /**
-     * @param routeBean     the route bean
-     * @param mapParameters a JavaFX property, read-only, containing the parameters of the map displayed,
+     * @param routeBean   the route bean
+     * @param mvpProperty a JavaFX property, read-only, containing the parameters of the map displayed,
      */
-    public RouteManager(RouteBean routeBean, SimpleObjectProperty<MapViewParameters> mapParameters) {
+    public RouteManager(RouteBean routeBean, SimpleObjectProperty<MapViewParameters> mvpProperty) {
         this.line = new Polyline();
         this.routeBean = routeBean;
         this.circle = new Circle(CIRCLE_RADIUS);
-        this.mapParameters = mapParameters;
+        this.mvpProperty = mvpProperty;
 
         this.routeNodes = new ArrayList<>();
         this.routeNodesDouble = new ArrayList<>();
@@ -51,12 +48,8 @@ public final class RouteManager {
         pane = new Pane(line, circle);
         pane.setPickOnBounds(false);
 
-
         line.setId("route");
         circle.setId("highlight");
-
-        line.setVisible(false);
-        circle.setVisible(false);
 
         routeBean.highlightedPositionProperty().addListener((p, o, n) -> {
                     setCircle();
@@ -64,14 +57,13 @@ public final class RouteManager {
                 }
         );
 
-        routeBean.routeProperty().addListener((p, o, n) ->
-                visibleProperty());
+        routeBean.routeProperty().addListener((p, o, n) -> {
+                    visibleProperty();
+                    rebuildWhenRouteChanges(o, n);
+                }
+        );
 
-        routeBean.routeProperty().addListener((e, oV, nV) ->
-                rebuildWhenRoute(oV, nV));
-
-        mapParameters.addListener((e, oV, nV) ->
-                rebuildWhenZoom(oV, nV));
+        mvpProperty.addListener((p, o, n) -> rebuildWhenMvpChanges(o, n));
 
         handler();
     }
@@ -83,21 +75,16 @@ public final class RouteManager {
      * @param oV old route
      * @param nV new route
      */
-    private void rebuildWhenRoute(Route oV, Route nV) {
+    private void rebuildWhenRouteChanges(Route oV, Route nV) {
         if (oV != nV && nV != null) {
             pointsSequence();
-            line.setLayoutX(-mapParameters.get().xTopLeft());
-            line.setLayoutY(-mapParameters.get().yTopLeft());
+            line.setLayoutX(-mvpProperty.get().xTopLeft());
+            line.setLayoutY(-mvpProperty.get().yTopLeft());
 
-
-            if(Double.isNaN(routeBean.highlightedPosition())){
+            if (Double.isNaN(routeBean.highlightedPosition())) {
                 circle.setVisible(false);
-            }else {
-                PointWebMercator point = PointWebMercator.
-                        ofPointCh(routeBean.route().pointAt(routeBean.highlightedPosition()));
-
-                circle.setCenterX(mapParameters.get().viewX(point));
-                circle.setCenterY(mapParameters.get().viewY(point));
+            } else {
+                setCircle();
             }
         }
     }
@@ -109,9 +96,8 @@ public final class RouteManager {
      * @param oV old route
      * @param nV new route
      */
-    private void rebuildWhenZoom(MapViewParameters oV, MapViewParameters nV) {
+    private void rebuildWhenMvpChanges(MapViewParameters oV, MapViewParameters nV) {
         if (oV.zoomLevel() != nV.zoomLevel() && routeBean.route() != null) {
-
 
             pointsSequence();
             line.setLayoutX(-nV.xTopLeft());
@@ -120,21 +106,15 @@ public final class RouteManager {
             if (Double.isNaN(routeBean.highlightedPosition())) {
                 circle.setVisible(false);
             } else {
-                PointWebMercator point = PointWebMercator.
-                        ofPointCh(routeBean.route().pointAt(routeBean.highlightedPosition()));
-
-                circle.setCenterX(point.xAtZoomLevel(nV.zoomLevel()) - nV.xTopLeft());
-                circle.setCenterY(point.yAtZoomLevel(nV.zoomLevel()) - nV.yTopLeft());
-
+                setCircle();
             }
         }
         if (oV.zoomLevel() == nV.zoomLevel()) {
 
-            line.setLayoutX(line.getLayoutX() + oV.xTopLeft() - nV.xTopLeft());
-            line.setLayoutY(line.getLayoutY() + oV.yTopLeft() - nV.yTopLeft());
+            line.setLayoutX(-nV.xTopLeft());
+            line.setLayoutY(-nV.yTopLeft());
 
-            circle.setCenterX(circle.getCenterX() + oV.xTopLeft() - nV.xTopLeft());
-            circle.setCenterY(circle.getCenterY() + oV.yTopLeft() - nV.yTopLeft());
+            circle.setVisible(false);
         }
     }
 
@@ -144,8 +124,8 @@ public final class RouteManager {
                     ofPointCh(routeBean.route()
                             .pointAt(routeBean.highlightedPosition()));
 
-            circle.setCenterX(mapParameters.get().viewX(point));
-            circle.setCenterY(mapParameters.get().viewY(point));
+            circle.setCenterX(mvpProperty.get().viewX(point));
+            circle.setCenterY(mvpProperty.get().viewY(point));
         }
 
 
@@ -164,7 +144,6 @@ public final class RouteManager {
 
         } else if (routeBean.highlightedPositionProperty().get() == 0 || Double.isNaN(routeBean.highlightedPosition())) {
             circle.setVisible(false);
-            line.setVisible(true);
         } else {
             line.setVisible(true);
             circle.setVisible(true);
@@ -181,10 +160,10 @@ public final class RouteManager {
     private void handler() {
 
         circle.setOnMouseClicked(e -> {
-            Point2D point2D = circle.localToParent(e.getX(), e.getY());
-            PointCh point = mapParameters.get().pointAt(point2D.getX(), point2D.getY()).toPointCh();
-            int closestPointId = routeBean.route()
-                    .nodeClosestTo(routeBean.highlightedPosition());
+                    Point2D point2D = circle.localToParent(e.getX(), e.getY());
+                    PointCh point = mvpProperty.get().pointAt(point2D.getX(), point2D.getY()).toPointCh();
+                    int closestPointId = routeBean.route()
+                            .nodeClosestTo(routeBean.highlightedPosition());
 
                     int index = routeBean.indexOfNonEmptySegmentAt(routeBean.highlightedPosition()) + 1;
                     Waypoint waypoint = new Waypoint(point, closestPointId);
@@ -198,6 +177,7 @@ public final class RouteManager {
     /**
      * adds all the points to the polyline
      */
+    //TODO stream
     private void pointsSequence() {
 
         routeNodes.clear();
@@ -207,8 +187,8 @@ public final class RouteManager {
         routeNodes = new ArrayList<>(routeBean.route().points());
         routeNodes.forEach(o -> {
             PointWebMercator pointWebMercator = PointWebMercator.ofPointCh(o);
-            routeNodesDouble.add(pointWebMercator.xAtZoomLevel(mapParameters.get().zoomLevel()));
-            routeNodesDouble.add(pointWebMercator.yAtZoomLevel(mapParameters.get().zoomLevel()));
+            routeNodesDouble.add(pointWebMercator.xAtZoomLevel(mvpProperty.get().zoomLevel()));
+            routeNodesDouble.add(pointWebMercator.yAtZoomLevel(mvpProperty.get().zoomLevel()));
 
         });
 
