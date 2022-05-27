@@ -16,22 +16,15 @@ import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Transform;
 import javafx.scene.Group;
 import javafx.scene.text.Text;
-
-import java.io.InputStream;
 //TODO formatted
 /**
  * Represents a manager for the elevation profile
  *
  * @author Baudoin Coispeau (339364)
- * @author Gustave Charles-Saigne (345945),9ujni0
+ * @author Gustave Charles-Saigne (345945)
  */
 
 public final class ElevationProfileManager {
-    private final static int MIN_HORIZONTAL_SPACING = 25;
-    private final static int MIN_VERTICAL_SPACING = 50;
-    private static final int TO_KILOMETERS = 1000;
-    private static final int[] POS_STEPS =
-            {1000, 2000, 5000, 10_000, 25_000, 50_000, 100_000};
     private final int MINIMAL_VALUE_FOR_RECTANGLE = 0;
     private final Path path;
     private final Polygon polygon;
@@ -40,27 +33,36 @@ public final class ElevationProfileManager {
     private final Text textVbox;
     private final ObjectProperty<Transform> screenToWorld;
     private final ObjectProperty<Transform> worldToScreen;
-    private final Insets insets;
     private final ReadOnlyObjectProperty<ElevationProfile> elevationProfileProperty;
     private final ReadOnlyDoubleProperty highlightedProperty;
     private final ObjectProperty<Rectangle2D> rectangle2DProperty;
     private final DoubleProperty mousePosition;
-    private static final int[] ELE_STEPS =
-            {5, 10, 20, 25, 50, 100, 200, 250, 500, 1_000};
-    private static final String font = "Avenir";
-    private static final int fontSize = 10;
-    private static final String gridLabel = "grid_label";
-    private static final String[] gridOrientations = {"vertical", "horizontal"};
     private final Pane elevationPane;
     private final Pane statisticsPane;
 
-    private final Insets INSET = new Insets(10, 10, 20, 40);
+    private final static Insets insets = new Insets(10, 10, 20, 40);
+    private static final int[] ELE_STEPS =
+            {5, 10, 20, 25, 50, 100, 200, 250, 500, 1_000};
+    private static final int[] POS_STEPS =
+            {1000, 2000, 5000, 10_000, 25_000, 50_000, 100_000};
+    private static final int FONT_SIZE = 10;
+    private final static int MIN_HORIZONTAL_SPACING = 25;
+    private final static int MIN_VERTICAL_SPACING = 50;
+    private static final int TO_KILOMETERS = 1000;
+    private static final String FONT = "Avenir";
+    private static final String GRID_LABEL = "grid_label";
+    private static final String VERTICAL_ORIENTATION = "vertical";
+    private static final String HORIZONTAL_ORIENTATION = "horizontal";
+    private static final String GRID_ID = "grid";
+    private static final String PROFILE_ID = "profile";
+    private static final String V_BOX_ID = "profile_data";
+    private static final String MAP_STYLE = "elevation_profile.css";
 
     /**
      * Manages the display and interaction with the profile of the route
      *
      * @param elevationProfileProperty a read-only property containing the profile to display,
-     *                                it contains null if there is no such profile
+     *                                 it contains null if there is no such profile
      * @param highlightedProperty      a read-only property containing the position along
      *                                 the profile to be highlighted,
      *                                 it contains Nan if there is no such position
@@ -81,11 +83,10 @@ public final class ElevationProfileManager {
         VBox vBox = new VBox(textVbox);
         elevationPane = new Pane(path, polygon, line, group);
         statisticsPane = new BorderPane(elevationPane, null, null, vBox, null);
-        insets = INSET;
-        path.setId("grid");
-        polygon.setId("profile");
-        vBox.setId("profile_data");
-        statisticsPane.getStylesheets().setAll("elevation_profile.css");
+        path.setId(GRID_ID);
+        polygon.setId(PROFILE_ID);
+        vBox.setId(V_BOX_ID);
+        statisticsPane.getStylesheets().setAll(MAP_STYLE);
         createRectangle();
 
         elevationPane.widthProperty().addListener((p, o, n) ->
@@ -204,22 +205,14 @@ public final class ElevationProfileManager {
 
         //Creates horizontal lines
 
-        double closestStepBound = Math2.ceilDiv((int) Math.round(minElevation), yStep) * yStep;
+        double closestStepBound = Math2.ceilDiv((int) minElevation, yStep) * yStep;
         for (double i = closestStepBound; i < maxElevation; i += yStep) {
             Point2D startHorizontal = worldToScreen.get().transform(0, i);
             Point2D endHorizontal = worldToScreen.get().transform(length, i);
             path.getElements().addAll(new MoveTo(startHorizontal.getX(), startHorizontal.getY()),
                     new LineTo(endHorizontal.getX(), endHorizontal.getY()));
 
-            Text textGroup_1 = new Text();
-            textGroup_1.getStyleClass().setAll(gridLabel, gridOrientations[0]);
-            textGroup_1.setTextOrigin(VPos.CENTER);
-            textGroup_1.setFont(Font.font(font, fontSize));
-            textGroup_1.setText(Integer.toString((int) i));
-            textGroup_1.setX(startHorizontal.getX());
-            textGroup_1.setY(startHorizontal.getY());
-            textGroup_1.setLayoutX(-(textGroup_1.prefWidth(0) + 2));
-            group.getChildren().add(textGroup_1);
+            createLabels(HORIZONTAL_ORIENTATION, VPos.CENTER, Integer.toString((int) i), 0, startHorizontal);
         }
 
         // Creates vertical lines
@@ -230,19 +223,31 @@ public final class ElevationProfileManager {
             path.getElements().addAll(new MoveTo(startVertical.getX(), startVertical.getY()),
                     new LineTo(endVertical.getX(), endVertical.getY()));
 
-            Text textGroup_2 = new Text();
-            textGroup_2.getStyleClass().setAll(gridLabel, gridOrientations[1]);
-            textGroup_2.setTextOrigin(VPos.TOP);
-            textGroup_2.setFont(Font.font(font, fontSize));
-            textGroup_2.setText(Integer.toString((int) (i / TO_KILOMETERS)));
-            textGroup_2.setLayoutY(rectangle2DProperty.get().getMaxY());
-            textGroup_2.setLayoutX(startVertical.getX() - textGroup_2.prefWidth(0) / 2);
-            group.getChildren().add(textGroup_2);
+            createLabels(VERTICAL_ORIENTATION, VPos.TOP, Integer.toString((int) (i / TO_KILOMETERS)), rectangle2DProperty.get().getMaxY(),
+                    startVertical);
         }
     }
 
+    private void createLabels(String gridOrientation, VPos pos, String text, double layoutY, Point2D startPoint) {
+        Text textGroup = new Text();
+        textGroup.getStyleClass().setAll(GRID_LABEL, gridOrientation);
+        textGroup.setTextOrigin(pos);
+        textGroup.setFont(Font.font(FONT, FONT_SIZE));
+        textGroup.setText(text);
+        if (gridOrientation.equals(VERTICAL_ORIENTATION)) {
+            textGroup.setLayoutY(layoutY);
+        }
+        textGroup.setLayoutX(gridOrientation.equals(VERTICAL_ORIENTATION) ? startPoint.getX() - textGroup.prefWidth(0) / 2
+                : -(textGroup.prefWidth(0) + 2));
+        if (gridOrientation.equals(HORIZONTAL_ORIENTATION)) {
+            textGroup.setX(startPoint.getX());
+            textGroup.setY(startPoint.getY());
+        }
+        group.getChildren().add(textGroup);
+    }
+
     /**
-     *displays the route statistics presented at the bottom of the panel
+     * displays the route statistics presented at the bottom of the panel
      */
     private void createBox() {
         textVbox.setText("Longueur : %.1f km".formatted(elevationProfileProperty.get().length() / TO_KILOMETERS) +
@@ -266,18 +271,17 @@ public final class ElevationProfileManager {
         }
         polygon.getPoints().addAll(rectangle2DProperty.get().getMaxX(),rectangle2DProperty.get().getMaxY(),
                 rectangle2DProperty.get().getMinX(),rectangle2DProperty.get().getMaxY());
-
     }
 
     private void createRectangle() {
         rectangle2DProperty.bind(Bindings.createObjectBinding(
                 () -> new Rectangle2D(insets.getLeft(), insets.getTop(),
-                Math.max(MINIMAL_VALUE_FOR_RECTANGLE,
-                        elevationPane.getWidth() - insets.getLeft() - insets.getRight()),
-                Math.max(MINIMAL_VALUE_FOR_RECTANGLE,
-                        elevationPane.getHeight() - insets.getBottom() - insets.getTop())),
+                        Math.max(MINIMAL_VALUE_FOR_RECTANGLE,
+                                elevationPane.getWidth() - insets.getLeft() - insets.getRight()),
+                        Math.max(MINIMAL_VALUE_FOR_RECTANGLE,
+                                elevationPane.getHeight() - insets.getBottom() - insets.getTop())),
                 elevationPane.widthProperty(), elevationPane.heightProperty()
-                ));
+        ));
     }
 
     private void createLine() {

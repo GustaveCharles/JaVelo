@@ -16,6 +16,8 @@ public final class ElevationProfile {
     private final double length;
     private final float[] samples;
     private final DoubleSummaryStatistics s = new DoubleSummaryStatistics();
+    private static double totalAscent;
+    private static double totalDescent;
 
     /**
      * Builds the profile of a route and whose elevation samples are contained in the array elevationSamples.
@@ -32,6 +34,18 @@ public final class ElevationProfile {
         System.arraycopy(elevationSamples, 0, samples, 0, elevationSamples.length);
         for (float sample : samples) {
             s.accept(sample);
+        }
+
+        totalAscent = 0;
+        totalDescent = 0;
+
+        for (int i = 0; i < samples.length - 1; i++) {
+            float difference = samples[i + 1] - samples[i];
+            if (difference > 0) {
+                totalAscent += difference;
+            } else {
+                totalDescent += difference;
+            }
         }
     }
 
@@ -69,13 +83,6 @@ public final class ElevationProfile {
      * @return the total elevation gain of the profile
      */
     public double totalAscent() {
-        double totalAscent = 0;
-        for (int i = 0; i < samples.length - 1; i++) {
-            float difference = samples[i + 1] - samples[i];
-            if (difference >= 0) {
-                totalAscent += difference;
-            }
-        }
         return Math.abs(totalAscent);
     }
 
@@ -86,13 +93,6 @@ public final class ElevationProfile {
      * @return the total elevation gain of the profile (positive or zero)
      */
     public double totalDescent() {
-        double totalDescent = 0;
-        for (int i = 0; i < samples.length - 1; i++) {
-            float difference = samples[i + 1] - samples[i];
-            if (difference <= 0) {
-                totalDescent += difference;
-            }
-        }
         return Math.abs(totalDescent);
     }
 
@@ -103,12 +103,8 @@ public final class ElevationProfile {
      * @return the altitude at the given position
      */
     public double elevationAt(double position) {
-        if (position <= 0) {
-            return samples[0];
-        }
-        if (position >= length) {
-            return samples[samples.length - 1];
-        }
         return Functions.sampled(samples, length).applyAsDouble(position);
     }
 }
+
+
