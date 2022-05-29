@@ -19,6 +19,8 @@ import javafx.scene.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.IntStream;
 //TODO formatted
 /**
@@ -74,17 +76,17 @@ public final class ElevationProfileManager {
      */
     public ElevationProfileManager(ReadOnlyObjectProperty<ElevationProfile> elevationProfileProperty,
                                    ReadOnlyDoubleProperty highlightedProperty) {
-        this.screenToWorld = new SimpleObjectProperty<>();
-        this.worldToScreen = new SimpleObjectProperty<>();
+        screenToWorld = new SimpleObjectProperty<>();
+        worldToScreen = new SimpleObjectProperty<>();
         this.elevationProfileProperty = elevationProfileProperty;
         this.highlightedProperty = highlightedProperty;
-        this.mousePosition = new SimpleDoubleProperty(Double.NaN);
-        this.path = new Path();
-        this.polygon = new Polygon();
-        this.line = new Line();
-        this.group = new Group();
-        this.textVbox = new Text();
-        this.rectangle2DProperty = new SimpleObjectProperty<>(Rectangle2D.EMPTY);
+        mousePosition = new SimpleDoubleProperty(Double.NaN);
+        path = new Path();
+        polygon = new Polygon();
+        line = new Line();
+        group = new Group();
+        textVbox = new Text();
+        rectangle2DProperty = new SimpleObjectProperty<>(Rectangle2D.EMPTY);
         VBox vBox = new VBox(textVbox);
         elevationPane = new Pane(path, polygon, line, group);
         statisticsPane = new BorderPane(elevationPane, null, null, vBox, null);
@@ -95,22 +97,15 @@ public final class ElevationProfileManager {
         elevationNodes = new ArrayList<>();
         createRectangle();
 
-        elevationPane.widthProperty().addListener((p, o, n) ->
-                displayElevation()
-        );
+        elevationPane.widthProperty().addListener((p, o, n) -> displayElevation());
 
-        elevationPane.heightProperty().addListener((p, o, n) ->
-                displayElevation()
-
-        );
+        elevationPane.heightProperty().addListener((p, o, n) -> displayElevation());
 
         elevationPane.setOnMouseMoved(e -> {
             if (rectangle2DProperty.get().contains(new Point2D(e.getX(), e.getY()))) {
                 Point2D point2D = screenToWorld.get().transform(e.getX(), e.getY());
                 mousePosition.set(point2D.getX());
-            } else {
-                mousePosition.set(Double.NaN);
-            }
+            } else mousePosition.set(Double.NaN);
         });
 
         elevationPane.setOnMouseExited(e -> {
@@ -221,7 +216,7 @@ public final class ElevationProfileManager {
             path.getElements().addAll(new MoveTo(startHorizontal.getX(), startHorizontal.getY()),
                     new LineTo(endHorizontal.getX(), endHorizontal.getY()));
 
-            createLabels(HORIZONTAL_ORIENTATION, VPos.CENTER, Integer.toString((int) i), 0, startHorizontal);
+            createLabels(VERTICAL_ORIENTATION, VPos.CENTER, Integer.toString((int) i), Double.NaN, startHorizontal);
         }
 
         // Creates vertical lines
@@ -232,7 +227,7 @@ public final class ElevationProfileManager {
             path.getElements().addAll(new MoveTo(startVertical.getX(), startVertical.getY()),
                     new LineTo(endVertical.getX(), endVertical.getY()));
 
-            createLabels(VERTICAL_ORIENTATION, VPos.TOP,
+            createLabels(HORIZONTAL_ORIENTATION, VPos.TOP,
                     Integer.toString((int) (i / TO_KILOMETERS)), rectangle2DProperty.get().getMaxY(),
                     startVertical);
         }
@@ -244,15 +239,15 @@ public final class ElevationProfileManager {
         textGroup.setTextOrigin(pos);
         textGroup.setFont(Font.font(FONT, FONT_SIZE));
         textGroup.setText(text);
+        if (gridOrientation.equals(HORIZONTAL_ORIENTATION)) textGroup.setLayoutY(layoutY);
+
         if (gridOrientation.equals(VERTICAL_ORIENTATION)) {
-            textGroup.setLayoutY(layoutY);
-        }
-        textGroup.setLayoutX(gridOrientation.equals(VERTICAL_ORIENTATION) ? startPoint.getX() - textGroup.prefWidth(0) / 2
-                : -(textGroup.prefWidth(0) + 2));
-        if (gridOrientation.equals(HORIZONTAL_ORIENTATION)) {
             textGroup.setX(startPoint.getX());
             textGroup.setY(startPoint.getY());
         }
+        textGroup.setLayoutX(gridOrientation.equals(HORIZONTAL_ORIENTATION) ?
+                startPoint.getX() - textGroup.prefWidth(0) / 2
+                : -(textGroup.prefWidth(0) + 2));
         group.getChildren().add(textGroup);
     }
 
@@ -321,3 +316,5 @@ public final class ElevationProfileManager {
         }
     }
 }
+
+

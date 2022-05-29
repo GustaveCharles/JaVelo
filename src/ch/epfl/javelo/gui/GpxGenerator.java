@@ -25,7 +25,7 @@ import java.util.List;
  * @author Gustave Charles -- Saigne (345945)
  * @author Baudoin Coispeau (339364)
  */
-public final class GpxGenerator {
+public class GpxGenerator {
 
     private GpxGenerator() {
     }

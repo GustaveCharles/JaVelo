@@ -25,7 +25,7 @@ public final class JaVelo extends Application {
     private final static String PATH_CACHE = "osm-cache";
     private final static String SERVER_NAME = "tile.openstreetmap.org";
     private final static String MENU_NAME = "Fichier";
-    private final static String EXPORT_NAME = "Exporter GPX";
+    private final static String MENU_LABEL_ITEM = "Exporter GPX";
     private final static String GPX_FILE_NAME = "javelo.gpx";
     private final static String MAP_STYLE = "map.css";
     private final static String PANE_NAME = "JaVelo";
@@ -63,7 +63,7 @@ public final class JaVelo extends Application {
         SplitPane.setResizableWithParent(profilePane, false);
 
         Menu menu = new Menu(MENU_NAME);
-        MenuItem exportGPXItem = new MenuItem(EXPORT_NAME);
+        MenuItem exportGPXItem = new MenuItem(MENU_LABEL_ITEM);
         menu.getItems().add(exportGPXItem);
         exportGPXItem.disableProperty().set(true);
         MenuBar menuBar = new MenuBar(menu);
@@ -85,8 +85,7 @@ public final class JaVelo extends Application {
         routeBean.elevationProfileProperty().addListener((e, oV, nV) -> {
             if (oV == null & nV != null) {
                 splitPane.getItems().add(1, profilePane);
-            }
-            if (nV == null & oV != null) {
+            } else if (nV == null & oV != null) {
                 splitPane.getItems().remove(1);
             }
         });
