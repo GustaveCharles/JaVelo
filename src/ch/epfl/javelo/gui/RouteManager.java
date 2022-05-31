@@ -12,7 +12,6 @@ import javafx.scene.shape.Polyline;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * manages the display of the route and part of the interaction with it
@@ -142,6 +141,7 @@ public final class RouteManager {
 
         } else if (routeBean.highlightedPositionProperty().get() == 0 || Double.isNaN(routeBean.highlightedPosition())) {
             circle.setVisible(false);
+            line.setVisible(true);
         } else {
             line.setVisible(true);
             circle.setVisible(true);
@@ -192,6 +192,3 @@ public final class RouteManager {
     }
 
 }
-
-
-

@@ -31,7 +31,7 @@ public final class RouteBean {
      * Builds a JavaFX bean grouping properties related to waypoints and the corresponding route
      *
      * @param routeComputer a route calculator, of RouteComputer type,
-     *                     used to determine the best route connecting two waypoints.
+     *                      used to determine the best route connecting two waypoints.
      */
     public RouteBean(RouteComputer routeComputer) {
         this.routeComputer = routeComputer;
@@ -45,17 +45,8 @@ public final class RouteBean {
     }
 
     /**
-     * A getter for the route
-     *
-     * @return a read-only property which contains the route
-     */
-    public ReadOnlyObjectProperty<Route> routeProperty() {
-        return route;
-    }
-
-    /**
      * Creates a route connecting waypoints, returns null if there is no
-     * road between two waypoints or there are less than 2 waypoints
+     * road between two waypoints or if there are less than 2 waypoints
      */
     private void createRoute() {
         if (waypoints.size() >= MIN_GROUP_SIZE) {
@@ -118,6 +109,15 @@ public final class RouteBean {
     /**
      * A getter for the route
      *
+     * @return a read-only property which contains the route
+     */
+    public ReadOnlyObjectProperty<Route> routeProperty() {
+        return route;
+    }
+
+    /**
+     * A getter for the route
+     *
      * @return a route
      */
     public Route route() {
@@ -151,7 +151,11 @@ public final class RouteBean {
         return waypoints;
     }
 
-    //todo commenter
+    /**
+     * A getter for the elevation profile property
+     *
+     * @return a read-only property which contains the elevation profile
+     */
     public ReadOnlyObjectProperty<ElevationProfile> elevationProfileProperty() {
         return elevationProfile;
     }

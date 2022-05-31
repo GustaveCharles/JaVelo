@@ -19,8 +19,6 @@ import javafx.scene.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.stream.IntStream;
 //TODO formatted
 /**
@@ -31,6 +29,52 @@ import java.util.stream.IntStream;
  */
 
 public final class ElevationProfileManager {
+
+    /**
+     * A set of inside offsets for the 4 side of a rectangular area in the elevation pane
+     */
+    private final static Insets insets = new Insets(10, 10, 20, 40);
+
+    /**
+     * The different values that can be used to separate the (horizontal) lines of altitude
+     */
+    private static final int[] ELE_STEPS =
+            {5, 10, 20, 25, 50, 100, 200, 250, 500, 1_000};
+
+    /**
+     * The different values that can be used to separate the (vertical) lines of position
+     */
+    private static final int[] POS_STEPS =
+            {1000, 2000, 5000, 10_000, 25_000, 50_000, 100_000};
+
+    /**
+     * The font size for statistics of the route
+     */
+    private static final int FONT_SIZE = 10;
+
+    /**
+     * The minimum value for the separation between the horizontal lines (JavaFX units (pixels))
+     */
+    private final static int MIN_HORIZONTAL_SPACING = 25;
+
+    /**
+     * The minimum value for the separation between the vertical lines (JavaFX units (pixels))
+     */
+    private final static int MIN_VERTICAL_SPACING = 50;
+
+    /**
+     * Constant to convert kilometers to meters
+     */
+    private static final int TO_KILOMETERS = 1000;
+    private static final String FONT = "Avenir";
+    private static final String GRID_LABEL = "grid_label";
+    private static final String VERTICAL_ORIENTATION = "vertical";
+    private static final String HORIZONTAL_ORIENTATION = "horizontal";
+    private static final String GRID_ID = "grid";
+    private static final String PROFILE_ID = "profile";
+    private static final String V_BOX_ID = "profile_data";
+    private static final String MAP_STYLE = "elevation_profile.css";
+
     private final int MINIMAL_VALUE_FOR_RECTANGLE = 0;
     private final Path path;
     private final Polygon polygon;
@@ -46,24 +90,6 @@ public final class ElevationProfileManager {
     private final Pane elevationPane;
     private final Pane statisticsPane;
     private final List<Double> elevationNodes;
-
-    private final static Insets insets = new Insets(10, 10, 20, 40);
-    private static final int[] ELE_STEPS =
-            {5, 10, 20, 25, 50, 100, 200, 250, 500, 1_000};
-    private static final int[] POS_STEPS =
-            {1000, 2000, 5000, 10_000, 25_000, 50_000, 100_000};
-    private static final int FONT_SIZE = 10;
-    private final static int MIN_HORIZONTAL_SPACING = 25;
-    private final static int MIN_VERTICAL_SPACING = 50;
-    private static final int TO_KILOMETERS = 1000;
-    private static final String FONT = "Avenir";
-    private static final String GRID_LABEL = "grid_label";
-    private static final String VERTICAL_ORIENTATION = "vertical";
-    private static final String HORIZONTAL_ORIENTATION = "horizontal";
-    private static final String GRID_ID = "grid";
-    private static final String PROFILE_ID = "profile";
-    private static final String V_BOX_ID = "profile_data";
-    private static final String MAP_STYLE = "elevation_profile.css";
 
     /**
      * Manages the display and interaction with the profile of the route
@@ -181,7 +207,6 @@ public final class ElevationProfileManager {
         //Searches for the smallest value guaranteeing that, on the screen, the horizontal lines are separated by
         //at least 25 JavaFX units (pixels). If no value guarantees this, the largest of all is used.
 
-        //TODO FAIRE UN STREAM
         for (int i : POS_STEPS) {
             if (worldToScreen.get().deltaTransform(i, 0).getX() >= MIN_VERTICAL_SPACING) {
                 xStep = i;
@@ -209,7 +234,7 @@ public final class ElevationProfileManager {
 
         //Creates horizontal lines
 
-        double closestStepBound = Math2.ceilDiv((int) minElevation, yStep) * yStep;
+        double closestStepBound = Math2.ceilDiv((int) Math.ceil(minElevation), yStep) * yStep;
         for (double i = closestStepBound; i < maxElevation; i += yStep) {
             Point2D startHorizontal = worldToScreen.get().transform(0, i);
             Point2D endHorizontal = worldToScreen.get().transform(length, i);
@@ -233,6 +258,15 @@ public final class ElevationProfileManager {
         }
     }
 
+    /**
+     * Creates the labels for the elevation value and the length of the route
+     *
+     * @param gridOrientation the orientation of the grid
+     * @param pos             the vertical position
+     * @param text            the value to display
+     * @param layoutY         position for the labels on the y-axis
+     * @param startPoint      the starting point for the line
+     */
     private void createLabels(String gridOrientation, VPos pos, String text, double layoutY, Point2D startPoint) {
         Text textGroup = new Text();
         textGroup.getStyleClass().setAll(GRID_LABEL, gridOrientation);

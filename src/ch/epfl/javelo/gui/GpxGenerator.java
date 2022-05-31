@@ -29,7 +29,6 @@ public class GpxGenerator {
 
     private GpxGenerator() {
     }
-
     /**
      * Creates a GPX file attached to a route
      *

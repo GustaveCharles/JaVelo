@@ -31,7 +31,8 @@ public record MapViewParameters(int zoomLevel, double xTopLeft, double yTopLeft)
     }
 
     /**
-     * Converts x and y coordinates in relation to the top-left corner of the map portion into an instance of PointWebMercator
+     * Converts x and y coordinates in relation to the top-left corner of the map portion into an instance
+     * of PointWebMercator
      *
      * @param xComparedToXTopLeft x-coordinate
      * @param yComparedToYTopLeft y-coordinate
