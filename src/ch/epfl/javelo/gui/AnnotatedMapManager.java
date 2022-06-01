@@ -36,6 +36,9 @@ public final class AnnotatedMapManager {
      */
     private final static int MAX_DISTANCE_PIXELS = 15;
 
+    /**
+     * The initial map view parameters
+     */
     private final static MapViewParameters MAP_VIEW_PARAMETERS =
             new MapViewParameters(12, 543200, 370650);
 
