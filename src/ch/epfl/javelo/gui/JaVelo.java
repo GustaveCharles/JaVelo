@@ -130,26 +130,26 @@ public final class JaVelo extends Application {
             }
         });
 
-        Pane errorManagerPane = errorManager.pane();
-
-        StackPane stackPane = new StackPane(splitPane, errorManagerPane);
-        BorderPane borderPane = new BorderPane();
-
-        borderPane.setCenter(stackPane);
-        borderPane.setTop(menuBar);
-
-        borderPane.getStylesheets().add(MAP_STYLE);
-        primaryStage.setMinWidth(PANE_WIDTH);
-        primaryStage.setMinHeight(PANE_HEIGHT);
-        primaryStage.setTitle(PANE_NAME);
-        primaryStage.setScene(new Scene(borderPane));
-        primaryStage.show();
-
         routeBean.highlightedPositionProperty().bind(
                 Bindings
                         .when(annotatedMapManager.mousePositionOnRouteProperty().greaterThanOrEqualTo(0))
                         .then(annotatedMapManager.mousePositionOnRouteProperty())
                         .otherwise(elevationProfileManager.mousePositionOnProfileProperty())
         );
+
+        Pane errorManagerPane = errorManager.pane();
+
+        StackPane stackPane = new StackPane(splitPane, errorManagerPane);
+
+        BorderPane borderPane = new BorderPane();
+        borderPane.setCenter(stackPane);
+        borderPane.setTop(menuBar);
+        borderPane.getStylesheets().add(MAP_STYLE);
+
+        primaryStage.setMinWidth(PANE_WIDTH);
+        primaryStage.setMinHeight(PANE_HEIGHT);
+        primaryStage.setTitle(PANE_NAME);
+        primaryStage.setScene(new Scene(borderPane));
+        primaryStage.show();
     }
 }

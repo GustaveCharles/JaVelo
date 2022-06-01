@@ -15,8 +15,9 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 
 import java.util.function.Consumer;
+
 /**
- * manages the display of the “annotated” map,
+ * Manages the display of the “annotated” map,
  * i.e. the base map above which the route and waypoints are superimposed
  *
  * @author Gustave Charles -- Saigne (345945)
@@ -30,17 +31,21 @@ public final class AnnotatedMapManager {
     private final DoubleProperty mouseProperty;
     private final SimpleObjectProperty<MapViewParameters> mapViewParametersP;
 
+    /**
+     * The maximum distance (in pixels) between the mouse and the route to display the highlighted position
+     */
     private final static int MAX_DISTANCE_PIXELS = 15;
+
     private final static MapViewParameters MAP_VIEW_PARAMETERS =
             new MapViewParameters(12, 543200, 370650);
 
     /**
-     * creates a basemap manager (BaseMapManager),
-     * a waypoints manager (WaypointsManager) and a route manager (RouteManager)
+     * Creates a basemap manager (BaseMapManager),
+     * a waypoints' manager (WaypointsManager) and a route manager (RouteManager)
      *
-     * @param graph the road network graph
-     * @param tileManager the OpenStreetMap tile manager
-     * @param routeBean the route bean
+     * @param graph          the road network graph
+     * @param tileManager    the OpenStreetMap tile manager
+     * @param routeBean      the route bean
      * @param stringConsumer an “error consumer” to report an error
      */
     public AnnotatedMapManager(Graph graph, TileManager tileManager, RouteBean routeBean,
@@ -56,24 +61,25 @@ public final class AnnotatedMapManager {
                 new WaypointsManager(graph, mapViewParametersP, routeBean.waypointsProperty(), stringConsumer);
         BaseMapManager baseMapManager = new BaseMapManager(tileManager, waypointsManager, mapViewParametersP);
 
-        this.mainPane = new StackPane(baseMapManager.pane(), routeManager.pane(), waypointsManager.pane());
+        mainPane = new StackPane(baseMapManager.pane(), routeManager.pane(), waypointsManager.pane());
         mainPane.getStylesheets().add("map.css");
 
         handler();
     }
 
     /**
+     * A getter for the pane
      *
-     * @return returns the the panel containing the annotated map
+     * @return the panel containing the annotated map
      */
     public Pane pane() {
         return mainPane;
     }
 
     /**
+     * A getter for the property of the mouse position
      *
-     * @return returning the property containing the position of
-     * the mouse pointer along the route
+     * @return the property containing the position of the mouse pointer along the route
      */
     public ReadOnlyDoubleProperty mousePositionOnRouteProperty() {
         return mouseProperty;
@@ -90,6 +96,7 @@ public final class AnnotatedMapManager {
                         PointWebMercator pointWebMercator =
                                 mapViewParametersP.get().pointAt(point2DMouse.getX(), point2DMouse.getY());
                         PointCh pointCh = pointWebMercator.toPointCh();
+
                         if (pointCh == null) {
                             return Double.NaN;
                         }
@@ -109,11 +116,8 @@ public final class AnnotatedMapManager {
                 point2DProperty, routeBean.routeProperty(), mapViewParametersP
         ));
 
-
         mainPane.setOnMouseMoved(e -> point2DProperty.set(new Point2D(e.getX(), e.getY())));
-
         mainPane.setOnMouseExited(e -> point2DProperty.set(null));
-
         mainPane.setOnMouseDragged(e -> point2DProperty.set(null));
     }
 }

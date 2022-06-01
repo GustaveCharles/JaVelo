@@ -17,15 +17,27 @@ import java.util.*;
  */
 public final class RouteBean {
 
+    /**
+     * The maximum step length for the elevation
+     */
+    public final static int MAX_LENGTH = 5;
+
+    /**
+     * The maximum capacity of the waypoints cache
+     */
+    public final static int MAX_CAPACITY = 80;
+
+    /**
+     * The minimal value of waypoints to create a route
+     */
+    public final static int MIN_GROUP_SIZE = 2;
+
     private final RouteComputer routeComputer;
     private final DoubleProperty highlightedPosition;
     private final ObjectProperty<Route> route;
     private final ObservableList<Waypoint> waypoints;
     private final ObjectProperty<ElevationProfile> elevationProfile;
     private final LinkedHashMap<Pair<Integer, Integer>, Route> map;
-    public final static int MAX_LENGTH = 5;
-    public final static int MAX_CAPACITY = 80;
-    public final static int MIN_GROUP_SIZE = 2;
 
     /**
      * Builds a JavaFX bean grouping properties related to waypoints and the corresponding route

@@ -12,7 +12,7 @@ import java.nio.file.Path;
 import java.util.LinkedHashMap;
 
 /**
- * represents an OSM tile manager *
+ * Represents an OSM tile manager
  *
  * @author Baudoin Coispeau (339364)
  * @author Gustave Charles-Saigne (345945)

@@ -31,22 +31,22 @@ public final class BaseMapManager {
     private final GraphicsContext gc;
 
     /**
-     * height of a tile
+     * Height of a tile
      */
     private final static int TILE_HEIGHT = 256;
     /**
-     * minimal zoom of JaVelo
+     * Minimal zoom of JaVelo
      */
     private final static int MIN_ZOOM = 8;
     /**
-     * maximal zoom of JaVelo
+     * Maximal zoom of JaVelo
      */
     private final static int MAX_ZOOM = 19;
 
     /**
-     * @param tileManager      the tile manager to use to get the tiles from the map
+     * @param tileManager      The tile manager to use to get the tiles from the map
      * @param waypointsManager waypoint manager
-     * @param property         a JavaFX property containing the parameters of the map displayed
+     * @param property         A JavaFX property containing the parameters of the map displayed
      */
     public BaseMapManager(TileManager tileManager, WaypointsManager waypointsManager,
                           ObjectProperty<MapViewParameters> property) {
@@ -74,7 +74,9 @@ public final class BaseMapManager {
     }
 
     /**
-     * @return returns the current pane
+     * A getter for the pane
+     *
+     * @return the current pane
      */
     public Pane pane() {
         return pane;

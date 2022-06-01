@@ -22,10 +22,6 @@ import java.util.function.Consumer;
  */
 public final class WaypointsManager {
 
-    private final ObjectProperty<MapViewParameters> mapParameters;
-    private final Consumer<String> stringConsumer;
-    private final Graph graph;
-    private final ObservableList<Waypoint> listOfWayPoint;
     /**
      * The search radius for nodeClosestTo method
      */
@@ -66,6 +62,11 @@ public final class WaypointsManager {
      * Identity name for the group of all waypoints
      */
     private final static String GROUP_ID = "pin";
+
+    private final ObjectProperty<MapViewParameters> mapParameters;
+    private final Consumer<String> stringConsumer;
+    private final Graph graph;
+    private final ObservableList<Waypoint> listOfWayPoint;
     private final Pane pane;
 
     /**

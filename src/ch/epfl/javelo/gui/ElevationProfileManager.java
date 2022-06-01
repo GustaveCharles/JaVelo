@@ -20,7 +20,7 @@ import javafx.scene.text.Text;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
-//TODO formatted
+
 /**
  * Represents a manager for the elevation profile
  *
@@ -29,11 +29,6 @@ import java.util.stream.IntStream;
  */
 
 public final class ElevationProfileManager {
-
-    /**
-     * A set of inside offsets for the 4 side of a rectangular area in the elevation pane
-     */
-    private final static Insets insets = new Insets(10, 10, 20, 40);
 
     /**
      * The different values that can be used to separate the (horizontal) lines of altitude
@@ -46,6 +41,11 @@ public final class ElevationProfileManager {
      */
     private static final int[] POS_STEPS =
             {1000, 2000, 5000, 10_000, 25_000, 50_000, 100_000};
+
+    /**
+     * A set of inside offsets for the 4 side of a rectangular area in the elevation pane
+     */
+    private final static Insets insets = new Insets(10, 10, 20, 40);
 
     /**
      * The font size for statistics of the route
@@ -66,16 +66,51 @@ public final class ElevationProfileManager {
      * Constant to convert kilometers to meters
      */
     private static final int TO_KILOMETERS = 1000;
+
+    /**
+     * The font for statistics of the route
+     */
     private static final String FONT = "Avenir";
+
+    /**
+     * The grid label identity
+     */
     private static final String GRID_LABEL = "grid_label";
+
+    /**
+     * The vertical orientation id for the grid
+     */
     private static final String VERTICAL_ORIENTATION = "vertical";
+
+    /**
+     * The horizontal orientation id for the grid
+     */
     private static final String HORIZONTAL_ORIENTATION = "horizontal";
+
+    /**
+     * The grid id
+     */
     private static final String GRID_ID = "grid";
+
+    /**
+     * The profile id
+     */
     private static final String PROFILE_ID = "profile";
+
+    /**
+     * The vBox id
+     */
     private static final String V_BOX_ID = "profile_data";
+    /**
+     * The style for the profile of the route
+     */
     private static final String MAP_STYLE = "elevation_profile.css";
 
+    /**
+     * The minimal value for the rectangle;
+     */
     private final int MINIMAL_VALUE_FOR_RECTANGLE = 0;
+
     private final Path path;
     private final Polygon polygon;
     private final Line line;
@@ -259,7 +294,7 @@ public final class ElevationProfileManager {
     }
 
     /**
-     * Creates the labels for the elevation value and the length of the route
+     * Creates the labels for the elevation and the length of the route
      *
      * @param gridOrientation the orientation of the grid
      * @param pos             the vertical position
@@ -286,7 +321,7 @@ public final class ElevationProfileManager {
     }
 
     /**
-     * displays the route statistics presented at the bottom of the panel
+     * Displays the route statistics presented at the bottom of the panel
      */
     private void createBox() {
         textVbox.setText("Longueur : %.1f km".formatted(elevationProfileProperty.get().length() / TO_KILOMETERS) +
@@ -298,11 +333,14 @@ public final class ElevationProfileManager {
                 ));
     }
 
+    /**
+     * Creates the polygon representing the elevation profile
+     */
     private void createPolygon() {
         polygon.getPoints().clear();
         elevationNodes.clear();
 
-        IntStream.range((int) rectangle2DProperty.get().getMinX(),(int)rectangle2DProperty.get().getMaxX()+1)
+        IntStream.range((int) rectangle2DProperty.get().getMinX(), (int) rectangle2DProperty.get().getMaxX() + 1)
                 .forEach(e -> {
                     Point2D point2Dd = screenToWorld.get().transform(e, 0);
                     double point = elevationProfileProperty.get().elevationAt(point2Dd.getX());
@@ -311,10 +349,13 @@ public final class ElevationProfileManager {
                 });
 
         polygon.getPoints().addAll(elevationNodes);
-        polygon.getPoints().addAll(rectangle2DProperty.get().getMaxX(),rectangle2DProperty.get().getMaxY(),
-                rectangle2DProperty.get().getMinX(),rectangle2DProperty.get().getMaxY());
+        polygon.getPoints().addAll(rectangle2DProperty.get().getMaxX(), rectangle2DProperty.get().getMaxY(),
+                rectangle2DProperty.get().getMinX(), rectangle2DProperty.get().getMaxY());
     }
 
+    /**
+     * Creates a rectangle containing the elevation profile
+     */
     private void createRectangle() {
         rectangle2DProperty.bind(Bindings.createObjectBinding(
                 () -> new Rectangle2D(insets.getLeft(), insets.getTop(),
@@ -326,6 +367,9 @@ public final class ElevationProfileManager {
         ));
     }
 
+    /**
+     * Creates the line and binds it to the highlighted and rectangle property
+     */
     private void createLine() {
         line.startYProperty().bind(Bindings.select(rectangle2DProperty, "minY"));
         line.endYProperty().bind(Bindings.select(rectangle2DProperty, "maxY"));
@@ -340,6 +384,9 @@ public final class ElevationProfileManager {
         }, highlightedProperty, worldToScreen));
     }
 
+    /**
+     * Triggers all methods required to display the elevation profile
+     */
     private void displayElevation() {
         if (elevationProfileProperty.get() != null) {
             createTransformation();
