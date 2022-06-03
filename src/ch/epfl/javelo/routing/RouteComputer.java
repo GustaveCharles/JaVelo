@@ -63,7 +63,9 @@ public final class RouteComputer {
             if (nodeId == endNodeId) {
                 int currentNode = endNodeId;
                 while (currentNode != startNodeId) {
-                    edges.add(Edge.of(graph, getEdgeId(predecessor[currentNode], currentNode), predecessor[currentNode], currentNode));
+                    edges.add(Edge.of(graph, getEdgeId(predecessor[currentNode], currentNode),
+                            predecessor[currentNode],
+                            currentNode));
                     currentNode = predecessor[currentNode];
                 }
                 Collections.reverse(edges);

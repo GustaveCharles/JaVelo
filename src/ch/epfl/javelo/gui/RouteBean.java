@@ -20,17 +20,17 @@ public final class RouteBean {
     /**
      * The maximum step length for the elevation
      */
-    public final static int MAX_LENGTH = 5;
+    private final static int MAX_LENGTH = 5;
 
     /**
      * The maximum capacity of the waypoints cache
      */
-    public final static int MAX_CAPACITY = 80;
+    private final static int MAX_CAPACITY = 80;
 
     /**
      * The minimal value of waypoints to create a route
      */
-    public final static int MIN_GROUP_SIZE = 2;
+    private final static int MIN_GROUP_SIZE = 2;
 
     private final RouteComputer routeComputer;
     private final DoubleProperty highlightedPosition;
