@@ -74,7 +74,7 @@ public class GpxGenerator {
             if (i != points.size() - 1) {
                 position += points.get(i).distanceTo(points.get(i + 1));
             }
-            ele.setAttribute("altitude", String.valueOf(profile.elevationAt(position)));
+            ele.setTextContent(String.valueOf(profile.elevationAt(position)));
         }
 
         return doc;
