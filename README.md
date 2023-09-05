@@ -1,6 +1,6 @@
 # JaVelo - Your Ultimate Bike Travel Companion for Switzerland
 
-![JaVelo GUI](https://raw.githubusercontent.com/GustaveCharles/JaVelo/master/javelo-gui.png)
+![javelo-gui](https://github.com/GustaveCharles/JaVelo/assets/118212739/4c098e05-ecbe-415a-a426-3d7f7bde3e75)
 
 **JaVelo** is a Java application crafted to elevate your cycling adventures in the picturesque landscapes of Switzerland. Much like Google Maps guides you on the road, JaVelo is your trusted cycling companion. It empowers you to seamlessly visualize biking routes, ascents, and descents across Switzerland, making your cycling escapades not only more enjoyable but also meticulously planned. JaVelo employs the efficient A* algorithm and harnesses the power of JavaFX and OpenStreetMap to provide the best user experience.
 
