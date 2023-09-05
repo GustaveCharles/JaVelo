@@ -6,7 +6,7 @@
 
 ## Demonstration
 
-[![Demonstration of JaVelo](https://img.youtube.com/vi/YOUR_VIDEO_ID_HERE/0.jpg)](https://github.com/GustaveCharles/JaVelo/blob/master/javelo-final.mp4)
+https://github.com/GustaveCharles/JaVelo/assets/118212739/559f4808-a0fe-4933-8ca9-6b8859fd1edd
 
 ## Key Features
 
